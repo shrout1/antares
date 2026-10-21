@@ -27,6 +27,7 @@
 #include "math/geometry.hpp"
 #include "video/opengl-driver.hpp"
 
+struct GLFWcursor;
 struct GLFWwindow;
 
 namespace antares {
@@ -45,6 +46,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     virtual Point     get_mouse();
     virtual InputMode input_mode() const;
+    virtual bool      show_pointer(const PixMap& image, Point hotspot);
 
     virtual bool start_editing(TextReceiver* text);
     virtual void stop_editing(TextReceiver* text);
@@ -63,6 +65,8 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     void        mouse_move(double x, double y);
     void        window_size(int width, int height);
     void        window_maximize(bool maximized);
+    void        update_pointer();
+    float       pointer_scale() const;
     static void key_callback(GLFWwindow* w, int key, int scancode, int action, int mods);
     static void char_callback(GLFWwindow* w, unsigned int code_point);
     static void mouse_button_callback(GLFWwindow* w, int button, int action, int mods);
@@ -79,6 +83,14 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     wall_time       _last_click_usecs;
     int             _last_click_count;
     TextReceiver*   _text;
+
+    // The pointer requested while drawing the current frame, if any.
+    const PixMap* _pointer_image = nullptr;
+    Point         _pointer_hotspot;
+    bool          _pointer_shown = false;
+    GLFWcursor*   _cursor        = nullptr;
+    const PixMap* _cursor_image  = nullptr;
+    float         _cursor_scale  = 0;
 };
 
 }  // namespace antares

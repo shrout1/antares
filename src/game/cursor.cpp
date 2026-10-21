@@ -41,6 +41,9 @@ void Cursor::draw() const { draw_at(sys.video->get_mouse()); }
 void Cursor::draw_at(Point where) const {
     if (world().contains(where)) {
         const NatePixTable* sprite = sys.pix.cursor();
+        if (sys.video->show_pointer(sprite->at(0).pix_map(), sprite->at(0).center())) {
+            return;
+        }
         where.offset(-sprite->at(0).center().h, -sprite->at(0).center().v);
         sprite->at(0).texture().draw(where.h, where.v);
     }

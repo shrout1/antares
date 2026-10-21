@@ -24,6 +24,9 @@
 #include <pn/output>
 #include <sfz/sfz.hpp>
 
+#include <cmath>
+#include <vector>
+
 #ifdef _MSC_VER
 #include <chrono>
 #include <thread>
@@ -32,6 +35,7 @@
 #endif
 
 #include "config/preferences.hpp"
+#include "drawing/pix-map.hpp"
 
 using sfz::range;
 
@@ -189,6 +193,51 @@ Point GLFWVideoDriver::get_mouse() {
 }
 
 InputMode GLFWVideoDriver::input_mode() const { return KEYBOARD_MOUSE; }
+
+bool GLFWVideoDriver::show_pointer(const PixMap& image, Point hotspot) {
+    _pointer_image   = &image;
+    _pointer_hotspot = hotspot;
+    return true;
+}
+
+float GLFWVideoDriver::pointer_scale() const { return scale(); }
+
+// Hands the pointer requested for the frame just drawn to the system, so it moves with the
+// mouse between frames.
+void GLFWVideoDriver::update_pointer() {
+    const bool show = (_pointer_image != nullptr);
+    if (show && ((_pointer_image != _cursor_image) || (pointer_scale() != _cursor_scale))) {
+        const float scale  = pointer_scale();
+        const int   width  = std::lround(_pointer_image->size().width * scale);
+        const int   height = std::lround(_pointer_image->size().height * scale);
+
+        std::vector<unsigned char> pixels;
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                const RgbColor& c = _pointer_image->get(int(x / scale), int(y / scale));
+                pixels.insert(pixels.end(), {c.red, c.green, c.blue, c.alpha});
+            }
+        }
+        GLFWimage   glfw_image = {width, height, pixels.data()};
+        GLFWcursor* cursor     = glfwCreateCursor(
+                &glfw_image, std::lround(_pointer_hotspot.h * scale),
+                std::lround(_pointer_hotspot.v * scale));
+        if (cursor) {
+            glfwSetCursor(_window, cursor);
+            if (_cursor) {
+                glfwDestroyCursor(_cursor);
+            }
+            _cursor       = cursor;
+            _cursor_image = _pointer_image;
+            _cursor_scale = scale;
+        }
+    }
+    if (show != _pointer_shown) {
+        glfwSetInputMode(_window, GLFW_CURSOR, show ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN);
+        _pointer_shown = show;
+    }
+    _pointer_image = nullptr;
+}
 
 bool GLFWVideoDriver::start_editing(TextReceiver* text) {
     _text = text;
@@ -514,11 +563,13 @@ void GLFWVideoDriver::loop(Card* initial) {
     while (!main_loop.done() && !glfwWindowShouldClose(_window)) {
         glfwPollEvents();
         _loop->draw();
+        update_pointer();
         glfwSwapBuffers(_window);
         wall_time at;
         if (main_loop.top()->next_timer(at) && (now() > at)) {
             main_loop.top()->fire_timer();
             main_loop.draw();
+            update_pointer();
             glfwSwapBuffers(_window);
         } else {
 #ifdef _MSC_VER
