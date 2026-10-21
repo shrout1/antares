@@ -588,7 +588,7 @@ void GLFWVideoDriver::loop(Card* initial) {
             glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
             glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
         }
-        _window = glfwCreateWindow(_window_size.width, _window_size.height, "", monitor, NULL);
+        _window = glfwCreateWindow(_window_size.width, _window_size.height, "", monitor, nullptr);
         if (_window) {
             break;
         }
