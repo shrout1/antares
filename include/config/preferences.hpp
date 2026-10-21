@@ -26,6 +26,13 @@
 
 namespace antares {
 
+// How large the battlefield is drawn, in pixels per point.
+enum class GameScale {
+    NATIVE,  // one point per pixel
+    WHOLE,   // the largest whole number of pixels per point that shows 480 points of height
+    FILL,    // the same scale as the panels, showing 480 points of height
+};
+
 struct Preferences {
     Preferences();
     Preferences copy() const;
@@ -37,7 +44,8 @@ struct Preferences {
     int16_t volume;
     bool    fullscreen;
     Size    window_size;
-    Size    resolution;  // empty to fill the display
+    Size      resolution;  // empty to fill the display
+    GameScale game_scale;
 };
 
 class PrefsDriver {
@@ -55,7 +63,8 @@ class PrefsDriver {
     int  volume() const { return get().volume; }
     int  fullscreen() const { return get().fullscreen; }
     Size window_size() const { return get().window_size; }
-    Size resolution() const { return get().resolution; }
+    Size      resolution() const { return get().resolution; }
+    GameScale game_scale() const { return get().game_scale; }
 
     void set_key(size_t index, Key key);
     void set_play_idle_music(bool on);
@@ -65,6 +74,7 @@ class PrefsDriver {
     void set_fullscreen(bool on);
     void set_window_size(Size size);
     void set_resolution(Size size);
+    void set_game_scale(GameScale scale);
 
     static PrefsDriver* driver();
 };

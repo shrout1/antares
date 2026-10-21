@@ -75,6 +75,22 @@ static void set(Key& v, pn::value_cref x) {
     }
 }
 
+static const struct {
+    GameScale   value;
+    const char* name;
+} kGameScaleNames[] = {
+        {GameScale::WHOLE, "whole"},
+        {GameScale::FILL, "fill"},
+};
+
+static void set(GameScale& v, pn::value_cref x) {
+    for (const auto& s : kGameScaleNames) {
+        if (x.is_string() && (x.as_string() == s.name)) {
+            v = s.value;
+        }
+    }
+}
+
 static void set(Size& s, pn::value_cref x) {
     if (x.is_map()) {
         set(s.width, x.as_map().get("width"));
@@ -107,6 +123,7 @@ FilePrefsDriver::FilePrefsDriver(pn::string_view path) : _path(path.copy()) {
     set(_current.fullscreen, video.get("fullscreen"));
     set(_current.window_size, video.get("window"));
     set(_current.resolution, video.get("resolution"));
+    set(_current.game_scale, video.get("game scale"));
 }
 
 void FilePrefsDriver::set(const Preferences& p) {
@@ -130,6 +147,12 @@ void FilePrefsDriver::set(const Preferences& p) {
                 {"width", p.resolution.width},
                 {"height", p.resolution.height},
         };
+    }
+
+    for (const auto& s : kGameScaleNames) {
+        if (p.game_scale == s.value) {
+            video["game scale"] = s.name;
+        }
     }
 
     makedirs(dirname(_path), 0755);

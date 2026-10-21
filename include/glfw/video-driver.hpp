@@ -23,6 +23,7 @@
 #include <stack>
 
 #include "config/keys.hpp"
+#include "config/preferences.hpp"
 #include "drawing/color.hpp"
 #include "math/geometry.hpp"
 #include "video/opengl-driver.hpp"
@@ -90,6 +91,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     Size            _viewport_size;
     Point           _viewport_offset;  // top-left corner in the framebuffer
     Size            _resolution;
+    GameScale       _game_scale         = GameScale::NATIVE;
     int             _pixel_ratio        = 1;  // pixels per window coordinate
     float           _battlefield_scale  = 1;  // pixels per point on the battlefield
     float           _ui_scale           = 1;  // pixels per point in panels and SCREEN
