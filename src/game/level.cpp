@@ -324,7 +324,17 @@ void construct_level(LoadState* state) {
 
     if (step == 0) {
         load_blessed_objects(all_colors);
-        load_initial(Handle<const Initial>(step), all_colors);
+        if (Initial::all().size() == 0) {
+            // No per-initial steps; do the condition and setup steps now.
+            for (auto c : Condition::all()) {
+                load_condition(c, all_colors);
+            }
+            RecalcAllAdmiralBuildData();
+            Messages::clear();
+            g.time = game_ticks(-g.level->base.start_time.value_or(secs(0)));
+        } else {
+            load_initial(Handle<const Initial>(step), all_colors);
+        }
     } else if (step < Initial::all().size()) {
         load_initial(Handle<const Initial>(step), all_colors);
     } else if (step == Initial::all().size()) {

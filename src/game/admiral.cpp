@@ -644,6 +644,10 @@ void Admiral::think() {
         }
     }
 
+    if (!g.root.get()) {
+        return;
+    }
+
     // get the current object
     if (!_considerShip.get()) {
         _considerShip = anObject = g.root;

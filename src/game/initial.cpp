@@ -69,6 +69,9 @@ void create_initial(Handle<const Initial> initial) {
             initial->override_.sprite.has_value()
                               ? sfz::make_optional<pn::string_view>(*initial->override_.sprite)
                               : sfz::nullopt);
+    if (!anObject.get()) {
+        return;  // object table full
+    }
 
     if (anObject->attributes & kIsDestination) {
         anObject->asDestination = MakeNewDestination(
@@ -159,6 +162,9 @@ void UnhideInitialObject(Handle<const Initial> initial) {
             initial->override_.sprite.has_value()
                               ? sfz::make_optional<pn::string_view>(*initial->override_.sprite)
                               : sfz::nullopt);
+    if (!anObject.get()) {
+        return;  // object table full
+    }
 
     if (anObject->attributes & kIsDestination) {
         anObject->asDestination = MakeNewDestination(
@@ -193,7 +199,9 @@ void UnhideInitialObject(Handle<const Initial> initial) {
 }
 
 Handle<SpaceObject> GetObjectFromInitialNumber(Handle<const Initial> initial) {
-    if (initial.number() >= 0) {
+    if (initial.number() >= static_cast<int>(Initial::all().size())) {
+        return SpaceObject::none();  // plugins may name initials the level lacks
+    } else if (initial.number() >= 0) {
         auto object = g.initials[initial.number()];
         if (object.get()) {
             if ((object->id != g.initial_ids[initial.number()]) ||

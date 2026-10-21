@@ -158,6 +158,12 @@ void SelectLevelScreen::update_chapters(size_t* select) {
                     _chapters.begin(), _chapters.end(),
                     [](int i) { return Level::get(i) == nullptr; }),
             _chapters.end());
+    if (_chapters.empty() && !plug.chapters.empty()) {
+        // The ledger starts at chapter 1; a plugin's first chapter may be later.
+        int first = plug.chapters.begin()->first;
+        sys.ledger->unlock_chapter(first);
+        _chapters.push_back(first);
+    }
 
     if (select) {
         _index =

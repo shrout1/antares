@@ -657,7 +657,8 @@ void SpaceObject::set_owner(Handle<Admiral> new_owner, bool message) {
         }
     }
 
-    if (object->attributes & kIsDestination) {
+    // kIsDestination doesn't guarantee a Destination.
+    if ((object->attributes & kIsDestination) && object->asDestination.get()) {
         if (object->attributes & kNeutralDeath) {
             ClearAllOccupants(object->asDestination, new_owner, object->base->occupy_count);
         }
@@ -679,7 +680,7 @@ void SpaceObject::set_owner(Handle<Admiral> new_owner, bool message) {
 
 void SpaceObject::alter_occupation(Handle<Admiral> owner, int32_t howMuch, bool message) {
     auto object = this;
-    if (object->active && (object->attributes & kIsDestination) &&
+    if (object->active && (object->attributes & kIsDestination) && object->asDestination.get() &&
         (object->attributes & kNeutralDeath)) {
         if (AlterDestinationObjectOccupation(object->asDestination, owner, howMuch) >=
             object->base->occupy_count) {
@@ -732,7 +733,8 @@ void SpaceObject::destroy() {
 
         // if it's a destination, we keep anyone from thinking they have it as a destination
         // (all at once since this should be very rare)
-        if ((object->attributes & kIsDestination) && object->base->destroy.die) {
+        if ((object->attributes & kIsDestination) && object->asDestination.get() &&
+            object->base->destroy.die) {
             RemoveDestination(object->asDestination);
             for (auto fixObject : SpaceObject::all()) {
                 if ((fixObject->attributes & kCanAcceptDestination) &&
@@ -814,7 +816,7 @@ void SpaceObject::create_floating_player_body() {
 }
 
 pn::string_view SpaceObject::long_name() const {
-    if (attributes & kIsDestination) {
+    if ((attributes & kIsDestination) && asDestination.get()) {
         return GetDestBalanceName(asDestination);
     } else {
         return base->long_name;
@@ -822,7 +824,7 @@ pn::string_view SpaceObject::long_name() const {
 }
 
 pn::string_view SpaceObject::short_name() const {
-    if (attributes & kIsDestination) {
+    if ((attributes & kIsDestination) && asDestination.get()) {
         return GetDestBalanceName(asDestination);
     } else {
         return base->short_name;

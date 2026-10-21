@@ -63,7 +63,11 @@ Level::~Level() {
     }
 }
 
-const Level* Level::get(int number) { return Level::get(plug.chapters[number]); }
+const Level* Level::get(int number) {
+    // operator[] would add an empty chapter.
+    auto it = plug.chapters.find(number);
+    return (it == plug.chapters.end()) ? nullptr : Level::get(it->second);
+}
 
 const Level* Level::get(pn::string_view name) {
     auto it = plug.levels.find(name.copy());

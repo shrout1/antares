@@ -299,7 +299,9 @@ static void apply(
         const RevealAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
     for (auto i : a.initial) {
-        UnhideInitialObject(i);
+        if ((i.number() >= 0) && (i.number() < static_cast<int>(Initial::all().size()))) {
+            UnhideInitialObject(i);
+        }
     }
 }
 
@@ -612,7 +614,9 @@ static void apply(
 static void apply(
         const MessageAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
-    Messages::start(a.id, &a.pages);
+    if (!a.pages.empty()) {
+        Messages::start(a.id, &a.pages);
+    }
 }
 
 static void apply(

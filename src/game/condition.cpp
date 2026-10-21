@@ -223,6 +223,16 @@ static bool is_true(const ConditionWhen& c) {
 }
 
 void CheckLevelConditions() {
+    // Actions can check conditions, so a persistent condition can re-trigger itself; bound the
+    // nesting.
+    static int depth = 0;
+    if (depth >= 8) {
+        return;
+    }
+    struct DepthGuard {
+        DepthGuard() { ++depth; }
+        ~DepthGuard() { --depth; }
+    } guard;
     for (auto& c : g.level->base.conditions) {
         int index = (&c - g.level->base.conditions.data());
         if (g.condition_enabled[index] && is_true(c.when)) {

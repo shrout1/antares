@@ -55,7 +55,8 @@ MainScreen::MainScreen()
     button(kSoloButton)
             ->bind({
                     [this] { stack()->push(new SoloGame); },
-                    [] { return plug.chapters.find(1) != plug.chapters.end(); },
+                    // A plugin's first solo chapter may be after 1.
+                    [] { return !plug.chapters.empty(); },
             });
 
     button(kNetButton)
