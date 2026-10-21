@@ -142,7 +142,9 @@ void GameCursor::draw() const {
     }
 
     if (where.h < viewport().left) {
+        sys.video->set_region(VideoDriver::Region::LEFT_PANEL);
         draw_at(where);
+        sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
     }
 }
 

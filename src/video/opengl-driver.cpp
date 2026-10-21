@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <cmath>
 #include <pn/output>
 
 #include "drawing/color.hpp"
@@ -384,6 +385,18 @@ OpenGlVideoDriver::OpenGlVideoDriver() : _static_seed{0} {}
 
 int OpenGlVideoDriver::scale() const { return viewport_size().width / screen_size().width; }
 
+vec4 OpenGlVideoDriver::region_transform(Region region) const {
+    float s = scale();
+    return {s, s, 0, 0};
+}
+
+void OpenGlVideoDriver::set_region(Region region, float h, float v) {
+    vec4 t = region_transform(region);
+    t.z += std::trunc(h * t.x);
+    t.w += std::trunc(v * t.y);
+    _uniforms.transform.set(t);
+}
+
 Texture OpenGlVideoDriver::texture(pn::string_view name, const PixMap& content, int scale) {
     return unique_ptr<Texture::Impl>(
             new OpenGlTextureImpl(name, content, scale, _uniforms, _vbuf));
@@ -621,6 +634,7 @@ OpenGlVideoDriver::MainLoop::Setup::Setup(OpenGlVideoDriver& driver) {
     glGenBuffers(3, driver._vbuf);
 
     driver._uniforms.screen.load(program);
+    driver._uniforms.transform.load(program);
     driver._uniforms.scale.load(program);
     driver._uniforms.color_mode.load(program);
     driver._uniforms.sprite.load(program);
@@ -661,11 +675,13 @@ void OpenGlVideoDriver::MainLoop::draw() {
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
-    glViewport(0, 0, _driver.viewport_size().width, _driver.viewport_size().height);
+    const Point origin = _driver.viewport_origin();
+    glViewport(origin.h, origin.v, _driver.viewport_size().width, _driver.viewport_size().height);
 
-    auto screen = _driver.screen_size();
-    _driver._uniforms.screen.set({screen.width * 1.0f, screen.height * 1.0f});
+    auto viewport = _driver.viewport_size();
+    _driver._uniforms.screen.set({viewport.width * 1.0f, viewport.height * 1.0f});
     _driver._uniforms.scale.set(_driver.scale());
+    _driver.set_region(Region::SCREEN);
 
     int32_t seed = {_driver._static_seed.next(256)};
     seed <<= 8;

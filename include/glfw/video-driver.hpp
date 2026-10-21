@@ -40,8 +40,14 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     virtual pn::string_view glsl_version() const;
 
-    virtual Size viewport_size() const { return _viewport_size; }
-    virtual Size screen_size() const { return _screen_size; }
+    virtual Size  viewport_size() const { return _viewport_size; }
+    virtual Point viewport_origin() const;
+    virtual Size  screen_size() const { return _screen_size; }
+    virtual int   scale() const { return _pixel_ratio; }
+    virtual float overlay_scale() const { return _ui_scale / _battlefield_scale; }
+
+    virtual void  set_game_layout(bool game) { _game_layout = game; }
+    virtual Point convert(Point p, Region from, Region to) const;
 
     virtual Point     get_mouse();
     virtual InputMode input_mode() const;
@@ -55,6 +61,9 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     void loop(Card* initial);
 
+  protected:
+    virtual vec4 region_transform(Region region) const;
+
   private:
     void        key(int key, int scancode, int action, int mods);
     void        char_(unsigned int code_point);
@@ -62,17 +71,31 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     void        mouse_button(int button, int action, int mods);
     void        mouse_move(double x, double y);
     void        window_size(int width, int height);
+    void        update_size();
+    Point       to_screen(double x, double y) const;
+    Point       from_pixels(double x, double y, Region region) const;
     void        window_maximize(bool maximized);
     static void key_callback(GLFWwindow* w, int key, int scancode, int action, int mods);
     static void char_callback(GLFWwindow* w, unsigned int code_point);
     static void mouse_button_callback(GLFWwindow* w, int button, int action, int mods);
     static void mouse_move_callback(GLFWwindow* w, double x, double y);
     static void window_size_callback(GLFWwindow* w, int width, int height);
+    static void framebuffer_size_callback(GLFWwindow* w, int width, int height);
     static void window_maximize_callback(GLFWwindow* w, int maximized);
 
     bool            _fullscreen;
+    Size            _window_size;
     Size            _screen_size;
+    Size            _framebuffer_size;
     Size            _viewport_size;
+    Point           _viewport_offset;  // top-left corner in the framebuffer
+    Size            _resolution;
+    int             _pixel_ratio        = 1;  // pixels per window coordinate
+    float           _battlefield_scale  = 1;  // pixels per point on the battlefield
+    float           _ui_scale           = 1;  // pixels per point in panels and SCREEN
+    int             _left_panel_pixels  = 0;
+    int             _right_panel_pixels = 0;
+    bool            _game_layout        = false;
     pn::string_view _glsl_version;
     GLFWwindow*     _window;
     MainLoop*       _loop;

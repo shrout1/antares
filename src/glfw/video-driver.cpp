@@ -25,13 +25,16 @@
 #include <sfz/sfz.hpp>
 
 #ifdef _MSC_VER
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <thread>
 #else
 #include <unistd.h>
 #endif
 
 #include "config/preferences.hpp"
+#include "game/globals.hpp"
 
 using sfz::range;
 
@@ -169,7 +172,7 @@ static void throw_error(int code, const char* message) {
 
 GLFWVideoDriver::GLFWVideoDriver()
         : _fullscreen(sys.prefs->fullscreen()),
-          _screen_size(sys.prefs->window_size()),
+          _window_size(sys.prefs->window_size()),
           _last_click_count(0),
           _text(nullptr) {
     if (!glfwInit()) {
@@ -185,7 +188,103 @@ pn::string_view GLFWVideoDriver::glsl_version() const { return _glsl_version; }
 Point GLFWVideoDriver::get_mouse() {
     double x, y;
     glfwGetCursorPos(_window, &x, &y);
-    return {int(x), int(y)};
+    return to_screen(x, y);
+}
+
+// The battlefield is drawn at one point per pixel; the panels and all other screens are scaled
+// up to fit the display, keeping their 640x480 proportions.
+static const Size kOriginalScreenSize = {640, 480};
+
+// With a fixed resolution, the game is laid out as on a display of that size, then scaled to fit
+// the framebuffer, centered.
+void GLFWVideoDriver::update_size() {
+    glfwGetWindowSize(_window, &_window_size.width, &_window_size.height);
+    glfwGetFramebufferSize(_window, &_framebuffer_size.width, &_framebuffer_size.height);
+    _pixel_ratio = std::max(1, _framebuffer_size.width / std::max(1, _window_size.width));
+    _resolution  = sys.prefs->resolution();
+    if (_resolution.as_rect().empty()) {
+        _viewport_size     = _framebuffer_size;
+        _battlefield_scale = _pixel_ratio;
+    } else {
+        _battlefield_scale = std::min(
+                float(_framebuffer_size.width) / _resolution.width,
+                float(_framebuffer_size.height) / _resolution.height);
+        _viewport_size = {
+                int(std::lround(_resolution.width * _battlefield_scale)),
+                int(std::lround(_resolution.height * _battlefield_scale))};
+    }
+    _viewport_offset = {
+            (_framebuffer_size.width - _viewport_size.width) / 2,
+            (_framebuffer_size.height - _viewport_size.height) / 2};
+    _ui_scale = std::max<float>(
+            _battlefield_scale,
+            std::min(
+                    float(_viewport_size.width) / kOriginalScreenSize.width,
+                    float(_viewport_size.height) / kOriginalScreenSize.height));
+    _left_panel_pixels           = std::lround(kLeftPanelWidth * _ui_scale);
+    _right_panel_pixels          = std::lround(kRightPanelWidth * _ui_scale);
+    const int battlefield_pixels = _viewport_size.width - _left_panel_pixels - _right_panel_pixels;
+    _screen_size                 = {
+            kLeftPanelWidth + int(battlefield_pixels / _battlefield_scale) + kRightPanelWidth,
+            int(_viewport_size.height / _battlefield_scale)};
+}
+
+Point GLFWVideoDriver::viewport_origin() const {
+    return {_viewport_offset.h,
+            _framebuffer_size.height - _viewport_offset.v - _viewport_size.height};
+}
+
+vec4 GLFWVideoDriver::region_transform(Region region) const {
+    const float k = _ui_scale;
+    const float r = _battlefield_scale;
+    // Panels are laid out around instrument_top(); center them vertically.
+    const int   instrument_top = (_screen_size.height / 2) - (kOriginalScreenSize.height / 2);
+    const float panel_offset   = ((_viewport_size.height - (kOriginalScreenSize.height * k)) / 2) -
+                               (instrument_top * k);
+    switch (region) {
+        case Region::SCREEN: {
+            Rect original = kOriginalScreenSize.as_rect();
+            original.center_in(_screen_size.as_rect());
+            return {k, k,
+                    ((_viewport_size.width - (original.width() * k)) / 2) - (original.left * k),
+                    ((_viewport_size.height - (original.height() * k)) / 2) - (original.top * k)};
+        }
+        case Region::BATTLEFIELD: return {r, r, _left_panel_pixels - (kLeftPanelWidth * r), 0};
+        case Region::OVERLAY: return {k, k, _left_panel_pixels - (kLeftPanelWidth * r), 0};
+        case Region::LEFT_PANEL: return {k, k, 0, panel_offset};
+        case Region::RIGHT_PANEL:
+            return {k, k,
+                    (_viewport_size.width - _right_panel_pixels) -
+                            ((_screen_size.width - kRightPanelWidth) * k),
+                    panel_offset};
+    }
+    return {r, r, 0, 0};
+}
+
+Point GLFWVideoDriver::from_pixels(double x, double y, Region region) const {
+    const vec4 t = region_transform(region);
+    return {int(std::floor((x - t.z) / t.x)), int(std::floor((y - t.w) / t.y))};
+}
+
+Point GLFWVideoDriver::convert(Point p, Region from, Region to) const {
+    const vec4 t = region_transform(from);
+    return from_pixels((p.h * t.x) + t.z, (p.v * t.y) + t.w, to);
+}
+
+Point GLFWVideoDriver::to_screen(double x, double y) const {
+    x = (x * _framebuffer_size.width / std::max(1, _window_size.width)) - _viewport_offset.h;
+    y = (y * _framebuffer_size.height / std::max(1, _window_size.height)) - _viewport_offset.v;
+    Region region = Region::SCREEN;
+    if (_game_layout) {
+        if (x < _left_panel_pixels) {
+            region = Region::LEFT_PANEL;
+        } else if (x >= (_viewport_size.width - _right_panel_pixels)) {
+            region = Region::RIGHT_PANEL;
+        } else {
+            region = Region::BATTLEFIELD;
+        }
+    }
+    return from_pixels(x, y, region);
 }
 
 InputMode GLFWVideoDriver::input_mode() const { return KEYBOARD_MOUSE; }
@@ -380,15 +479,14 @@ void GLFWVideoDriver::mouse_button(int button, int action, int mods) {
 }
 
 void GLFWVideoDriver::mouse_move(double x, double y) {
-    MouseMoveEvent(now(), Point(x, y)).send(_loop->top());
+    MouseMoveEvent(now(), to_screen(x, y)).send(_loop->top());
 }
 
 void GLFWVideoDriver::window_size(int width, int height) {
-    _screen_size = {width, height};
+    update_size();
     if (!_fullscreen) {
-        sys.prefs->set_window_size(_screen_size);
+        sys.prefs->set_window_size(_window_size);
     }
-    glfwGetFramebufferSize(_window, &_viewport_size.width, &_viewport_size.height);
 }
 
 void GLFWVideoDriver::window_maximize(bool maximized) {
@@ -404,14 +502,14 @@ void GLFWVideoDriver::window_maximize(bool maximized) {
     if (_fullscreen) {
         monitor      = glfwGetPrimaryMonitor();
         mode         = glfwGetVideoMode(monitor);
-        _screen_size = {mode->width, mode->height};
+        _window_size = {mode->width, mode->height};
     } else {
         mode         = glfwGetVideoMode(glfwGetWindowMonitor(_window));
-        _screen_size = sys.prefs->window_size();
+        _window_size = sys.prefs->window_size();
     }
 
     Rect screen_rect{Point{0, 0}, Size{mode->width, mode->height}};
-    Rect window_rect{Point{0, 0}, _screen_size};
+    Rect window_rect{Point{0, 0}, _window_size};
     window_rect.center_in(screen_rect);
     glfwSetWindowMonitor(
             _window, monitor, window_rect.left, window_rect.top, window_rect.width(),
@@ -427,6 +525,11 @@ void GLFWVideoDriver::key_callback(GLFWwindow* w, int key, int scancode, int act
 void GLFWVideoDriver::char_callback(GLFWwindow* w, unsigned int code_point) {
     GLFWVideoDriver* driver = reinterpret_cast<GLFWVideoDriver*>(glfwGetWindowUserPointer(w));
     driver->char_(code_point);
+}
+
+void GLFWVideoDriver::framebuffer_size_callback(GLFWwindow* w, int width, int height) {
+    GLFWVideoDriver* driver = reinterpret_cast<GLFWVideoDriver*>(glfwGetWindowUserPointer(w));
+    driver->update_size();
 }
 
 void GLFWVideoDriver::mouse_button_callback(GLFWwindow* w, int button, int action, int mods) {
@@ -473,7 +576,7 @@ void GLFWVideoDriver::loop(Card* initial) {
     if (_fullscreen) {
         monitor      = glfwGetPrimaryMonitor();
         mode         = glfwGetVideoMode(monitor);
-        _screen_size = {mode->width, mode->height};
+        _window_size = {mode->width, mode->height};
     }
 
     for (const auto hint_version : {hint_opengl32, hint_opengl20}) {
@@ -485,7 +588,7 @@ void GLFWVideoDriver::loop(Card* initial) {
             glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
             glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
         }
-        _window = glfwCreateWindow(_screen_size.width, _screen_size.height, "", monitor, NULL);
+        _window = glfwCreateWindow(_window_size.width, _window_size.height, "", monitor, nullptr);
         if (_window) {
             break;
         }
@@ -494,7 +597,7 @@ void GLFWVideoDriver::loop(Card* initial) {
         throw std::runtime_error("glfwCreateWindow");
     }
 
-    glfwGetFramebufferSize(_window, &_viewport_size.width, &_viewport_size.height);
+    update_size();
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     glfwSetWindowUserPointer(_window, this);
@@ -503,6 +606,7 @@ void GLFWVideoDriver::loop(Card* initial) {
     glfwSetMouseButtonCallback(_window, mouse_button_callback);
     glfwSetCursorPosCallback(_window, mouse_move_callback);
     glfwSetWindowSizeCallback(_window, window_size_callback);
+    glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
 
     /* Make the _window's context current */
     glfwMakeContextCurrent(_window);
@@ -513,6 +617,9 @@ void GLFWVideoDriver::loop(Card* initial) {
 
     while (!main_loop.done() && !glfwWindowShouldClose(_window)) {
         glfwPollEvents();
+        if (sys.prefs->resolution() != _resolution) {
+            update_size();
+        }
         _loop->draw();
         glfwSwapBuffers(_window);
         wall_time at;

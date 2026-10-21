@@ -472,27 +472,34 @@ void draw_instruments() {
     left_rect.inset(0, (world().height() - 768) / 2);
     right_rect.inset(0, (world().height() - 768) / 2);
 
+    sys.video->set_region(VideoDriver::Region::LEFT_PANEL);
     sys.left_instrument_texture.draw(left_rect.left, left_rect.top);
+    sys.video->set_region(VideoDriver::Region::RIGHT_PANEL);
     sys.right_instrument_texture.draw(right_rect.left, right_rect.top);
 
     if (g.ship.get() && g.ship->active) {
         const SpaceObject::Weapon& pulse   = g.ship->pulse;
         const SpaceObject::Weapon& beam    = g.ship->beam;
         const SpaceObject::Weapon& special = g.ship->special;
+        sys.video->set_region(VideoDriver::Region::LEFT_PANEL);
         draw_player_ammo(
                 (pulse.base && (pulse.base->device->ammo > 0)) ? pulse.ammo : -1,
                 (beam.base && (beam.base->device->ammo > 0)) ? beam.ammo : -1,
                 (special.base && (special.base->device->ammo > 0)) ? special.ammo : -1);
 
+        sys.video->set_region(VideoDriver::Region::RIGHT_PANEL);
         draw_bar_indicator(kShieldBar, g.ship->health(), g.ship->max_health());
         draw_bar_indicator(kEnergyBar, g.ship->energy(), g.ship->max_energy());
         draw_bar_indicator(kBatteryBar, g.ship->battery(), g.ship->max_battery());
     }
 
+    sys.video->set_region(VideoDriver::Region::RIGHT_PANEL);
     draw_build_time_bar();
+    sys.video->set_region(VideoDriver::Region::LEFT_PANEL);
     draw_money();
     draw_radar();
     draw_mini_screen();
+    sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
 }
 
 void EraseSite() {}

@@ -47,6 +47,17 @@ class VideoDriver {
     virtual int       scale() const       = 0;
     virtual Size      screen_size() const = 0;
 
+    // Parts of the screen that a driver may scale separately. OVERLAY is for text and icons over
+    // the battlefield; it draws overlay_scale() times larger than BATTLEFIELD.
+    enum class Region { SCREEN, BATTLEFIELD, OVERLAY, LEFT_PANEL, RIGHT_PANEL };
+    // `h` and `v` shift drawing by fractions of a point, rounded toward zero to whole pixels.
+    virtual void  set_region(Region region, float h = 0, float v = 0) {}
+    virtual float overlay_scale() const { return 1; }
+    // If true, mouse input is in the coordinates of the region under the mouse.
+    virtual void set_game_layout(bool game) {}
+    // The point in `to` that is drawn at the same place as `p` in `from`.
+    virtual Point convert(Point p, Region from, Region to) const { return p; }
+
     virtual bool start_editing(TextReceiver* text) = 0;
     virtual void stop_editing(TextReceiver* text)  = 0;
 
