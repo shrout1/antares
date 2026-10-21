@@ -58,10 +58,6 @@ class VideoDriver {
     virtual void    draw_diamond(const Rect& rect, const RgbColor& color)           = 0;
     virtual void    draw_plus(const Rect& rect, const RgbColor& color)              = 0;
 
-    // Shows `image` as the system's mouse pointer until the next frame, with `hotspot` under
-    // the mouse; false if the driver can't, so the caller draws it instead.
-    virtual bool show_pointer(const PixMap& image, Point hotspot) { return false; }
-
   private:
     friend class Points;
     friend class Lines;
