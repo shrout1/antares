@@ -111,7 +111,7 @@ MainScreen::MainScreen()
 void MainScreen::quit() {
     // 1-second fade-out.
     _state = QUITTING;
-    stack()->push(new ColorFade(ColorFade::TO_COLOR, RgbColor::black(), secs(1), false, NULL));
+    stack()->push(new ColorFade(ColorFade::TO_COLOR, RgbColor::black(), secs(1), false, nullptr));
 }
 
 MainScreen::~MainScreen() {}

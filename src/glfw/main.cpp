@@ -145,7 +145,7 @@ void main(int argc, char* const* argv) {
         OpenAlSoundDriver sound;
         GLFWVideoDriver   video;
         enable_plugin_switching();
-        video.loop(new Master(scenario, time(NULL)));
+        video.loop(new Master(scenario, time(nullptr)));
     }
 
     if (plugin_requested()) {

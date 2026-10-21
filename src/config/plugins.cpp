@@ -154,7 +154,8 @@ PluginSummary summarize(sfz::optional<pn::string_view> plugin_path, pn::string_v
         PluginFiles              files{files_path};
         sfz::optional<pn::value> x = files.read("info.pn");
         if (!x.has_value()) {
-            throw std::runtime_error("not an antares plugin");
+            p.error = "not an antares plugin";
+            return p;
         }
         Info info    = antares::info(path_value{*x});
         p.title      = info.title.copy();

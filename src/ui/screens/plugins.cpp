@@ -235,7 +235,7 @@ PluginsScreen::PluginsScreen(bool* switched)
             });
 }
 
-PluginsScreen::~PluginsScreen() {}
+PluginsScreen::~PluginsScreen() = default;
 
 bool PluginsScreen::playable(const Entry& e) const {
     if (!e.summary.error.empty()) {
