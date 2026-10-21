@@ -105,6 +105,7 @@ source_set("libantares-config") {
     "include/config/gamepad.hpp",
     "include/config/keys.hpp",
     "include/config/ledger.hpp",
+    "include/config/plugins.hpp",
     "include/config/preferences.hpp",
 
     # This doesn't really belong here, but there isn't an associated
@@ -116,6 +117,7 @@ source_set("libantares-config") {
     "src/config/gamepad.cpp",
     "src/config/keys.cpp",
     "src/config/ledger.cpp",
+    "src/config/plugins.cpp",
     "src/config/preferences.cpp",
   ]
   public_deps = [
@@ -123,6 +125,7 @@ source_set("libantares-config") {
     ":libantares-lang",
     "//ext/libsfz",
   ]
+  deps = [ "//ext/libzipxx" ]
   configs += [ ":antares_private" ]
 }
 
@@ -372,6 +375,7 @@ source_set("libantares-ui") {
     "include/ui/screens/object-data.hpp",
     "include/ui/screens/options.hpp",
     "include/ui/screens/play-again.hpp",
+    "include/ui/screens/plugins.hpp",
     "include/ui/screens/scroll-text.hpp",
     "include/ui/screens/select-level.hpp",
     "include/ui/widget.hpp",
@@ -392,6 +396,7 @@ source_set("libantares-ui") {
     "src/ui/screens/object-data.cpp",
     "src/ui/screens/options.cpp",
     "src/ui/screens/play-again.cpp",
+    "src/ui/screens/plugins.cpp",
     "src/ui/screens/scroll-text.cpp",
     "src/ui/screens/select-level.cpp",
     "src/ui/widget.cpp",

@@ -19,7 +19,9 @@
 #ifndef ANTARES_CONFIG_LEDGER_HPP_
 #define ANTARES_CONFIG_LEDGER_HPP_
 
+#include <pn/string>
 #include <set>
+#include <sfz/sfz.hpp>
 #include <vector>
 
 namespace antares {
@@ -61,6 +63,18 @@ class DirectoryLedger : public Ledger {
     std::set<int> load();
     void          save(const std::set<int> chapters);
 };
+
+// Progress for any plugin, by identifier, as stored by DirectoryLedger.
+//
+// load_progress() returns the unlocked chapters, or nothing if the plugin has never been played.
+// A saved copy of the progress lives in dirs().root/saved-progress; the copy also records the
+// plugin title and identifier, so a copy received from another player can be imported under any
+// file name.
+sfz::optional<std::set<int>> load_progress(pn::string_view identifier);
+void                         reset_progress(pn::string_view identifier);
+sfz::optional<std::set<int>> load_saved_progress(pn::string_view identifier);
+pn::string                   save_progress(pn::string_view identifier, pn::string_view title);
+bool                         import_progress(pn::string_view identifier);
 
 }  // namespace antares
 

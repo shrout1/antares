@@ -45,6 +45,8 @@ class MainScreen : public InterfaceScreen {
     virtual void gamepad_button_up(const GamepadButtonUpEvent& event);
 
   private:
+    void quit();
+
     enum State {
         NORMAL   = 0,
         QUITTING = 1,
@@ -52,6 +54,7 @@ class MainScreen : public InterfaceScreen {
     State                   _state;
     std::vector<pn::string> _replays;
     wall_time               _next_timer;
+    bool                    _switch_plugin = false;
 };
 
 }  // namespace antares

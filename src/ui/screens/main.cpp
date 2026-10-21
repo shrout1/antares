@@ -32,6 +32,7 @@
 #include "ui/flows/solo-game.hpp"
 #include "ui/interface-handling.hpp"
 #include "ui/screens/options.hpp"
+#include "ui/screens/plugins.hpp"
 #include "ui/screens/scroll-text.hpp"
 #include "video/driver.hpp"
 
@@ -47,6 +48,7 @@ static constexpr char kQuitButton[]    = "quit";
 static constexpr char kAboutButton[]   = "about-ares";
 static constexpr char kDemoButton[]    = "demo";
 static constexpr char kIntroButton[]   = "replay-intro";
+static constexpr char kPluginsButton[] = "plugins";
 
 MainScreen::MainScreen()
         : InterfaceScreen("main", {0, 0, 640, 480}),
@@ -95,15 +97,21 @@ MainScreen::MainScreen()
                     [this] { stack()->push(new OptionsScreen); },
             });
 
+    button(kPluginsButton)
+            ->bind({
+                    [this] { stack()->push(new PluginsScreen(&_switch_plugin)); },
+            });
+
     button(kQuitButton)
             ->bind({
-                    [this] {
-                        // 1-second fade-out.
-                        _state = QUITTING;
-                        stack()->push(new ColorFade(
-                                ColorFade::TO_COLOR, RgbColor::black(), secs(1), false, NULL));
-                    },
+                    [this] { quit(); },
             });
+}
+
+void MainScreen::quit() {
+    // 1-second fade-out.
+    _state = QUITTING;
+    stack()->push(new ColorFade(ColorFade::TO_COLOR, RgbColor::black(), secs(1), false, NULL));
 }
 
 MainScreen::~MainScreen() {}
@@ -111,6 +119,11 @@ MainScreen::~MainScreen() {}
 void MainScreen::become_front() {
     switch (_state) {
         case NORMAL:
+            if (_switch_plugin) {
+                // The game restarts with the plugin chosen on the plugins screen.
+                quit();
+                break;
+            }
             InterfaceScreen::become_front();
             sys.music.play(Music::IDLE, Music::title_song);
             _next_timer = (now() + kMainDemoTimeOutTime);
