@@ -1,6 +1,6 @@
 [submodule "test"]
 	path = test
-	url = https://github.com/arescentral/antares-test-data.git
+	url = https://github.com/shrout1/antares-test-data.git
 [submodule "ext/libsfz"]
 	path = ext/libsfz
 	url = https://github.com/sfiera/libsfz.git
@@ -15,7 +15,7 @@
 	url = https://github.com/sfiera/libpng-gyp.git
 [submodule "data"]
 	path = data
-	url = https://github.com/arescentral/antares-data.git
+	url = https://github.com/shrout1/antares-data.git
 [submodule "ext/libmodplug-gyp"]
 	path = ext/libmodplug
 	url = https://github.com/sfiera/libmodplug-gyp.git
