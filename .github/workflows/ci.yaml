@@ -46,7 +46,7 @@ jobs:
           destination: 'downloads.arescentral.org/Antares'
 
   macOS:
-    runs-on: macos-latest
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,12 +57,12 @@ jobs:
       - run: make
       - run: make smoke-test
 
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         run: scripts/load-cert.sh
         env:
           DEVELOPER_P12_BASE64: ${{ secrets.DEVELOPER_P12_BASE64 }}
           DEVELOPER_P12_PASS_BASE64: ${{ secrets.DEVELOPER_P12_PASS_BASE64 }}
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         run: make sign notarize
         env:
           APPLE_USER: ${{ secrets.APPLE_USER }}
