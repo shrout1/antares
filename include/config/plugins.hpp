@@ -21,6 +21,7 @@
 
 #include <map>
 #include <pn/string>
+#include <set>
 #include <sfz/sfz.hpp>
 #include <vector>
 
@@ -43,6 +44,9 @@ struct PluginSummary {
 void                       add_plugin_directory(pn::string_view dir);
 std::vector<PluginSummary> list_plugins();
 bool                       is_loaded(const PluginSummary& p);  // the plugin being played now?
+
+// Every file under `dir`, recursively; empty if `dir` doesn't exist.
+std::set<pn::string> list_files(pn::string_view dir);
 
 // Switching plugins restarts the game. Front-ends that can do that call enable_plugin_switching()
 // at startup, and after the main loop finishes, check plugin_requested() and restart with

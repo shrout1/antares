@@ -82,11 +82,10 @@ class PluginFiles {
         std::vector<pn::string> names;
         if (_dir.has_value()) {
             pn::string dir = pn::format("{0}/levels", *_dir);
-            if (path::isdir(dir)) {
-                for (const auto& entry : sfz::scandir(dir)) {
-                    if (is_level(entry.name)) {
-                        names.push_back(pn::format("levels/{0}", entry.name));
-                    }
+            for (const pn::string& file : list_files(dir)) {
+                pn::string_view name = pn::string_view{file}.substr(dir.size() + 1);
+                if (is_level(name)) {
+                    names.push_back(pn::format("levels/{0}", name));
                 }
             }
         } else {
@@ -182,18 +181,12 @@ PluginSummary summarize(sfz::optional<pn::string_view> plugin_path, pn::string_v
     return p;
 }
 
-class PluginFinder : public sfz::TreeWalker {
+class FileLister : public sfz::TreeWalker {
   public:
-    PluginFinder(std::set<pn::string>* paths) : _paths(paths) {}
+    FileLister(std::set<pn::string>* paths) : _paths(paths) {}
 
     void file(pn::string_view name, const sfz::Stat& st) const override {
-        static const pn::string_view extension = ".antaresplugin";
-        if ((name.size() > extension.size()) &&
-            (name.substr(name.size() - extension.size()) == extension)) {
-            _paths->insert(name.copy());
-        } else if (path::basename(name) == "info.pn") {
-            _paths->insert(path::dirname(name).copy());
-        }
+        _paths->insert(name.copy());
     }
 
     void pre_directory(pn::string_view name, const sfz::Stat& st) const override {}
@@ -209,6 +202,14 @@ class PluginFinder : public sfz::TreeWalker {
 
 }  // namespace
 
+std::set<pn::string> list_files(pn::string_view dir) {
+    std::set<pn::string> paths;
+    if (path::isdir(dir)) {
+        sfz::walk(dir, sfz::WALK_LOGICAL, FileLister{&paths});
+    }
+    return paths;
+}
+
 void add_plugin_directory(pn::string_view dir) { plugin_dirs.push_back(dir.copy()); }
 
 std::vector<PluginSummary> list_plugins() {
@@ -222,8 +223,14 @@ std::vector<PluginSummary> list_plugins() {
         roots.push_back(dir);
     }
     for (pn::string_view root : roots) {
-        if (path::isdir(root)) {
-            sfz::walk(root, sfz::WALK_LOGICAL, PluginFinder{&paths});
+        static const pn::string_view extension = ".antaresplugin";
+        for (const pn::string& file : list_files(root)) {
+            if ((file.size() > extension.size()) &&
+                (pn::string_view{file}.substr(file.size() - extension.size()) == extension)) {
+                paths.insert(file.copy());
+            } else if (path::basename(file) == "info.pn") {
+                paths.insert(path::dirname(file).copy());
+            }
         }
     }
     for (const pn::string& path : paths) {

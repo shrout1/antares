@@ -18,7 +18,6 @@
 
 #include "config/ledger.hpp"
 
-#include <algorithm>
 #include <cmath>
 #include <pn/array>
 #include <pn/input>
@@ -28,6 +27,7 @@
 #include <sfz/sfz.hpp>
 
 #include "config/dirs.hpp"
+#include "config/plugins.hpp"
 #include "config/preferences.hpp"
 #include "data/plugin.hpp"
 #include "game/sys.hpp"
@@ -127,21 +127,11 @@ static sfz::optional<pn::string> find_saved_progress(pn::string_view identifier)
     if (path::isfile(exact)) {
         return sfz::make_optional(std::move(exact));
     }
-    if (!path::isdir(dir)) {
-        return sfz::nullopt;
-    }
-    std::vector<pn::string> names;
-    for (const auto& entry : sfz::scandir(dir)) {
-        names.push_back(entry.name.copy());
-    }
-    std::sort(names.begin(), names.end());
-    for (const pn::string& name : names) {
-        pn::string path = pn::format("{0}/{1}", dir, name);
+    for (const pn::string& path : list_files(dir)) {
         pn::string found;
         try {
-            if (path::isfile(path) && read_progress(path, &found).has_value() &&
-                (found == identifier)) {
-                return sfz::make_optional(std::move(path));
+            if (read_progress(path, &found).has_value() && (found == identifier)) {
+                return sfz::make_optional(path.copy());
             }
         } catch (std::runtime_error&) {
             // Not a progress file; skip it.
