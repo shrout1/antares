@@ -675,7 +675,8 @@ void OpenGlVideoDriver::MainLoop::draw() {
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
-    glViewport(0, 0, _driver.viewport_size().width, _driver.viewport_size().height);
+    const Point origin = _driver.viewport_origin();
+    glViewport(origin.h, origin.v, _driver.viewport_size().width, _driver.viewport_size().height);
 
     auto viewport = _driver.viewport_size();
     _driver._uniforms.screen.set({viewport.width * 1.0f, viewport.height * 1.0f});

@@ -100,6 +100,7 @@ Preferences::Preferences() {
 
     fullscreen  = false;
     window_size = {640, 480};
+    resolution  = {0, 0};
 }
 
 Preferences Preferences::copy() const {
@@ -111,6 +112,7 @@ Preferences Preferences::copy() const {
     copy.volume             = volume;
     copy.fullscreen         = fullscreen;
     copy.window_size        = window_size;
+    copy.resolution         = resolution;
     return copy;
 }
 
@@ -162,6 +164,12 @@ void PrefsDriver::set_fullscreen(bool on) {
 void PrefsDriver::set_window_size(Size size) {
     Preferences p(get().copy());
     p.window_size = size;
+    set(p);
+}
+
+void PrefsDriver::set_resolution(Size size) {
+    Preferences p(get().copy());
+    p.resolution = size;
     set(p);
 }
 

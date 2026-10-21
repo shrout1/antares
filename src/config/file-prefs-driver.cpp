@@ -106,6 +106,7 @@ FilePrefsDriver::FilePrefsDriver(pn::string_view path) : _path(path.copy()) {
     pn::map_cref video = m.get("video").as_map();
     set(_current.fullscreen, video.get("fullscreen"));
     set(_current.window_size, video.get("window"));
+    set(_current.resolution, video.get("resolution"));
 }
 
 void FilePrefsDriver::set(const Preferences& p) {
@@ -114,6 +115,21 @@ void FilePrefsDriver::set(const Preferences& p) {
     pn::map keys;
     for (auto i : range<size_t>(KEY_COUNT)) {
         keys[kKeyNames[i]] = p.keys[i].value();
+    }
+
+    pn::map video{
+            {"fullscreen", p.fullscreen},
+            {"window",
+             pn::map{
+                     {"width", p.window_size.width},
+                     {"height", p.window_size.height},
+             }},
+    };
+    if (!p.resolution.as_rect().empty()) {
+        video["resolution"] = pn::map{
+                {"width", p.resolution.width},
+                {"height", p.resolution.height},
+        };
     }
 
     makedirs(dirname(_path), 0755);
@@ -127,15 +143,7 @@ void FilePrefsDriver::set(const Preferences& p) {
                      {"game music", p.play_music_in_game},
              }},
             {"keys", std::move(keys)},
-            {"video",
-             pn::map{
-                     {"fullscreen", p.fullscreen},
-                     {"window",
-                      pn::map{
-                              {"width", p.window_size.width},
-                              {"height", p.window_size.height},
-                      }},
-             }},
+            {"video", std::move(video)},
     });
 }
 

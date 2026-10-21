@@ -195,25 +195,48 @@ Point GLFWVideoDriver::get_mouse() {
 // up to fit the display, keeping their 640x480 proportions.
 static const Size kOriginalScreenSize = {640, 480};
 
+// With a fixed resolution, the game is laid out as on a display of that size, then scaled to fit
+// the framebuffer, centered.
 void GLFWVideoDriver::update_size() {
     glfwGetWindowSize(_window, &_window_size.width, &_window_size.height);
-    glfwGetFramebufferSize(_window, &_viewport_size.width, &_viewport_size.height);
-    _pixel_ratio = std::max(1, _viewport_size.width / std::max(1, _window_size.width));
-    _ui_scale    = std::max<float>(
-            _pixel_ratio, std::min(
-                                  float(_viewport_size.width) / kOriginalScreenSize.width,
-                                  float(_viewport_size.height) / kOriginalScreenSize.height));
+    glfwGetFramebufferSize(_window, &_framebuffer_size.width, &_framebuffer_size.height);
+    _pixel_ratio = std::max(1, _framebuffer_size.width / std::max(1, _window_size.width));
+    _resolution  = sys.prefs->resolution();
+    if (_resolution.as_rect().empty()) {
+        _viewport_size     = _framebuffer_size;
+        _battlefield_scale = _pixel_ratio;
+    } else {
+        _battlefield_scale = std::min(
+                float(_framebuffer_size.width) / _resolution.width,
+                float(_framebuffer_size.height) / _resolution.height);
+        _viewport_size = {
+                int(std::lround(_resolution.width * _battlefield_scale)),
+                int(std::lround(_resolution.height * _battlefield_scale))};
+    }
+    _viewport_offset = {
+            (_framebuffer_size.width - _viewport_size.width) / 2,
+            (_framebuffer_size.height - _viewport_size.height) / 2};
+    _ui_scale = std::max<float>(
+            _battlefield_scale,
+            std::min(
+                    float(_viewport_size.width) / kOriginalScreenSize.width,
+                    float(_viewport_size.height) / kOriginalScreenSize.height));
     _left_panel_pixels           = std::lround(kLeftPanelWidth * _ui_scale);
     _right_panel_pixels          = std::lround(kRightPanelWidth * _ui_scale);
     const int battlefield_pixels = _viewport_size.width - _left_panel_pixels - _right_panel_pixels;
     _screen_size                 = {
-            kLeftPanelWidth + (battlefield_pixels / _pixel_ratio) + kRightPanelWidth,
-            _viewport_size.height / _pixel_ratio};
+            kLeftPanelWidth + int(battlefield_pixels / _battlefield_scale) + kRightPanelWidth,
+            int(_viewport_size.height / _battlefield_scale)};
+}
+
+Point GLFWVideoDriver::viewport_origin() const {
+    return {_viewport_offset.h,
+            _framebuffer_size.height - _viewport_offset.v - _viewport_size.height};
 }
 
 vec4 GLFWVideoDriver::region_transform(Region region) const {
     const float k = _ui_scale;
-    const float r = _pixel_ratio;
+    const float r = _battlefield_scale;
     // Panels are laid out around instrument_top(); center them vertically.
     const int   instrument_top = (_screen_size.height / 2) - (kOriginalScreenSize.height / 2);
     const float panel_offset   = ((_viewport_size.height - (kOriginalScreenSize.height * k)) / 2) -
@@ -249,8 +272,8 @@ Point GLFWVideoDriver::convert(Point p, Region from, Region to) const {
 }
 
 Point GLFWVideoDriver::to_screen(double x, double y) const {
-    x             = x * _viewport_size.width / std::max(1, _window_size.width);
-    y             = y * _viewport_size.height / std::max(1, _window_size.height);
+    x = (x * _framebuffer_size.width / std::max(1, _window_size.width)) - _viewport_offset.h;
+    y = (y * _framebuffer_size.height / std::max(1, _window_size.height)) - _viewport_offset.v;
     Region region = Region::SCREEN;
     if (_game_layout) {
         if (x < _left_panel_pixels) {
@@ -594,6 +617,9 @@ void GLFWVideoDriver::loop(Card* initial) {
 
     while (!main_loop.done() && !glfwWindowShouldClose(_window)) {
         glfwPollEvents();
+        if (sys.prefs->resolution() != _resolution) {
+            update_size();
+        }
         _loop->draw();
         glfwSwapBuffers(_window);
         wall_time at;

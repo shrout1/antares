@@ -60,6 +60,22 @@ static constexpr char kVolRect[]       = "volume";
 
 static constexpr char kFullscreenButton[] = "fullscreen";
 
+// An empty size fills the display.
+static const struct {
+    const char* id;
+    Size        size;
+} kResolutions[] = {
+        {"resolution/fill", {0, 0}},
+        {"resolution/640x480", {640, 480}},
+        {"resolution/800x600", {800, 600}},
+        {"resolution/1024x768", {1024, 768}},
+        {"resolution/1280x960", {1280, 960}},
+        {"resolution/1280x720", {1280, 720}},
+        {"resolution/1366x768", {1366, 768}},
+        {"resolution/1600x900", {1600, 900}},
+        {"resolution/1920x1080", {1920, 1080}},
+};
+
 static constexpr char        kTabBox[] = "tabs";
 static constexpr const char* kTabs[]   = {
         "ship", "command", "shortcuts", "utility", "hot-keys",
@@ -234,6 +250,13 @@ VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
                     [] { return sys.prefs->fullscreen(); },
                     [](bool on) { sys.prefs->set_fullscreen(on); },
             });
+    for (const auto& r : kResolutions) {
+        const Size size = r.size;
+        checkbox(r.id)->bind({
+                [size] { return sys.prefs->resolution() == size; },
+                [size](bool) { sys.prefs->set_resolution(size); },
+        });
+    }
 
     button(kDoneButton)
             ->bind({

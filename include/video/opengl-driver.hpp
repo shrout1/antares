@@ -102,6 +102,8 @@ class OpenGlVideoDriver : public VideoDriver {
     };
 
     virtual Size            viewport_size() const = 0;
+    // Bottom-left corner of the viewport in the framebuffer, in pixels.
+    virtual Point           viewport_origin() const { return {0, 0}; }
     virtual pn::string_view glsl_version() const  = 0;
 
     // Points in `region` to viewport pixels: scale by (x, y), then offset by (z, w).

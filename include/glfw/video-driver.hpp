@@ -40,10 +40,11 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     virtual pn::string_view glsl_version() const;
 
-    virtual Size viewport_size() const { return _viewport_size; }
-    virtual Size screen_size() const { return _screen_size; }
+    virtual Size  viewport_size() const { return _viewport_size; }
+    virtual Point viewport_origin() const;
+    virtual Size  screen_size() const { return _screen_size; }
     virtual int   scale() const { return _pixel_ratio; }
-    virtual float overlay_scale() const { return _ui_scale / _pixel_ratio; }
+    virtual float overlay_scale() const { return _ui_scale / _battlefield_scale; }
 
     virtual void  set_game_layout(bool game) { _game_layout = game; }
     virtual Point convert(Point p, Region from, Region to) const;
@@ -85,8 +86,12 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     bool            _fullscreen;
     Size            _window_size;
     Size            _screen_size;
+    Size            _framebuffer_size;
     Size            _viewport_size;
+    Point           _viewport_offset;  // top-left corner in the framebuffer
+    Size            _resolution;
     int             _pixel_ratio        = 1;  // pixels per window coordinate
+    float           _battlefield_scale  = 1;  // pixels per point on the battlefield
     float           _ui_scale           = 1;  // pixels per point in panels and SCREEN
     int             _left_panel_pixels  = 0;
     int             _right_panel_pixels = 0;
