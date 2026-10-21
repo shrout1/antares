@@ -55,7 +55,8 @@ class OpenGlVideoDriver : public VideoDriver {
   public:
     OpenGlVideoDriver();
 
-    virtual int scale() const;
+    virtual int  scale() const;
+    virtual void set_region(Region region, float h = 0, float v = 0);
 
     virtual Texture texture(pn::string_view name, const PixMap& content, int scale);
     virtual void    dither_rect(const Rect& rect, const RgbColor& color);
@@ -69,6 +70,7 @@ class OpenGlVideoDriver : public VideoDriver {
 
     struct Uniforms {
         Uniform<vec2>          screen          = {"screen"};
+        Uniform<vec4>          transform       = {"transform"};
         Uniform<int>           scale           = {"scale"};
         Uniform<int>           color_mode      = {"color_mode"};
         Uniform<sampler2DRect> sprite          = {"sprite"};
@@ -101,6 +103,9 @@ class OpenGlVideoDriver : public VideoDriver {
 
     virtual Size            viewport_size() const = 0;
     virtual pn::string_view glsl_version() const  = 0;
+
+    // Points in `region` to viewport pixels: scale by (x, y), then offset by (z, w).
+    virtual vec4 region_transform(Region region) const;
 
   private:
     virtual void begin_points();

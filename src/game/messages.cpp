@@ -18,6 +18,8 @@
 
 #include "game/messages.hpp"
 
+#include <cmath>
+
 #include "config/keys.hpp"
 #include "data/resource.hpp"
 #include "drawing/color.hpp"
@@ -190,10 +192,12 @@ void Messages::clip() {
         m->labelMessage = false;
     }
 
-    m->retro_text = StyledText::retro(
+    const float scale = sys.video->overlay_scale();
+    m->retro_text     = StyledText::retro(
             text,
             {sys.fonts.tactical,
-             viewport().width() - kHBuffer - sys.fonts.tactical.logicalWidth + 1, 0, 0, 60},
+                 int(viewport().width() / scale) - kHBuffer - sys.fonts.tactical.logicalWidth + 1, 0,
+                 0, 60},
             kMessagesForeColor, kMessagesBackColor);
     m->retro_origin =
             Point(viewport().left + kHBuffer,
@@ -202,7 +206,7 @@ void Messages::clip() {
     m->retro_text.hide();
 
     if (!m->labelMessage) {
-        g.bottom_border = m->retro_text.height() + kLongMessageVPadDouble;
+        g.bottom_border = std::lround((m->retro_text.height() + kLongMessageVPadDouble) * scale);
     }
     m->stage = kShowStage;
 }
@@ -304,13 +308,17 @@ void Messages::draw_message_screen(ticks by_units) {
     if (!message_data.empty()) {
         pn::string_view message = message_data.front();
 
+        // The label rises one point per tick, scaled like the label itself.
+        const float scale = sys.video->overlay_scale();
         if (time_count < kRaiseTime) {
             g.message_label->set_position(
-                    kMessageScreenLeft, viewport().bottom - time_count.count());
+                    kMessageScreenLeft,
+                    viewport().bottom - std::lround(time_count.count() * scale));
         } else if (time_count > kLowerTime) {
             g.message_label->set_position(
                     kMessageScreenLeft,
-                    viewport().bottom - (kMessageDisplayTime - time_count).count());
+                    viewport().bottom -
+                            std::lround((kMessageDisplayTime - time_count).count() * scale));
         }
 
         g.message_label->text() = StyledText::plain(
@@ -399,6 +407,13 @@ void MessageLabel_Set_Special(Handle<Label> label, pn::string_view text) {
         if (attachPoint.h >= (kSmallScreenWidth - kRightPanelWidth)) {
             attachPoint.h =
                     (attachPoint.h - (kSmallScreenWidth - kRightPanelWidth)) + play_screen().right;
+            attachPoint = sys.video->convert(
+                    attachPoint, VideoDriver::Region::RIGHT_PANEL,
+                    VideoDriver::Region::BATTLEFIELD);
+        } else if (attachPoint.h < kLeftPanelWidth) {
+            attachPoint = sys.video->convert(
+                    attachPoint, VideoDriver::Region::LEFT_PANEL,
+                    VideoDriver::Region::BATTLEFIELD);
         }
         ++it;
     }
@@ -413,16 +428,23 @@ void MessageLabel_Set_Special(Handle<Label> label, pn::string_view text) {
     label->set_keep_on_screen_anyway(true);
 
     switch (whichType.value()) {
-        case 'R':
+        case 'R': {
+            Point p = sys.video->convert(
+                    {play_screen().right, instrument_top() + value},
+                    VideoDriver::Region::RIGHT_PANEL, VideoDriver::Region::BATTLEFIELD);
             label->set_offset(0, 0);
-            label->set_position(
-                    play_screen().right - label->width() - 10, instrument_top() + value);
+            label->set_position(p.h - label->width() - 10, p.v);
             break;
+        }
 
-        case 'L':
+        case 'L': {
+            Point p = sys.video->convert(
+                    {kLeftPanelWidth, instrument_top() + value}, VideoDriver::Region::LEFT_PANEL,
+                    VideoDriver::Region::BATTLEFIELD);
             label->set_offset(0, 0);
-            label->set_position(138, instrument_top() + value);
+            label->set_position(p.h + 10, p.v);
             break;
+        }
 
         case 'O': {
             auto o = GetObjectFromInitialNumber(Handle<const Initial>(value));
@@ -450,11 +472,18 @@ void Messages::draw_message() {
         rects.fill(message_bounds, kMessagesBackColor);
     }
 
-    Rect bounds(viewport().left, viewport().bottom, viewport().right, play_screen().bottom);
+    const float scale = sys.video->overlay_scale();
+    Rect        bounds{
+            sys.video->convert(
+                    {viewport().left, viewport().bottom}, VideoDriver::Region::BATTLEFIELD,
+                    VideoDriver::Region::OVERLAY),
+            Size{int(viewport().width() / scale), int(g.bottom_border / scale)}};
     bounds.inset(kHBuffer, 0);
     bounds.top += kLongMessageVPad;
+    sys.video->set_region(VideoDriver::Region::OVERLAY);
     long_message_data->retro_text.draw(bounds);
     long_message_data->retro_text.draw_cursor(bounds, kMessagesForeColor, /* ends= */ false);
+    sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
 }
 
 pn::string_view Messages::pause_string() { return sys.messages.at(10); }

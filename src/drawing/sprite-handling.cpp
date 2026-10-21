@@ -18,6 +18,7 @@
 
 #include "drawing/sprite-handling.hpp"
 
+#include <cmath>
 #include <numeric>
 #include <sfz/sfz.hpp>
 
@@ -196,14 +197,22 @@ void draw_sprites() {
                 int tinySize = aSprite->icon.size;
                 if ((aSprite->table != NULL) && !aSprite->killMe && tinySize &&
                     (aSprite->draw_tiny != NULL) && (aSprite->whichLayer == layer)) {
-                    Rect tiny_rect(-tinySize, -tinySize, tinySize, tinySize);
-                    tiny_rect.offset(aSprite->where.h, aSprite->where.v);
+                    // Drawn at their original size in OVERLAY, which shares the battlefield's
+                    // origin; the fraction of a point keeps their position exact.
+                    const float scale = sys.video->overlay_scale();
+                    const float h     = aSprite->where.h / scale;
+                    const float v     = aSprite->where.v / scale;
+                    Rect        tiny_rect(-tinySize, -tinySize, tinySize, tinySize);
+                    tiny_rect.offset(std::floor(h), std::floor(v));
+                    sys.video->set_region(
+                            VideoDriver::Region::OVERLAY, h - std::floor(h), v - std::floor(v));
                     aSprite->draw_tiny(
                             tiny_rect, GetRGBTranslateColorShade(
                                                aSprite->tinyColor.hue, aSprite->tinyColor.shade));
                 }
             }
         }
+        sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
     }
 }
 

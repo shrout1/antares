@@ -19,6 +19,7 @@
 #include "game/labels.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 #include "drawing/color.hpp"
 #include "drawing/pix-map.hpp"
@@ -125,9 +126,14 @@ void Label::draw() {
         }
         const RgbColor dark = GetRGBTranslateColorShade(label->hue, VERY_DARK);
         sys.video->dither_rect(label->thisRect, dark);
-        rect.offset(kLabelInnerSpace, kLabelInnerSpace);
 
+        const Point origin = sys.video->convert(
+                rect.origin(), VideoDriver::Region::BATTLEFIELD, VideoDriver::Region::OVERLAY);
+        rect = Rect{origin, Size{label->_text.auto_width(), label->_text.height()}};
+        rect.offset(kLabelInnerSpace, kLabelInnerSpace);
+        sys.video->set_region(VideoDriver::Region::OVERLAY);
         label->_text.draw(rect);
+        sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
     }
 }
 
@@ -316,9 +322,14 @@ void Label::set_offset(int32_t hoff, int32_t voff) {
     offset.v = voff;
 }
 
-int32_t Label::width() const { return _text.auto_width() + kLabelTotalInnerSpace; }
+// In battlefield points; labels draw at overlay scale.
+int32_t Label::width() const {
+    return std::lround((_text.auto_width() + kLabelTotalInnerSpace) * sys.video->overlay_scale());
+}
 
-int32_t Label::height() const { return _text.height() + kLabelTotalInnerSpace; }
+int32_t Label::height() const {
+    return std::lround((_text.height() + kLabelTotalInnerSpace) * sys.video->overlay_scale());
+}
 
 int32_t Label::line_height() const { return sys.fonts.tactical.height; }
 

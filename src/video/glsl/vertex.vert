@@ -32,13 +32,14 @@ out vec2 uv;
 out vec4 color;
 out vec2 screen_position;
 
-uniform vec2 screen;
+uniform vec2 screen;  // in pixels
+uniform vec4 transform;
 
 void main() {
-    mat4 transform =
+    mat4 projection =
             mat4(2.0 / screen.x, 0, 0, 0, 0, -2.0 / screen.y, 0, 0, 0, 0, 0, 0, -1.0, 1.0, 0, 1);
 
-    gl_Position     = transform * vertex;
+    gl_Position     = projection * vec4(vertex.xy * transform.xy + transform.zw, vertex.zw);
     uv              = tex_coord;
     screen_position = vertex.xy;
     color           = in_color;

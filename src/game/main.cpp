@@ -331,6 +331,7 @@ class PauseScreen : public Card {
 };
 
 void GamePlay::become_front() {
+    sys.video->set_game_layout(true);
     switch (_state) {
         case PLAYING:
             _input_source->start();
@@ -394,9 +395,13 @@ void GamePlay::become_front() {
     }
 }
 
-void GamePlay::resign_front() { minicomputer_cancel(); }
+void GamePlay::resign_front() {
+    sys.video->set_game_layout(false);
+    minicomputer_cancel();
+}
 
 void GamePlay::draw() const {
+    sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
     globals()->starfield.draw();
     if (_should_draw_sector_lines) {
         draw_sector_lines();
@@ -414,6 +419,7 @@ void GamePlay::draw() const {
         _player_ship.cursor().draw();
     }
     HintLine::draw();
+    sys.video->set_region(VideoDriver::Region::SCREEN);
     globals()->transitions.draw();
 }
 

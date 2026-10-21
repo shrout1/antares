@@ -18,6 +18,9 @@
 
 #include "ui/screens/scroll-text.hpp"
 
+#include <algorithm>
+#include <chrono>
+
 #include "config/preferences.hpp"
 #include "drawing/build-pix.hpp"
 #include "drawing/pix-map.hpp"
@@ -106,7 +109,13 @@ void ScrollTextScreen::draw() const {
     position.center_in(clip);
     position.offset(0, clip.top - position.top);
     position.offset(0, -_position);
+    // Between shifts, draw at the fraction of a point that has passed.
+    const double fraction = std::min(
+            1.0, std::chrono::duration<double>(now() - (_next_shift - _interval)) /
+                         std::chrono::duration<double>(_interval));
+    sys.video->set_region(VideoDriver::Region::SCREEN, 0, -fraction);
     _build_pix.draw(position.origin());
+    sys.video->set_region(VideoDriver::Region::SCREEN);
     Rects rects;
     rects.fill(Rect(world.left, world.top, world.right, clip.top), RgbColor::black());
     rects.fill(Rect(world.left, clip.bottom, world.right, world.bottom), RgbColor::black());
