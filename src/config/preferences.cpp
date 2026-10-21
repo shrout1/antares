@@ -101,6 +101,7 @@ Preferences::Preferences() {
     fullscreen  = false;
     window_size = {640, 480};
     resolution  = {0, 0};
+    game_scale  = GameScale::NATIVE;
 }
 
 Preferences Preferences::copy() const {
@@ -113,6 +114,7 @@ Preferences Preferences::copy() const {
     copy.fullscreen         = fullscreen;
     copy.window_size        = window_size;
     copy.resolution         = resolution;
+    copy.game_scale         = game_scale;
     return copy;
 }
 
@@ -170,6 +172,12 @@ void PrefsDriver::set_window_size(Size size) {
 void PrefsDriver::set_resolution(Size size) {
     Preferences p(get().copy());
     p.resolution = size;
+    set(p);
+}
+
+void PrefsDriver::set_game_scale(GameScale scale) {
+    Preferences p(get().copy());
+    p.game_scale = scale;
     set(p);
 }
 

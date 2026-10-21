@@ -76,6 +76,15 @@ static const struct {
         {"resolution/1920x1080", {1920, 1080}},
 };
 
+static const struct {
+    const char* id;
+    GameScale   scale;
+} kGameScales[] = {
+        {"game-scale/native", GameScale::NATIVE},
+        {"game-scale/whole", GameScale::WHOLE},
+        {"game-scale/fill", GameScale::FILL},
+};
+
 static constexpr char        kTabBox[] = "tabs";
 static constexpr const char* kTabs[]   = {
         "ship", "command", "shortcuts", "utility", "hot-keys",
@@ -255,6 +264,13 @@ VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
         checkbox(r.id)->bind({
                 [size] { return sys.prefs->resolution() == size; },
                 [size](bool) { sys.prefs->set_resolution(size); },
+        });
+    }
+    for (const auto& s : kGameScales) {
+        const GameScale scale = s.scale;
+        checkbox(s.id)->bind({
+                [scale] { return sys.prefs->game_scale() == scale; },
+                [scale](bool) { sys.prefs->set_game_scale(scale); },
         });
     }
 
