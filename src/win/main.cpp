@@ -32,6 +32,7 @@
 #include "config/dirs.hpp"
 #include "config/file-prefs-driver.hpp"
 #include "config/ledger.hpp"
+#include "config/plugins.hpp"
 #include "config/preferences.hpp"
 #include "data/extractor.hpp"
 #include "game/sys.hpp"
@@ -73,9 +74,11 @@ void usage(pn::output_view out, pn::string_view progname, int retcode) {
             "        --console       allocate console\n"
             "    -f, --factory       set path to factory scenario\n"
             "                        (default: {3})\n"
+            "    -p, --plugins       also list plugins found in this directory\n"
+            "                        (may be repeated; {4} is always searched)\n"
             "    -h, --help          display this help screen\n",
             progname, default_application_path(), default_config_path(),
-            default_factory_scenario_path());
+            default_factory_scenario_path(), dirs().scenarios);
     exit(retcode);
 }
 
@@ -91,6 +94,51 @@ void extract_data() {
     }
     NullStatusObserver observer;
     extractor.extract(&observer);
+}
+
+// Quotes an argument so that CommandLineToArgvW() reads it back unchanged.
+std::wstring quote_argument(pn::string_view arg) {
+    std::wstring in          = arg.cpp_wstr();
+    std::wstring out         = L"\"";
+    int          backslashes = 0;
+    for (wchar_t c : in) {
+        if (c == L'\\') {
+            ++backslashes;
+        } else if (c == L'"') {
+            out.append(backslashes + 1, L'\\');
+            backslashes = 0;
+        } else {
+            backslashes = 0;
+        }
+        out += c;
+    }
+    out.append(backslashes, L'\\');
+    return out + L"\"";
+}
+
+void restart(pn::string_view program, const std::vector<pn::string>& arguments) {
+    std::wstring command_line = quote_argument(program);
+    for (const pn::string& arg : arguments) {
+        command_line += L" " + quote_argument(arg);
+    }
+    wchar_t path[MAX_PATH];
+    if (!GetModuleFileNameW(nullptr, path, MAX_PATH)) {
+        throw std::runtime_error(
+                pn::format("GetModuleFileName: error {0}", static_cast<int64_t>(GetLastError()))
+                        .c_str());
+    }
+    STARTUPINFOW        startup_info{sizeof(STARTUPINFOW)};
+    PROCESS_INFORMATION process_info;
+    if (!CreateProcessW(
+                path, &command_line[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr,
+                &startup_info, &process_info)) {
+        throw std::runtime_error(pn::format(
+                                         "CreateProcess: {0}: error {1}", program,
+                                         static_cast<int64_t>(GetLastError()))
+                                         .c_str());
+    }
+    CloseHandle(process_info.hProcess);
+    CloseHandle(process_info.hThread);
 }
 
 }  // namespace
@@ -111,15 +159,22 @@ void main(int argc, char* const* argv) {
     };
 
     pn::string_view config_path = default_config_path();
-    callbacks.short_option      = [&progname, &config_path](
+    // Options to pass on when restarting with another plugin.
+    std::vector<pn::string> restart_options;
+    callbacks.short_option = [&progname, &config_path, &restart_options](
                                      pn::rune opt, const args::callbacks::get_value_f& get_value) {
+        pn::string_view value;
         switch (opt.value()) {
-            case 'a': set_application_path(get_value()); return true;
-            case 'c': config_path = get_value(); return true;
-            case 'f': set_factory_scenario_path(get_value()); return true;
+            case 'a': set_application_path(value = get_value()); break;
+            case 'c': config_path = value = get_value(); break;
+            case 'f': set_factory_scenario_path(value = get_value()); break;
+            case 'p': add_plugin_directory(value = get_value()); break;
             case 'h': usage(pn::out, progname, 0); return true;
             default: return false;
         }
+        restart_options.push_back(pn::format("-{0}", opt));
+        restart_options.push_back(value.copy());
+        return true;
     };
 
     callbacks.long_option =
@@ -130,6 +185,8 @@ void main(int argc, char* const* argv) {
                     return callbacks.short_option(pn::rune{'c'}, get_value);
                 } else if (opt == "factory-scenario") {
                     return callbacks.short_option(pn::rune{'f'}, get_value);
+                } else if (opt == "plugins") {
+                    return callbacks.short_option(pn::rune{'p'}, get_value);
                 } else if (opt == "help") {
                     return callbacks.short_option(pn::rune{'h'}, get_value);
                 } else if (opt == "console") {
@@ -156,16 +213,27 @@ void main(int argc, char* const* argv) {
 
     extract_data();
 
-    FilePrefsDriver prefs(config_path);
+    {
+        FilePrefsDriver prefs(config_path);
 
-    DirectoryLedger ledger;
+        DirectoryLedger ledger;
 #ifdef _MSC_VER
-    XAudio2SoundDriver sound;
+        XAudio2SoundDriver sound;
 #else
-    NullSoundDriver sound;
+        NullSoundDriver sound;
 #endif
-    GLFWVideoDriver video;
-    video.loop(new Master(scenario, time(NULL)));
+        GLFWVideoDriver video;
+        enable_plugin_switching();
+        video.loop(new Master(scenario, time(nullptr)));
+    }
+
+    if (plugin_requested()) {
+        // Start over with the plugin chosen on the plugins screen, keeping the other options.
+        if (requested_plugin().has_value()) {
+            restart_options.push_back(requested_plugin()->copy());
+        }
+        restart(argv[0], restart_options);
+    }
 }
 
 }  // namespace antares
