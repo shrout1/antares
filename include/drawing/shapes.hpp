@@ -33,6 +33,10 @@ class RgbColor;
 void draw_triangle_up(PixMap* destPix, const RgbColor& color);
 void draw_compat_plus(PixMap* destPix, const RgbColor& color);
 void draw_compat_diamond(PixMap* destPix, const RgbColor& color);
+// Smooth-edged versions of the shapes above as they'd be drawn at `size`, for drawing scaled
+// up to the size of `destPix`.
+void draw_smooth_triangle_up(PixMap* destPix, int32_t size, const RgbColor& color);
+void draw_smooth_diamond(PixMap* destPix, int32_t size, const RgbColor& color);
 void draw_vbracket(const Rects& rects, const Rect& rect, const RgbColor& color);
 void draw_shaded_rect(
         const Rects& rects, Rect rect, const RgbColor& fill_color, const RgbColor& light_color,

@@ -129,6 +129,10 @@ class OpenGlVideoDriver : public VideoDriver {
     std::map<size_t, Texture> _triangles;
     std::map<size_t, Texture> _diamonds;
     std::map<size_t, Texture> _pluses;
+    // Smooth triangles and diamonds by size in viewport pixels, for when they're scaled.
+    std::map<std::pair<size_t, int>, Texture> _smooth_triangles;
+    std::map<std::pair<size_t, int>, Texture> _smooth_diamonds;
+    float                                     _pixels_per_point = 1;
 
     uint32_t _vbuf[3];
 };

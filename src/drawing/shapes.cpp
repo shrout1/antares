@@ -19,6 +19,7 @@
 #include "drawing/shapes.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 #include "drawing/color.hpp"
 #include "drawing/pix-map.hpp"
@@ -38,6 +39,43 @@ void draw_triangle_up(PixMap* destPix, const RgbColor& color) {
         r.inset(1, 0);
         r.offset(0, 2);
     }
+}
+
+// Covers each pixel of `destPix` by the fraction of it inside the shape, sampled on a 4×4 grid.
+// `inside` takes coordinates in pixels of the shape at `size`.
+template <typename Inside>
+static void draw_smooth(PixMap* destPix, int32_t size, const RgbColor& color, Inside inside) {
+    const int     samples = 4;
+    const int32_t pixels  = destPix->size().width;
+    const double  unit    = double(size) / pixels;
+    for (int32_t y = 0; y < pixels; ++y) {
+        for (int32_t x = 0; x < pixels; ++x) {
+            int covered = 0;
+            for (int i = 0; i < samples; ++i) {
+                for (int j = 0; j < samples; ++j) {
+                    covered += inside(
+                            (x + (j + 0.5) / samples) * unit, (y + (i + 0.5) / samples) * unit);
+                }
+            }
+            RgbColor c = color;
+            c.alpha    = color.alpha * covered / (samples * samples);
+            destPix->set(x, y, c);
+        }
+    }
+}
+
+void draw_smooth_triangle_up(PixMap* destPix, int32_t size, const RgbColor& color) {
+    draw_smooth(destPix, size, color, [size](double x, double y) {
+        return std::abs(x - size / 2.0) < (size - y) / 2.0;
+    });
+}
+
+void draw_smooth_diamond(PixMap* destPix, int32_t size, const RgbColor& color) {
+    // Same bounds as draw_compat_diamond().
+    const double half = (size - 1) / 2.0;
+    draw_smooth(destPix, size, color, [half](double x, double y) {
+        return std::abs(x - 1 - half) + std::abs(y - half) < half;
+    });
 }
 
 static void draw_plus(PixMap::View pix, RgbColor color) {

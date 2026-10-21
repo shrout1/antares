@@ -395,6 +395,7 @@ void OpenGlVideoDriver::set_region(Region region, float h, float v) {
     t.z += std::trunc(h * t.x);
     t.w += std::trunc(v * t.y);
     _uniforms.transform.set(t);
+    _pixels_per_point = t.x;
 }
 
 Texture OpenGlVideoDriver::texture(pn::string_view name, const PixMap& content, int scale) {
@@ -542,6 +543,17 @@ void OpenGlVideoDriver::draw_triangle(const Rect& rect, const RgbColor& color) {
     size_t size = min(rect.width(), rect.height());
     Rect   to(0, 0, size, size);
     to.offset(rect.left, rect.top);
+    int pixels = std::lround(size * _pixels_per_point);
+    if (pixels != size * scale()) {
+        auto key = std::make_pair(size, pixels);
+        if (_smooth_triangles.find(key) == _smooth_triangles.end()) {
+            ArrayPixMap pix(pixels, pixels);
+            draw_smooth_triangle_up(&pix, size, RgbColor::white());
+            _smooth_triangles[key] = texture("", pix, 1);
+        }
+        _smooth_triangles[key].draw_shaded(to, color);
+        return;
+    }
     if (_triangles.find(size) == _triangles.end()) {
         ArrayPixMap pix(size, size);
         pix.fill(RgbColor::clear());
@@ -555,6 +567,17 @@ void OpenGlVideoDriver::draw_diamond(const Rect& rect, const RgbColor& color) {
     size_t size = min(rect.width(), rect.height());
     Rect   to(0, 0, size, size);
     to.offset(rect.left, rect.top);
+    int pixels = std::lround(size * _pixels_per_point);
+    if ((size > 3) && (pixels != size * scale())) {
+        auto key = std::make_pair(size, pixels);
+        if (_smooth_diamonds.find(key) == _smooth_diamonds.end()) {
+            ArrayPixMap pix(pixels, pixels);
+            draw_smooth_diamond(&pix, size, RgbColor::white());
+            _smooth_diamonds[key] = texture("", pix, 1);
+        }
+        _smooth_diamonds[key].draw_shaded(to, color);
+        return;
+    }
     if (_diamonds.find(size) == _diamonds.end()) {
         ArrayPixMap pix(size, size);
         pix.fill(RgbColor::clear());
