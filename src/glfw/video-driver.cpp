@@ -114,7 +114,7 @@ static Key glfw_key_to_usb(int key) {
         case GLFW_KEY_END: return Key::END;
         case GLFW_KEY_CAPS_LOCK: return Key::CAPS_LOCK;
         case GLFW_KEY_SCROLL_LOCK: return Key::NONE;
-        case GLFW_KEY_NUM_LOCK: return Key::NONE;
+        case GLFW_KEY_NUM_LOCK: return Key::N_CLEAR;
         case GLFW_KEY_PRINT_SCREEN: return Key::NONE;
         case GLFW_KEY_PAUSE: return Key::NONE;
 
