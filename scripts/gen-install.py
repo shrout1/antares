@@ -45,7 +45,7 @@ def main():
                 1-data)
                     for ICON in resources/antares.iconset/icon_*.png; do
                         ICONSIZE=${{ICON#resources/antares.iconset/icon_}}
-                        ICONSIZE=${{ICON%.png}}
+                        ICONSIZE=${{ICONSIZE%.png}}
                         @ install -m 755 -d "$ICONDIR/hicolor/$ICONSIZE/apps"
                         @ install -m 644 $ICON "$ICONDIR/hicolor/$ICONSIZE/apps/antares.png"
                     done
