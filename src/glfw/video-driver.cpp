@@ -19,15 +19,15 @@
 #include "glfw/video-driver.hpp"
 
 #include <GLFW/glfw3.h>
+#include <algorithm>
+#include <cmath>
 
 #include <game/sys.hpp>
 #include <pn/output>
 #include <sfz/sfz.hpp>
 
 #ifdef _MSC_VER
-#include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <thread>
 #else
 #include <unistd.h>
