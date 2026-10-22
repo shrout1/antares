@@ -51,6 +51,7 @@
 #include "math/special.hpp"
 #include "math/units.hpp"
 #include "sound/fx.hpp"
+#include "ui/input-log.hpp"
 
 namespace antares {
 
@@ -847,6 +848,8 @@ void PlayerShip::update() {
             default: break;
         }
     }
+
+    input_log::check(gTheseKeys, _message.editing() ? 0xff : g.key_mask);
 
     /*
     while ((globals()->gKeyMapBufferBottom != globals()->gKeyMapBufferTop)) {

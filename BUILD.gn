@@ -386,6 +386,7 @@ source_set("libantares-ui") {
     "src/ui/flows/master.cpp",
     "src/ui/flows/replay-game.cpp",
     "src/ui/flows/solo-game.cpp",
+    "src/ui/input-log.cpp",
     "src/ui/interface-handling.cpp",
     "src/ui/screen.cpp",
     "src/ui/screens/briefing.cpp",

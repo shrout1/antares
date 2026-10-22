@@ -33,8 +33,14 @@
 #include <unistd.h>
 #endif
 
+#ifdef __linux__
+#include <dlfcn.h>
+extern "C" void* glfwGetX11Display(void);
+#endif
+
 #include "config/preferences.hpp"
 #include "game/globals.hpp"
+#include "ui/input-log.hpp"
 
 using sfz::range;
 
@@ -327,15 +333,23 @@ void GLFWVideoDriver::key(int key, int scancode, int action, int mods) {
     }
 #endif
 
+    Key usb_key = (key < 0) ? Key::NONE : glfw_key_to_usb(key);
+    input_log::write(
+            "key %s %.*s (glfw %d, scancode %d, mods %d)%s",
+            (action == GLFW_PRESS)     ? "press"
+            : (action == GLFW_RELEASE) ? "release"
+                                       : "repeat",
+            int(usb_key.name().size()), usb_key.name().data(), key, scancode, mods,
+            _text ? " while editing text" : "");
+    if (action != GLFW_REPEAT) {
+        input_log::told(usb_key, action == GLFW_PRESS);
+    }
+
     if (_text) {
         edit(key, action, mods);
         return;
     }
 
-    if (key < 0) {
-        return;
-    }
-    Key usb_key = glfw_key_to_usb(key);
     if (usb_key == Key::NONE) {
         return;
     }
@@ -535,6 +549,39 @@ void GLFWVideoDriver::key_callback(GLFWwindow* w, int key, int scancode, int act
     driver->key(key, scancode, action, mods);
 }
 
+void GLFWVideoDriver::focus_callback(GLFWwindow* w, int focused) {
+    input_log::write("window focus %s", focused ? "gained" : "lost");
+}
+
+// Reads which pilot keys the X server has down, for comparing with what the game was told.
+void GLFWVideoDriver::log_held_keys() const {
+#ifdef __linux__
+    if (!input_log::enabled()) {
+        return;
+    }
+    using QueryKeymap        = int (*)(void*, char[32]);
+    static QueryKeymap query = reinterpret_cast<QueryKeymap>(dlsym(RTLD_DEFAULT, "XQueryKeymap"));
+    static void*       display = glfwGetX11Display();
+    if (!query || !display) {
+        return;
+    }
+    char keymap[32];
+    query(display, keymap);
+    for (int num = 0; num < 8; ++num) {
+        Key key = sys.prefs->key(num);
+        for (int g = GLFW_KEY_SPACE; g <= GLFW_KEY_LAST; ++g) {
+            if (glfw_key_to_usb(g) == key) {
+                int code = glfwGetKeyScancode(g);
+                if ((code > 0) && (code < 256)) {
+                    input_log::held(key, keymap[code / 8] & (1 << (code % 8)));
+                }
+                break;
+            }
+        }
+    }
+#endif
+}
+
 void GLFWVideoDriver::char_callback(GLFWwindow* w, unsigned int code_point) {
     GLFWVideoDriver* driver = reinterpret_cast<GLFWVideoDriver*>(glfwGetWindowUserPointer(w));
     driver->char_(code_point);
@@ -620,6 +667,7 @@ void GLFWVideoDriver::loop(Card* initial) {
     glfwSetCursorPosCallback(_window, mouse_move_callback);
     glfwSetWindowSizeCallback(_window, window_size_callback);
     glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
+    glfwSetWindowFocusCallback(_window, focus_callback);
 
     /* Make the _window's context current */
     glfwMakeContextCurrent(_window);
@@ -630,6 +678,7 @@ void GLFWVideoDriver::loop(Card* initial) {
 
     while (!main_loop.done() && !glfwWindowShouldClose(_window)) {
         glfwPollEvents();
+        log_held_keys();
         if ((sys.prefs->resolution() != _resolution) || (sys.prefs->game_scale() != _game_scale)) {
             update_size();
         }
