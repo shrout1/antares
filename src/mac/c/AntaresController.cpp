@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "config/ledger.hpp"
+#include "config/plugins.hpp"
 #include "config/preferences.hpp"
 #include "game/globals.hpp"
 #include "lang/exception.hpp"
@@ -63,6 +64,7 @@ extern "C" void antares_controller_destroy_drivers(AntaresDrivers* drivers) { de
 extern "C" bool antares_controller_loop(
         AntaresDrivers* drivers, const char* plugin_path, CFStringRef* error_message) {
     try {
+        enable_plugin_switching();
         drivers->video.loop(new Master(
                 plugin_path ? sfz::make_optional<pn::string_view>(plugin_path) : sfz::nullopt,
                 time(NULL)));
@@ -71,6 +73,13 @@ extern "C" bool antares_controller_loop(
         return false;
     }
     return true;
+}
+
+extern "C" const char* antares_controller_restart_plugin() {
+    if (!plugin_requested()) {
+        return nullptr;
+    }
+    return requested_plugin().has_value() ? requested_plugin()->c_str() : "";
 }
 
 }  // namespace antares
