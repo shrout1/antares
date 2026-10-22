@@ -1,7 +1,7 @@
 # Ares plugins for Antares
 
 The community scenarios from the [Ares Addons archive](http://www.cytheraguides.com/archives/ambrosia_addons/ares/),
-converted to Antares plugins, with a launcher for Linux and Windows for picking one and playing it.
+converted to Antares plugins, with a launcher for Linux, Windows and macOS for picking one and playing it.
 
 These plugins were written for the original Ares by its players, around 2000 to 2004. Each
 still carries its author's name, and its archive description is in `description.txt` inside the
@@ -16,7 +16,7 @@ plugin. They're collected here so they can be played again; they belong to their
   - `notes/`: what the converter changed or couldn't convert, one file per plugin.
   - `conversion-log.tsv`: every file in the archive, and the plugin made from it or why none was.
   - `descriptions.json`: each plugin's archive entry and description.
-- `launcher/antares-launcher`: the launcher (Linux and Windows).
+- `launcher/antares-launcher`: the launcher (Linux, Windows and macOS).
 - `tools/`: scripts used for the conversion.
 
 ## Playing
@@ -32,6 +32,17 @@ scenarios folder, then choose one with the Plugins button on the main menu:
 
 The game can also list a folder in place: `antares -p contrib/ares-plugins/plugins` (on Windows,
 `Antares.exe -p contrib\ares-plugins\plugins`).
+
+### Opening the game on a Mac
+
+Builds from this fork aren't signed by Apple, so the first time you open `Antares.app`, macOS
+says it can't check it for malware. Click Done, then open System Settings → Privacy & Security,
+scroll down to "Antares was blocked", click **Open Anyway** and confirm. After that it opens
+normally. (Or, in Terminal: `xattr -dr com.apple.quarantine /Applications/Antares.app`.)
+
+The Library folder is hidden in Finder; to reach the scenarios folder, choose Go → Go to Folder…
+(⇧⌘G) and paste `~/Library/Application Support/Antares/Scenarios`. It's made the first time the
+game runs.
 
 ## The launcher
 
@@ -57,6 +68,17 @@ python contrib\ares-plugins\launcher\antares-launcher
 It runs `Antares.exe` from your `PATH`, or else this checkout's build in `out\win\opt`, which it
 points at the `data` folder here. Its settings and logs are kept in `%APPDATA%\Antares Launcher`
 and `%LOCALAPPDATA%\Antares Launcher`, and progress in `Documents\Antares`, as the game keeps it.
+
+On macOS, the python.org installer includes Tk. Start the launcher from Terminal:
+
+```
+python3 contrib/ares-plugins/launcher/antares-launcher
+```
+
+It runs `Antares.app` from Applications (yours or the system's), or else this checkout's build in
+`out/mac/opt`. Run the game once first, so it unpacks the original scenario. Its settings and
+logs are kept in `~/Library/Application Support/Antares Launcher` and `~/Library/Caches/Antares
+Launcher`, and progress in `~/Library/Application Support/Antares`, as the game keeps it.
 
 Options at the bottom of the window (Linux only):
 

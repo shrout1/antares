@@ -3,10 +3,11 @@
 
 Shows each plugin's solo chapters and how many you've unlocked (Antares keeps that in
 registry/<identifier>.pn under its data folder: ~/.local/share/games/antares on Linux,
-Documents\\Antares on Windows), and saves, imports or resets that progress the same way as the
-game's Plugins screen (saved copies go in saved-progress/). Settings are kept in
-~/.config/antares-launcher.json (%APPDATA%\\Antares Launcher on Windows). Lists the plugins in
-../plugins unless another folder is chosen.
+Documents\\Antares on Windows, ~/Library/Application Support/Antares on macOS), and saves,
+imports or resets that progress the same way as the game's Plugins screen (saved copies go in
+saved-progress/). Settings are kept in ~/.config/antares-launcher.json (%APPDATA%\\Antares
+Launcher on Windows, ~/Library/Application Support/Antares Launcher on macOS). Lists the plugins
+in ../plugins unless another folder is chosen.
 """
 import ast
 import hashlib
@@ -16,6 +17,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import time
 import tkinter as tk
 import zipfile
@@ -23,6 +25,7 @@ from tkinter import filedialog, messagebox, ttk
 from tkinter import font as tkfont
 
 WINDOWS = os.name == 'nt'
+MAC = sys.platform == 'darwin'
 HOME = os.path.expanduser('~')
 # contrib/ares-plugins, followed through a symlink so an installed link still finds it.
 CONTRIB = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -44,6 +47,13 @@ if WINDOWS:
     CONFIG = os.path.join(CONFIG_DIR, 'antares-launcher.json')
     GAME_DATA = os.path.join(documents(), 'Antares')  # dirs().root in src/config/win-dirs.cpp
     REGISTRY = os.path.join(GAME_DATA, 'Registry')
+elif MAC:
+    LIBRARY = os.path.join(HOME, 'Library')
+    CONFIG_DIR = os.path.join(LIBRARY, 'Application Support', 'Antares Launcher')
+    CACHE_DIR = os.path.join(LIBRARY, 'Caches', 'Antares Launcher')
+    CONFIG = os.path.join(CONFIG_DIR, 'antares-launcher.json')
+    GAME_DATA = os.path.join(LIBRARY, 'Application Support', 'Antares')  # mac-dirs.cpp
+    REGISTRY = os.path.join(GAME_DATA, 'Registry')
 else:
     CONFIG_DIR = os.path.join(HOME, '.config', 'antares-launcher')
     CACHE_DIR = os.path.join(HOME, '.cache')
@@ -58,17 +68,28 @@ SAVED = os.path.join(GAME_DATA, 'saved-progress')
 # The converted plugins beside this launcher (contrib/ares-plugins/plugins).
 DEFAULT_FOLDER = os.path.join(CONTRIB, 'plugins')
 FACTORY = ''  # sentinel path: run Antares with no plugin argument
+FACTORY_ID = '4cab7415715aeeacf1486a352267ae82c0efb220'  # kFactoryScenarioIdentifier
 
 
 def find_antares():
     if WINDOWS:
         # A build in this checkout (out/win/opt, made by configure and ninja) if not on PATH.
         return shutil.which('antares') or os.path.join(REPO, 'out', 'win', 'opt', 'antares.exe')
+    if MAC:
+        # The app in Applications, or a build in this checkout.
+        bundles = [os.path.join(d, 'Antares.app') for d in
+                   ('/Applications', os.path.join(HOME, 'Applications'))]
+        bundles.append(os.path.join(REPO, 'out', 'mac', 'opt', 'Antares.app'))
+        exes = [os.path.join(b, 'Contents', 'MacOS', 'Antares') for b in bundles]
+        return next((e for e in exes if os.path.exists(e)), exes[0])
     return shutil.which('antares') or '/usr/local/games/antares'
 
 
 def app_data():
     """The folder holding the original game's info.pn and levels."""
+    if MAC:
+        # Unpacked from the original game on first launch.
+        return os.path.join(GAME_DATA, 'Scenarios', FACTORY_ID)
     if not WINDOWS:
         return '/usr/local/share/games/antares/app'
     # Antares.exe looks for data beside itself; a build in this checkout uses the data submodule.
@@ -304,9 +325,10 @@ class Launcher(tk.Tk):
         bottom = ttk.Frame(self, padding=10)
         bottom.pack(fill='x', side='bottom', before=body)
         # Both options are for Linux: Mesa's software renderer and GNOME's shortcuts.
-        self.software = tk.BooleanVar(value=self.cfg.get('software', True) and not WINDOWS)
-        self.free_super = tk.BooleanVar(value=self.cfg.get('free_super', True) and not WINDOWS)
-        if not WINDOWS:
+        linux = not (WINDOWS or MAC)
+        self.software = tk.BooleanVar(value=self.cfg.get('software', True) and linux)
+        self.free_super = tk.BooleanVar(value=self.cfg.get('free_super', True) and linux)
+        if linux:
             ttk.Checkbutton(bottom, text='Software rendering',
                             variable=self.software, command=self.save_config).pack(side='left')
             ttk.Checkbutton(bottom, text='Let the game use the Windows and Alt keys',
@@ -576,7 +598,7 @@ class Launcher(tk.Tk):
         cmd = [exe]
         if WINDOWS and app_data() != os.path.join(os.path.dirname(exe), 'data'):
             cmd += ['-a', app_data()]
-        if supports_plugins_option(exe):
+        if not MAC and supports_plugins_option(exe):  # the Mac app would open, not print help
             cmd += ['-p', self.folder()]
         cmd += [p['path']] if p['path'] else []
         if self.free_super.get():
