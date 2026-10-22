@@ -11,6 +11,7 @@ game's Plugins screen (saved copies go in saved-progress/). Settings are kept in
 import ast
 import hashlib
 import json
+import math
 import os
 import re
 import shutil
@@ -19,6 +20,7 @@ import time
 import tkinter as tk
 import zipfile
 from tkinter import filedialog, messagebox, ttk
+from tkinter import font as tkfont
 
 WINDOWS = os.name == 'nt'
 HOME = os.path.expanduser('~')
@@ -232,7 +234,7 @@ class Launcher(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('Antares Launcher')
-        self.geometry('980x600')
+        self.geometry('980x720')
         self.minsize(720, 420)
         ttk.Style(self).theme_use('clam')
         self.cfg = self.load_config()
@@ -275,14 +277,22 @@ class Launcher(tk.Tk):
         body.add(left, weight=3)
 
         right = ttk.Frame(body, padding=(12, 0, 0, 0))
-        self.details = tk.Text(right, wrap='word', width=34, height=10, relief='flat',
-                               background=self.cget('background'), font=('TkDefaultFont', 10))
-        dsb = ttk.Scrollbar(right, orient='vertical', command=self.details.yview)
-        self.details.configure(yscrollcommand=dsb.set, state='disabled')
-        dsb.pack(side='right', fill='y')
-        self.details.pack(fill='both', expand=True)
+        text = dict(wrap='word', width=34, relief='flat', background=self.cget('background'),
+                    font=('TkDefaultFont', 10))
         progress = ttk.Frame(right, padding=(0, 6, 0, 0))
-        progress.pack(fill='x', side='bottom', before=self.details)
+        progress.pack(fill='x', side='bottom')
+        # Sized to fit by fit_details(); the description below takes the rest of the pane.
+        self.details = tk.Text(right, height=10, **text)
+        self.details.configure(state='disabled')
+        self.details.pack(fill='x')
+        self.details.bind('<Configure>', lambda e: self.fit_details())
+        desc = ttk.Frame(right)
+        desc.pack(fill='both', expand=True)
+        self.description = tk.Text(desc, height=4, **text)
+        dsb = ttk.Scrollbar(desc, orient='vertical', command=self.description.yview)
+        self.description.configure(yscrollcommand=dsb.set, state='disabled')
+        dsb.pack(side='right', fill='y')
+        self.description.pack(fill='both', expand=True)
         ttk.Label(progress, text='Progress:').pack(side='left', padx=(0, 6))
         self.save_btn = ttk.Button(progress, text='Save', width=7, command=self.save_progress)
         self.import_btn = ttk.Button(progress, text='Import', width=7, command=self.import_progress)
@@ -464,17 +474,31 @@ class Launcher(tk.Tk):
                     lines.append('Saved copy: unreadable (%s)' % os.path.basename(saved))
             else:
                 lines.append('Saved copy: none')
-            if p['description']:
-                lines += ['', 'Description', p['description']]
             t.insert('1.0', '\n'.join(lines))
             t.tag_add('title', '1.0', '1.end')
             t.tag_configure('title', font=('TkDefaultFont', 13, 'bold'))
-            if p['description']:
-                head = len(lines) - 1  # the line before the description, which is the last item
-                t.tag_add('heading', '%d.0' % head, '%d.end' % head)
-                t.tag_configure('heading', font=('TkDefaultFont', 10, 'bold'))
         t.configure(state='disabled')
+        self.fit_details()
+
+        d = self.description
+        d.configure(state='normal')
+        d.delete('1.0', 'end')
+        if p and p['description']:
+            d.insert('1.0', 'Description\n', 'heading')
+            d.insert('end', p['description'])
+            d.tag_configure('heading', font=('TkDefaultFont', 10, 'bold'))
+        d.configure(state='disabled')
         self.update_progress_buttons()
+
+    def fit_details(self):
+        """Makes the details as tall as their wrapped text, so none of it is hidden."""
+        t = self.details
+        pixels = t.count('1.0', 'end', 'ypixels')
+        pixels = pixels[0] if isinstance(pixels, tuple) else pixels
+        line = tkfont.Font(font=t.cget('font')).metrics('linespace')
+        height = max(1, math.ceil((pixels or 0) / line))
+        if int(t.cget('height')) != height:
+            t.configure(height=height)
 
     # ---- progress
     def update_progress_buttons(self):
