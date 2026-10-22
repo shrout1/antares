@@ -1,0 +1,571 @@
+#!/usr/bin/env python3
+"""Antares Launcher: pick an Ares scenario / Antares plugin and start the game with it.
+
+Shows each plugin's solo chapters and how many you've unlocked (Antares keeps that in
+~/.local/share/games/antares/registry/<identifier>.pn), and saves, imports or resets that
+progress the same way as the game's Plugins screen (saved copies go in saved-progress/).
+Settings are kept in ~/.config/antares-launcher.json. Lists the plugins in ../plugins unless
+another folder is chosen.
+"""
+import ast
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import time
+import tkinter as tk
+import zipfile
+from tkinter import filedialog, messagebox, ttk
+
+HOME = os.path.expanduser('~')
+CONFIG = os.path.join(HOME, '.config', 'antares-launcher.json')
+LOG = os.path.join(HOME, '.cache', 'antares-launcher.log')
+INPUT_LOGS = os.path.join(HOME, '.cache', 'antares-input')  # one per game; builds with input-debug
+KEEP_INPUT_LOGS = 20
+ALSOFT_CONF = os.path.join(HOME, '.config', 'antares-launcher', 'alsoft.conf')
+REGISTRY = os.path.join(HOME, '.local', 'share', 'games', 'antares', 'registry')
+SAVED = os.path.join(HOME, '.local', 'share', 'games', 'antares', 'saved-progress')
+APP_DATA = '/usr/local/share/games/antares/app'
+# The converted plugins beside this launcher (contrib/ares-plugins/plugins), followed through a
+# symlink so an installed link still finds them.
+DEFAULT_FOLDER = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'plugins')
+FACTORY = ''  # sentinel path: run Antares with no plugin argument
+
+
+def find_antares():
+    return shutil.which('antares') or '/usr/local/games/antares'
+
+
+# GNOME schemas whose shortcuts can take Windows-key and Alt combinations away from the game.
+SHORTCUT_SCHEMAS = [
+    'org.gnome.desktop.wm.keybindings',
+    'org.gnome.mutter.keybindings',
+    'org.gnome.mutter.wayland.keybindings',
+    'org.gnome.shell.keybindings',
+    'org.gnome.settings-daemon.plugins.media-keys',
+    'org.gnome.shell.extensions.tiling-assistant',
+    'org.gnome.shell.extensions.dash-to-dock',
+]
+
+
+def gsettings(*args):
+    try:
+        out = subprocess.run(['gsettings', *args], check=True, capture_output=True, text=True,
+                             timeout=10)
+        return out.stdout
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def game_key_shortcuts():
+    """Desktop shortcuts that use the Windows key or Alt, as {"schema key": value}.
+
+    The game uses both as fire keys, so these combine with its other keys. Values are in
+    gsettings syntax, ready to restore.
+    """
+    found = {}
+    overlay = (gsettings('get', 'org.gnome.mutter', 'overlay-key') or '').strip()
+    if overlay and overlay != "''":
+        found['org.gnome.mutter overlay-key'] = overlay
+    for schema in SHORTCUT_SCHEMAS:
+        for line in (gsettings('list-recursively', schema) or '').splitlines():
+            parts = line.split(' ', 2)
+            if len(parts) < 3 or not parts[2].lstrip('@as ').startswith('['):
+                continue
+            if re.search(r'<(Super|Alt|Mod4|Meta)>', parts[2], re.I):
+                found[parts[0] + ' ' + parts[1]] = parts[2]
+    return found
+
+
+def free_game_keys(shortcuts):
+    for name, value in shortcuts.items():
+        schema, key = name.split(' ')
+        if key == 'overlay-key':
+            gsettings('set', schema, key, '')
+            continue
+        accels = ast.literal_eval(value.replace('@as ', '', 1))
+        kept = [a for a in accels if not re.search(r'<(Super|Alt|Mod4|Meta)>', a, re.I)]
+        gsettings('set', schema, key, repr(kept))
+
+
+def restore_shortcuts(shortcuts):
+    for name, value in shortcuts.items():
+        schema, key = name.split(' ')
+        gsettings('set', schema, key, value)
+
+
+def supports_plugins_option(exe):
+    # Builds with the in-game Plugins screen accept -p to list another plugin folder.
+    try:
+        out = subprocess.run([exe, '--help'], capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return '--plugins' in (out.stdout + out.stderr)
+
+
+def field(info, name):
+    m = re.search(r'^%s:\s*"(.*)"' % name, info, re.M)
+    return re.sub(r'\\(.)', r'\1', m.group(1)) if m else ''  # Procyon escapes \" and \\
+
+
+def read_plugin(path):
+    """Title, author, version, identifier, description, solo chapters and net level count of a
+    plugin."""
+    description = ''
+    if path == FACTORY:
+        info = open(os.path.join(APP_DATA, 'info.pn'), encoding='utf-8').read()
+        levels = []
+        ldir = os.path.join(APP_DATA, 'levels')
+        for f in sorted(os.listdir(ldir)):
+            levels.append(open(os.path.join(ldir, f), encoding='utf-8').read())
+    else:
+        with zipfile.ZipFile(path) as z:
+            info = z.read('info.pn').decode('utf-8')
+            levels = [z.read(n).decode('utf-8') for n in z.namelist()
+                      if n.startswith('levels/') and n.endswith('.pn')]
+            if 'description.txt' in z.namelist():  # the Ares Addons archive's description
+                description = z.read('description.txt').decode('utf-8', 'replace').strip()
+    chapters, net = [], 0
+    for text in levels:
+        m = re.search(r'^chapter:\s*(\d+)', text, re.M)
+        if m:
+            chapters.append(int(m.group(1)))
+        elif re.search(r'^type:\s*"net"', text, re.M):
+            net += 1
+    title = field(info, 'title') or os.path.basename(path)
+    ident = field(info, 'identifier') or hashlib.sha1(title.encode('utf-8')).hexdigest()
+    return {'path': path, 'title': title, 'author': field(info, 'author'),
+            'version': field(info, 'version'), 'id': ident, 'description': description,
+            'chapters': sorted(chapters), 'net': net}
+
+
+def unlocked(ident):
+    """Unlocked chapters from Antares's ledger, plus when it was last written."""
+    p = os.path.join(REGISTRY, ident + '.pn')
+    try:
+        text = open(p, encoding='utf-8').read()
+        m = re.search(r'chapters:\s*\[([^\]]*)\]', text)
+        chs = sorted(int(x) for x in re.findall(r'\d+', m.group(1))) if m else [1]
+        return chs, os.path.getmtime(p)
+    except OSError:
+        return [1], None
+
+
+def read_chapters(path):
+    text = open(path, encoding='utf-8').read()
+    m = re.search(r'chapters:\s*\[([^\]]*)\]', text)
+    if not m:
+        raise ValueError(path)
+    ident = re.search(r'identifier:\s*"([^"]*)"', text)
+    return sorted(int(x) for x in re.findall(r'\d+', m.group(1))), ident and ident.group(1)
+
+
+def write_chapters(path, chapters, title=None, ident=None):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    text = 'unlocked:\n\tchapters:  [%s]\n' % ', '.join(str(c) for c in chapters)
+    if ident:
+        text += 'plugin:\n\ttitle:       %s\n\tidentifier:  "%s"\n' % (
+            json.dumps(title, ensure_ascii=False), ident)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(text)
+
+
+def find_saved(ident):
+    """The saved copy of a plugin's progress: <identifier>.pn if present, or else any file in
+    saved-progress/ that names the plugin's identifier, as the game's Plugins screen does."""
+    exact = os.path.join(SAVED, ident + '.pn')
+    if os.path.isfile(exact):
+        return exact
+    try:
+        names = sorted(os.listdir(SAVED))
+    except OSError:
+        return None
+    for name in names:
+        path = os.path.join(SAVED, name)
+        try:
+            if os.path.isfile(path) and read_chapters(path)[1] == ident:
+                return path
+        except (OSError, ValueError, UnicodeDecodeError):
+            pass
+    return None
+
+
+class Launcher(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title('Antares Launcher')
+        self.geometry('980x600')
+        self.minsize(720, 420)
+        ttk.Style(self).theme_use('clam')
+        self.cfg = self.load_config()
+        self.plugins = []
+        self.proc = None
+        self.protocol('WM_DELETE_WINDOW', self.close)
+
+        top = ttk.Frame(self, padding=(10, 10, 10, 4))
+        top.pack(fill='x')
+        ttk.Label(top, text='Search:').pack(side='left')
+        self.query = tk.StringVar()
+        self.query.trace_add('write', lambda *a: self.fill())
+        e = ttk.Entry(top, textvariable=self.query, width=30)
+        e.pack(side='left', padx=(4, 12))
+        e.focus_set()
+        ttk.Button(top, text='Plugins folder…', command=self.choose_folder).pack(side='left')
+        self.folder_label = ttk.Label(top, foreground='#666')
+        self.folder_label.pack(side='left', padx=8)
+
+        body = ttk.PanedWindow(self, orient='horizontal')
+        body.pack(fill='both', expand=True, padx=10)
+        left = ttk.Frame(body)
+        cols = ('author', 'chapters', 'progress')
+        self.tree = ttk.Treeview(left, columns=cols, selectmode='browse')
+        self.tree.heading('#0', text='Scenario', command=lambda: self.sort('title'))
+        self.tree.heading('author', text='Author', command=lambda: self.sort('author'))
+        self.tree.heading('chapters', text='Chapters', command=lambda: self.sort('chapters'))
+        self.tree.heading('progress', text='Progress', command=lambda: self.sort('progress'))
+        self.tree.column('#0', width=300)
+        self.tree.column('author', width=170)
+        self.tree.column('chapters', width=80, anchor='center')
+        self.tree.column('progress', width=90, anchor='center')
+        sb = ttk.Scrollbar(left, orient='vertical', command=self.tree.yview)
+        self.tree.configure(yscrollcommand=sb.set)
+        self.tree.pack(side='left', fill='both', expand=True)
+        sb.pack(side='left', fill='y')
+        self.tree.bind('<<TreeviewSelect>>', lambda e: self.show_details())
+        self.tree.bind('<Double-1>', lambda e: self.launch())
+        self.tree.bind('<Return>', lambda e: self.launch())
+        body.add(left, weight=3)
+
+        right = ttk.Frame(body, padding=(12, 0, 0, 0))
+        self.details = tk.Text(right, wrap='word', width=34, height=10, relief='flat',
+                               background=self.cget('background'), font=('TkDefaultFont', 10))
+        dsb = ttk.Scrollbar(right, orient='vertical', command=self.details.yview)
+        self.details.configure(yscrollcommand=dsb.set, state='disabled')
+        dsb.pack(side='right', fill='y')
+        self.details.pack(fill='both', expand=True)
+        progress = ttk.Frame(right, padding=(0, 6, 0, 0))
+        progress.pack(fill='x', side='bottom', before=self.details)
+        ttk.Label(progress, text='Progress:').pack(side='left', padx=(0, 6))
+        self.save_btn = ttk.Button(progress, text='Save', width=7, command=self.save_progress)
+        self.import_btn = ttk.Button(progress, text='Import', width=7, command=self.import_progress)
+        self.reset_btn = ttk.Button(progress, text='Reset', width=7, command=self.reset_progress)
+        for b in (self.save_btn, self.import_btn, self.reset_btn):
+            b.pack(side='left', padx=(0, 6))
+        body.add(right, weight=2)
+
+        bottom = ttk.Frame(self, padding=10)
+        bottom.pack(fill='x', side='bottom', before=body)
+        self.software = tk.BooleanVar(value=self.cfg.get('software', True))
+        ttk.Checkbutton(bottom, text='Software rendering',
+                        variable=self.software, command=self.save_config).pack(side='left')
+        self.free_super = tk.BooleanVar(value=self.cfg.get('free_super', True))
+        ttk.Checkbutton(bottom, text='Let the game use the Windows and Alt keys',
+                        variable=self.free_super, command=self.save_config).pack(side='left',
+                                                                                 padx=(12, 0))
+        self.status = ttk.Label(bottom, foreground='#666')
+        self.status.pack(side='left', padx=12)
+        self.launch_btn = ttk.Button(bottom, text='Launch', command=self.launch)
+        self.launch_btn.pack(side='right')
+
+        self.sort_key = self.cfg.get('sort', 'title')
+        self.load_plugins()
+        self.restore_shortcuts()  # in case the launcher was killed during a game
+        self.bind('<FocusIn>', lambda e: self.refresh_progress())
+
+    # ---- settings
+    def load_config(self):
+        try:
+            return json.load(open(CONFIG))
+        except (OSError, ValueError):
+            return {}
+
+    def save_config(self):
+        self.cfg['free_super'] = self.free_super.get()
+        self.cfg['software'] = self.software.get()
+        self.cfg['sort'] = self.sort_key
+        try:
+            os.makedirs(os.path.dirname(CONFIG), exist_ok=True)
+            json.dump(self.cfg, open(CONFIG, 'w'), indent=2)
+        except OSError:
+            pass
+
+    def folder(self):
+        return self.cfg.get('folder', DEFAULT_FOLDER)
+
+    def choose_folder(self):
+        d = filedialog.askdirectory(initialdir=self.folder(), title='Folder of .antaresplugin files')
+        if d:
+            self.cfg['folder'] = d
+            self.save_config()
+            self.load_plugins()
+
+    # ---- list
+    def load_plugins(self):
+        self.folder_label.configure(text=self.folder())
+        self.plugins = [read_plugin(FACTORY)]
+        self.plugins[0]['title'] = 'Ares (original game)'
+        bad = 0
+        names = []
+        for dp, dn, fn in os.walk(self.folder()):
+            dn.sort()
+            names += [os.path.relpath(os.path.join(dp, f), self.folder())
+                      for f in sorted(fn) if f.endswith('.antaresplugin')]
+        for n in names:
+            try:
+                p = read_plugin(os.path.join(self.folder(), n))
+            except Exception:
+                bad += 1
+                continue
+            p['file'] = n
+            m = re.search(r' \((.+)\)\.antaresplugin$', n)
+            if m:  # another plugin has the same title; show which file this is
+                p['title'] += '  (%s)' % m.group(1)
+            if n.split(os.sep)[0] == 'Official':
+                p['title'] += '  [official]'
+            self.plugins.append(p)
+        self.refresh_progress(fill=False)
+        self.fill()
+        self.status.configure(text='%d plugins%s' % (len(self.plugins) - 1,
+                                                    ', %d unreadable' % bad if bad else ''))
+
+    def refresh_progress(self, fill=True):
+        for p in self.plugins:
+            chs, mtime = unlocked(p['id'])
+            p['unlocked'] = [c for c in chs if c in p['chapters']]
+            if not p['unlocked'] and p['chapters']:
+                p['unlocked'] = p['chapters'][:1]  # Antares opens the first chapter if 1 is missing
+            p['last'] = mtime
+        if fill:
+            self.fill(keep=True)
+
+    def progress_text(self, p):
+        if not p['chapters']:
+            return 'net only'
+        return '%d / %d' % (len(p['unlocked']), len(p['chapters']))
+
+    def sort(self, key):
+        self.sort_key = key
+        self.save_config()
+        self.fill(keep=True)
+
+    def fill(self, keep=False):
+        sel = self.tree.selection()
+        want = sel[0] if (keep and sel) else self.cfg.get('last')
+        self.tree.delete(*self.tree.get_children())
+        q = self.query.get().lower().strip()
+        factory, rest = self.plugins[:1], self.plugins[1:]
+        keys = {'title': lambda p: p['title'].lower(),
+                'author': lambda p: p['author'].lower(),
+                'chapters': lambda p: -len(p['chapters']),
+                'progress': lambda p: -(p['last'] or 0)}
+        rest = sorted(rest, key=keys.get(self.sort_key, keys['title']))
+        for p in factory + rest:
+            hay = (p['title'] + ' ' + p['author'] + ' ' + p.get('file', '')).lower()
+            if q and q not in hay:
+                continue
+            iid = p['path'] or '<factory>'
+            self.tree.insert('', 'end', iid=iid, text=p['title'],
+                             values=(p['author'], len(p['chapters']) or '–', self.progress_text(p)))
+        kids = self.tree.get_children()
+        if kids:
+            target = want if want in kids else kids[0]
+            self.tree.selection_set(target)
+            self.tree.see(target)
+
+    def selected(self):
+        sel = self.tree.selection()
+        if not sel:
+            return None
+        path = '' if sel[0] == '<factory>' else sel[0]
+        return next((p for p in self.plugins if p['path'] == path), None)
+
+    def show_details(self):
+        p = self.selected()
+        t = self.details
+        t.configure(state='normal')
+        t.delete('1.0', 'end')
+        if p:
+            lines = [p['title'], '']
+            if p['author']:
+                lines.append('Author:   ' + p['author'])
+            if p['version']:
+                lines.append('Version:  ' + p['version'])
+            lines.append('File:     ' + (p.get('file') or 'built-in'))
+            if p.get('file', '').split(os.sep)[0] == 'Official':
+                lines.append('Source:   arescentral.org hand-made conversion '
+                             '(progress shared with the converted version)')
+            lines.append('')
+            if p['chapters']:
+                lines.append('Solo chapters: %d' % len(p['chapters']))
+                lines.append('Unlocked: ' + ', '.join(str(c) for c in p['unlocked']))
+                nxt = [c for c in p['chapters'] if c not in p['unlocked']]
+                if nxt:
+                    lines.append('Next locked: chapter %d' % nxt[0])
+                else:
+                    lines.append('All chapters unlocked.')
+            if p['net']:
+                lines.append('Net levels: %d (multiplayer)' % p['net'])
+            if not p['chapters']:
+                lines.append('')
+                lines.append("Network-only: Antares doesn't support network play yet, so "
+                             "there is nothing to play solo in this one.")
+            lines.append('')
+            lines.append('Last progress: ' + (time.strftime('%Y-%m-%d %H:%M', time.localtime(p['last']))
+                                              if p['last'] else 'never'))
+            lines.append('Progress file: registry/%s.pn' % p['id'][:12] + '…')
+            saved = find_saved(p['id'])
+            if saved:
+                try:
+                    chs = read_chapters(saved)[0]
+                    lines.append('Saved copy: %s, chapters %s' % (
+                        time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(saved))),
+                        ', '.join(str(c) for c in chs)))
+                except (OSError, ValueError, UnicodeDecodeError):
+                    lines.append('Saved copy: unreadable (%s)' % os.path.basename(saved))
+            else:
+                lines.append('Saved copy: none')
+            if p['description']:
+                lines += ['', 'Description', p['description']]
+            t.insert('1.0', '\n'.join(lines))
+            t.tag_add('title', '1.0', '1.end')
+            t.tag_configure('title', font=('TkDefaultFont', 13, 'bold'))
+            if p['description']:
+                head = len(lines) - 1  # the line before the description, which is the last item
+                t.tag_add('heading', '%d.0' % head, '%d.end' % head)
+                t.tag_configure('heading', font=('TkDefaultFont', 10, 'bold'))
+        t.configure(state='disabled')
+        self.update_progress_buttons()
+
+    # ---- progress
+    def update_progress_buttons(self):
+        p = self.selected()
+        # The game writes the registry while it runs, so leave progress alone until it exits.
+        ok = bool(p and p['chapters']) and not (self.proc and self.proc.poll() is None)
+        self.save_btn.configure(state='normal' if ok else 'disabled')
+        self.reset_btn.configure(state='normal' if ok else 'disabled')
+        self.import_btn.configure(state='normal' if ok and find_saved(p['id']) else 'disabled')
+
+    def progress_changed(self):
+        self.refresh_progress()
+        self.show_details()
+
+    def save_progress(self):
+        p = self.selected()
+        path = os.path.join(SAVED, p['id'] + '.pn')
+        if os.path.exists(path) and not messagebox.askyesno(
+                'Save Progress', 'Replace the saved copy of %s\'s progress?' % p['title']):
+            return
+        try:
+            chs = read_chapters(os.path.join(REGISTRY, p['id'] + '.pn'))[0]
+        except (OSError, ValueError):
+            chs = [1]
+        write_chapters(path, chs, p['title'], p['id'])
+        self.status.configure(text='Saved progress for ' + p['title'])
+        self.progress_changed()
+
+    def import_progress(self):
+        p = self.selected()
+        saved = find_saved(p['id'])
+        if not saved or not messagebox.askyesno(
+                'Import Progress', 'Replace your progress in %s with the saved copy?' % p['title']):
+            return
+        write_chapters(os.path.join(REGISTRY, p['id'] + '.pn'), read_chapters(saved)[0])
+        self.status.configure(text='Imported progress for ' + p['title'])
+        self.progress_changed()
+
+    def reset_progress(self):
+        p = self.selected()
+        if not messagebox.askyesno(
+                'Reset Progress', 'Forget your progress in %s? Any saved copy is kept.' % p['title']):
+            return
+        try:
+            os.remove(os.path.join(REGISTRY, p['id'] + '.pn'))
+        except FileNotFoundError:
+            pass
+        self.status.configure(text='Reset progress for ' + p['title'])
+        self.progress_changed()
+
+    # ---- launch
+    def launch(self, p=None):
+        p = p or self.selected()
+        if not p:
+            return
+        if self.proc and self.proc.poll() is None:
+            messagebox.showinfo('Antares Launcher', 'Antares is already running.')
+            return
+        exe = find_antares()
+        if not os.path.exists(exe):
+            messagebox.showerror('Antares Launcher', 'Antares not found at %s' % exe)
+            return
+        env = dict(os.environ)
+        if os.path.exists(ALSOFT_CONF):
+            env['ALSOFT_CONF'] = ALSOFT_CONF
+        os.makedirs(INPUT_LOGS, exist_ok=True)
+        old = sorted(f for f in os.listdir(INPUT_LOGS) if f.endswith('.log'))
+        for f in old[:max(0, len(old) - KEEP_INPUT_LOGS + 1)]:
+            os.remove(os.path.join(INPUT_LOGS, f))
+        env['ANTARES_INPUT_LOG'] = os.path.join(INPUT_LOGS, time.strftime('%Y%m%d-%H%M%S.log'))
+        if self.software.get():
+            env['LIBGL_ALWAYS_SOFTWARE'] = '1'
+        else:
+            env.pop('LIBGL_ALWAYS_SOFTWARE', None)
+        cmd = [exe]
+        if supports_plugins_option(exe):
+            cmd += ['-p', self.folder()]
+        cmd += [p['path']] if p['path'] else []
+        if self.free_super.get():
+            shortcuts = game_key_shortcuts()
+            if shortcuts:
+                # Saved first, so a later launcher can restore them if this one is killed.
+                self.cfg['saved_shortcuts'] = shortcuts
+                self.save_config()
+                free_game_keys(shortcuts)
+        self.cfg['last'] = p['path'] or '<factory>'
+        self.save_config()
+        os.makedirs(os.path.dirname(LOG), exist_ok=True)
+        self.log = open(LOG, 'w')  # a file, not a pipe: a chatty game can't fill it and stall
+        self.proc = subprocess.Popen(cmd, env=env, start_new_session=True,
+                                     stdout=self.log, stderr=subprocess.STDOUT)
+        self.status.configure(text='Running: ' + p['title'])
+        self.launch_btn.configure(state='disabled')
+        self.update_progress_buttons()
+        self.after(1000, self.watch)
+
+    def restore_shortcuts(self):
+        saved = self.cfg.pop('saved_shortcuts', None)
+        old = self.cfg.pop('saved_overlay_key', None)
+        if old:
+            gsettings('set', 'org.gnome.mutter', 'overlay-key', old)
+        if saved:
+            restore_shortcuts(saved)
+        if saved or old:
+            self.save_config()
+
+    def close(self):
+        # A game still running loses the keys now, rather than the desktop keeping them off.
+        self.restore_shortcuts()
+        self.destroy()
+
+    def watch(self):
+        if self.proc.poll() is None:
+            self.after(1000, self.watch)
+            return
+        self.log.close()
+        self.restore_shortcuts()
+        try:
+            err = open(LOG, encoding='utf-8', errors='replace').read().strip()
+        except OSError:
+            err = ''
+        self.launch_btn.configure(state='normal')
+        self.update_progress_buttons()
+        self.status.configure(text='%d plugins' % (len(self.plugins) - 1))
+        self.refresh_progress()
+        if self.proc.returncode not in (0, None) and err:
+            messagebox.showerror('Antares exited with an error', err[-2000:])
+
+
+if __name__ == '__main__':
+    Launcher().mainloop()

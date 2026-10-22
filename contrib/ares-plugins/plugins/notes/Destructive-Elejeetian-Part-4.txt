@@ -1,0 +1,107 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 ele/cruiser                              ElejeetianCruiser
+    6 dev/econcsv-pellet-gu                    EConcsv Pellet Gu
+    7 dev/conc/pellet                          Concussive Pellet
+    8 sfx/gunsmoke                             Gunsmoke
+    9 misc/large-explosion                     Large Explosion
+   10 sfx/debris/a                             Debris
+   11 sfx/explosion/energy                     Energy Explosion
+   12 can/fighter                              Fighter
+   13 dev/pk/ish/gun                           P-K Beam Cannon
+   14 dev/pk/ish/bolt                          P-K Beam
+   15 misc/small-destruction                   Small Destruction
+   16 ast/shoot/narrow/up                      Asteroid Shoot Up
+   17 ast/otr/big                              Asteroid
+   18 misc/large-explosion-2                   Large Explosion
+   19 ast/regular/medium                       Asteroid Fragment
+   20 ast/regular/small                        Asteroid Debris
+   21 zrb/base                                 Zerbilite
+   22 zrb/spawn                                Zerbilite Spawn
+   23 ast/nasty                                Nastiroid
+   24 misc/giant-explosion                     Giant Explosion
+   25 sfx/debris/b                             Debris
+   26 sfx/debris/c                             Debris
+   27 ast/shoot/narrow/down                    Ast Shoot Down
+   28 ish/etc/astrominer                       Astrominer
+   29 dev/mine/gun                             Lightwave Cannon
+   30 dev/mine/pulse                           Lightwave Pulse
+   31 can/etc/spawner/obj                      Enemy Shooter Obj
+   32 can/etc/spawner/item                     Enemy Shooter Wpn
+   33 can/cruiser                              Cruiser
+   34 dev/antimatter-pulse                     Antimatter Pulse 
+   35 dev/anti1/pulse                          Antimatter Pulse
+   36 dev/stealth/item                         Stealth Field
+   37 can/schooner                             Schooner
+   38 loc/planet                               Planet
+   39 ele/fighter                              Fighter
+   40 dev/newo/gun                             Newo Beam Cannon
+   41 dev/newo/bolt                            Newo Beam
+   42 ele/etc/fighter                          Fighter
+   43 can/transport                            Transport
+   44 ele/transport                            Transport
+   45 loc/moon                                 Moon
+   46 loc/power                                Power Station
+   47 can/hvc                                  Heavy Cruiser
+   48 dev/anti1/rapid                          Rap A Pulse React
+   49 can/gunship                              Gunship
+   50 dev/antimatter-pulse-2                   Antimatter Pulse 
+   51 misc/antimatter-pulse                    Antimatter Pulse 
+   52 dev/anti2/pulse2                         Antimatter Pulse
+   53 misc/large-hit-explosi                   Large Hit Explosi
+   54 ele/gunship                              Gunship
+   55 dev/onas-pulse-gun                       Onas Pulse Gun+
+   56 dev/onas/pulse                           Onas Pulse
+   57 sfx/explosion/gas                        Gas Explosion
+   58 can/gateship/damaged                     Gate Ship
+   59 dev/shrikeolator/turret                  Shrikeolator
+   60 dev/shrikeolator/pulse                   Temp Pulse
+   61 sfx/explosion/shrikeolator               Large Energy Exp
+   62 dev/magno/turret                         Magno Launcher
+   63 dev/magno/pulse                          Magno Pulse
+   64 sfx/jump/large                           Jump Effect Large
+   65 can/gateship/dying                       Gate Ship
+   66 can/carrier                              Carrier
+   67 dev/cm/launcher                          C Missile Launch
+   68 dev/cm/missile                           C Missile
+   69 dev/cluster/turret                       ClusterCell Array
+   70 dev/cluster/pulse                        Cluster Cell
+   71 dev/bay/can                              Launching Bay
+   72 ele/etc/liner/disabled                   Luxury Liner
+   73 ele/etc/escape-pod                       Escape Pod
+   74 loc/jump/gate                            Jump Gate
+   75 loc/jump/node                            Jump Gate Non
+   76 ish/etc/tug                              Tractor Tug
+   77 ish/hvc                                  Heavy Cruiser
+   78 dev/fusion/rapid                         Rap F Pulse React
+   79 dev/fusion/pulse                         Fusion Pulse
+   80 dev/pk/ish/rapid                         Rapid P-K Cannon
+   81 dev/pk/can/bolt                          P-K Beam
+   82 dev/cm/five                              C Missiles(5)
+   83 sfx/jump/small                           Jump Gate Effect
+   84 gai/carrier                              Carrier
+   85 dev/bay/gai                              Launching Bay
+   86 gai/fighter                              Fighter
+   87 dev/kl/gun                               KL Beam Cannon
+   88 dev/kl/bolt                              Kinetic Laser
+   89 dev/conc/gun                             Concsv Pellet Gun
+   90 gai/cruiser                              Cruiser
+   91 gai/gunship                              Gunship
+   92 dev/atomic/turret                        Atomic Pulse Gun
+   93 dev/atomic/pulse                         Atomic Pulse
+   94 sfx/sparkle                              Sparkle
+   95 sal/carrier                              Carrier
+   96 dev/tspace/gun                           T-Space Bolt Rod
+   97 dev/tspace/ray                           Trans-Space Bolt
+   98 dev/bay/sal                              Launching Bay
+   99 sal/fighter                              Fighter
+  100 dev/pk/sal/gun                           LRPK Beam Cannon
+  101 dev/pk/sal/bolt                          LR PK Beam
+  102 sal/cruiser                              Cruiser
+  103 ele/etc/liner                            Luxury Liner
+
+notes:

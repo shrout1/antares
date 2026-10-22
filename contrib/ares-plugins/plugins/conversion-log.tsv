@@ -1,0 +1,142 @@
+archive	plugin file	result	detail
+Scenarios/22_Aaaagh.hqx	x/Aaaagh!.rsrc	ok	converted Aaaagh!.rsrc (274 objects, 20 levels) -> Aaaagh.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/23_Aftermath1.2.0.sit.bin	x/Aftermath 1.2.0/The Aftermath 1.2.0.rsrc	ok	converted The Aftermath 1.2.0.rsrc (320 objects, 8 levels) -> The-Aftermath.antaresplugin; 2 conversion notes (see --notes); about from Read Me!
+Scenarios/24_Ares_1.5_.sit.hqx	x/Ares 1.5 ƒ/Ares 1.5.rsrc	ok	converted Ares 1.5.rsrc (282 objects, 24 levels) -> Ares-1-5.antaresplugin; 18 conversion notes (see --notes); about from Ares 1.5 ReadMe
+Scenarios/25_AresNetRemix.sit.bin	x/Ares Net Remix/ANSR+.rsrc	ok	converted ANSR+.rsrc (211 objects, 7 levels) -> Ares-Net-Scenarios-remix.antaresplugin; 1 conversion notes (see --notes); about from ANSR+ info.txt
+Scenarios/25_AresNetRemix.sit.bin	x/Ares Net Remix/Ares Net [remix].rsrc	ok	converted Ares Net [remix].rsrc (206 objects, 7 levels) -> Ares-Net-Scenarios-remix (Ares-Net-remix).antaresplugin; 1 conversion notes (see --notes); about from ANSR+ info.txt
+Scenarios/26_Aressoundset.sit.hqx		no plugin	no Ares scenario data inside
+Scenarios/27_Ascender.sit.hqx	x/Ascender/Ascender.rsrc	ok	converted Ascender.rsrc (310 objects, 10 levels) -> Ascender.antaresplugin; 11 conversion notes (see --notes); about from Level info
+Scenarios/28_ATWNet1.0.2.sit.bin	x/ATW Net/ATW Net Scenarios v1.0.2.rsrc	ok	converted ATW Net Scenarios v1.0.2.rsrc (276 objects, 2 levels) -> After-The-War-Net-Scenarios.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/29_AudemedonBattles.hqx	x/AudemedonBattles/Audemedon Battles.rsrc	ok	converted Audemedon Battles.rsrc (118 objects, 3 levels) -> Audemedon-Battles.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/30_Babylon_five_.sit.hqx	x/Babylon_five_ƒ/B5 for Ares ALPHA.rsrc	ok	converted B5 for Ares ALPHA.rsrc (178 objects, 18 levels) -> B5-Ares.antaresplugin; rotation: misc/c-missile: 24 -> 36 directions; rotation: can/etc/ea-drone: 24 -> 36 directions; rotation: uns/cruiser: 24 -> 36 directions; rotation: sal/transport: 24 -> 36 directions
+Scenarios/31_Battlecruisers.bin	x/Battlecruisers.rsrc	ok	converted Battlecruisers.rsrc (301 objects, 31 levels) -> Battlecruisers.antaresplugin; 24 conversion notes (see --notes)
+Scenarios/32_Battlestations.Bin	x/Battlestations!.x/Battlestations! .rsrc	ok	converted Battlestations! .rsrc (193 objects, 7 levels) -> Battlestations.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/33_bigblobing.sit.Bin	x/BigBlobing.rsrc	ok	converted BigBlobing.rsrc (315 objects, 1 levels) -> Alpha-To-Omega.antaresplugin; 3 conversion notes (see --notes)
+Scenarios/34_Blackseas1.0.0.sit.bin	x/Black Seas ƒ 1.0.0/Black Seas.rsrc	ok	converted Black Seas.rsrc (649 objects, 15 levels) -> Black-Seas.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/35_Catharan_Crusades_v1.0	x/Catharan Crusades v1.0.x/Catharan Crusades v 1.0/Catharan Crusades.rsrc	ok	converted Catharan Crusades.rsrc (275 objects, 28 levels) -> Catharan-Crusades.antaresplugin; 2 conversion notes (see --notes); about from Read Me or be CURSED!
+Scenarios/36_Challenger.sit.hqx	x/Challenger ƒ/Challenger 1.0.0.rsrc	ok	converted Challenger 1.0.0.rsrc (308 objects, 30 levels) -> Challenger.antaresplugin; rotation: ele/hvd: 24 -> 60 directions; rotation: ele/carrier: 24 -> 60 directions; rotation: ele/fighter: 24 -> 60 directions; rotation: ele/gunship: 24 -> 60 directions; 7 conversion notes (see --notes)
+Scenarios/37_Challenger101.sit.hqx		error	scan failed: Command '['/usr/bin/unar', '-q', '-forks', 'visible', '-o', '/tmp/tmp0hpujkqq', '/tmp/claude-0/-home-user-Documents/73bc1e4f-f747-468b-bb15-8be64e998380/scratchpad/work/37/orig']' returned non-zero exit status 1.
+Scenarios/37_Challenger101.sit.hqx		no plugin	no Ares scenario data inside
+Scenarios/38_ColdDaysLongNights.sit.hqx	x/Cold Days And Long Nights/Cold Days and Long Nights.rsrc	ok	converted Cold Days and Long Nights.rsrc (239 objects, 11 levels) -> Cold-Days-and-Long-Nights-III.antaresplugin; 7 conversion notes (see --notes)
+Scenarios/39_Colliseum.sit	x/Colliseum/Colliseum.rsrc	ok	converted Colliseum.rsrc (299 objects, 6 levels) -> Colisseum.antaresplugin; 6 conversion notes (see --notes)
+Scenarios/40_comp killer.sit	x/comp killer.rsrc	ok	converted comp killer.rsrc (275 objects, 1 levels) -> comp-killers.antaresplugin
+Scenarios/41_Continuation_Thingy_1.0.0_.sit	x/Continuation Thingy 1.0.0 ƒ/Continuation Thingy.rsrc	ok	converted Continuation Thingy.rsrc (434 objects, 23 levels) -> Continuation-Thingy.antaresplugin; 7 conversion notes (see --notes); about from ReadMe
+Scenarios/42_Crazy Net Scenarios.sit	x/Crazy Net Scenarios!/Crazy Net Scenarios!.rsrc	ok	converted Crazy Net Scenarios!.rsrc (215 objects, 7 levels) -> Crazy-Net-Scenarios.antaresplugin; 13 conversion notes (see --notes); about from Read me
+Scenarios/43_Cruiser vs Schooner.sit.hqx	x/Cruiser vs Schooner.sit.1.x/Cruiser vs Schooner.rsrc	ok	converted Cruiser vs Schooner.rsrc (274 objects, 2 levels) -> Cruiser-vs-Schooner.antaresplugin; 2 conversion notes (see --notes)
+Scenarios/44_CvAFolder.sit.hqx	x/CvAFolder/Cantharan vs Ishiman.rsrc	ok	converted Cantharan vs Ishiman.rsrc (369 objects, 4 levels) -> Cantharan-vs-Ishiman.antaresplugin; 5 conversion notes (see --notes); about from Readme.rtf
+Scenarios/45_CvIFolder.sit.hqx	x/CvIFolder/Cantharan vs Ishiman.rsrc	ok	converted Cantharan vs Ishiman.rsrc (369 objects, 4 levels) -> Cantharan-vs-Ishiman (#45).antaresplugin; 5 conversion notes (see --notes); about from Readme.rtf
+Scenarios/46_D.E._For_Net.sit.hqx	x/Destructive Elejeetian Net/Destructive Elejeetian*For Net.rsrc	ok	converted Destructive Elejeetian*For Net.rsrc (63 objects, 1 levels) -> Destructive-Elejeetian-For-Net.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/47_D.E._Part12.sit.hqx	x/Destructive Elejeetian 1_2/Destructive Elejeetian*Part 1.rsrc	ok	converted Destructive Elejeetian*Part 1.rsrc (152 objects, 7 levels) -> Destructive-Elejeetian-Part-1.antaresplugin
+Scenarios/47_D.E._Part12.sit.hqx	x/Destructive Elejeetian 1_2/Destructive Elejeetian*Part 2.rsrc	ok	converted Destructive Elejeetian*Part 2.rsrc (372 objects, 4 levels) -> Destructive-Elejeetian-Part-2.antaresplugin; rotation: uns/bttlship: 24 -> 60 directions
+Scenarios/48_D.E._Part34.sit.hqx	x/Destructive Elejeetian 3_4/Destructive Elejeetian*Part 3.rsrc	ok	converted Destructive Elejeetian*Part 3.rsrc (35 objects, 2 levels) -> Destructive-Elejeetian-Part-3.antaresplugin
+Scenarios/48_D.E._Part34.sit.hqx	x/Destructive Elejeetian 3_4/Destructive Elejeetian*Part 4.rsrc	ok	converted Destructive Elejeetian*Part 4.rsrc (104 objects, 3 levels) -> Destructive-Elejeetian-Part-4.antaresplugin
+Scenarios/49_D.E._Part5.sit.hqx	x/Destructive Elejeetian 5/Destructive Elejeetian*Part 5.rsrc	ok	converted Destructive Elejeetian*Part 5.rsrc (83 objects, 4 levels) -> Destructive-Elejeetian-Part-5.antaresplugin
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*For Net.rsrc	duplicate	same as Destructive-Elejeetian-For-Net.antaresplugin
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*Marching.rsrc	ok	converted Destructive Elejeetian*Marching.rsrc (405 objects, 20 levels) -> Destructive-Elejeetian-Marching.antaresplugin; 5 conversion notes (see --notes)
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*Part 1.rsrc	ok	converted Destructive Elejeetian*Part 1.rsrc (152 objects, 7 levels) -> Destructive-Elejeetian-Part-1 (#50).antaresplugin
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*Part 2.rsrc	ok	converted Destructive Elejeetian*Part 2.rsrc (372 objects, 4 levels) -> Destructive-Elejeetian-Part-2 (#50).antaresplugin; rotation: uns/bttlship: 24 -> 60 directions
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*Part 3.rsrc	duplicate	same as Destructive-Elejeetian-Part-3.antaresplugin
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*Part 4.rsrc	duplicate	same as Destructive-Elejeetian-Part-4.antaresplugin
+Scenarios/50_DestructiveElejeetian.sit.hqx	x/Destructive Elejeetian/Destructive Elejeetian*Part 5.rsrc	duplicate	same as Destructive-Elejeetian-Part-5.antaresplugin
+Scenarios/51_Domination.sit	x/Domination.rsrc	ok	converted Domination.rsrc (321 objects, 1 levels) -> Domination.antaresplugin; 16 conversion notes (see --notes)
+Scenarios/52_Doom_.sit.hqx	x/Doom ƒ/Doom.rsrc	ok	converted Doom.rsrc (259 objects, 12 levels) -> Doom.antaresplugin; 4 conversion notes (see --notes); about from Doom ReadMe
+Scenarios/53_Duel.sit	x/53_Duel/Duel.rsrc	ok	converted Duel.rsrc (318 objects, 22 levels) -> Duel.antaresplugin; about from Duel Read Me
+Scenarios/54_EarthQuest_Resubmitted.sit.hqx	x/EarthQuest_Resubmitted.sit.1.x/EarthQuest_Resubmitted/Earth Quest_Resubmitted.rsrc	ok	converted Earth Quest_Resubmitted.rsrc (100 objects, 5 levels) -> Star-s-End-The-Raiders.antaresplugin; 4 conversion notes (see --notes)
+Scenarios/55_Earths Journey 2.0 Folder.hqx	x/Earth's Journey 2.0 Folder/Earth's Journey 2.0.rsrc	ok	converted Earth's Journey 2.0.rsrc (322 objects, 15 levels) -> Earth-s-Journey-2-0.antaresplugin; 16 conversion notes (see --notes)
+Scenarios/56_Earths Journey.sit.hqx	x/Earth's Journey/Earth's Journey Part 1.rsrc	ok	converted Earth's Journey Part 1.rsrc (304 objects, 5 levels) -> Earth-s-Journey-Back-To-The-Stars-Part-1.antaresplugin
+Scenarios/56_Earths Journey.sit.hqx	x/Earth's Journey/Earth's Journey Part 2.rsrc	ok	converted Earth's Journey Part 2.rsrc (282 objects, 4 levels) -> Earth-s-Journey-Back-To-The-Stars-Part-2.antaresplugin
+Scenarios/56_Earths Journey.sit.hqx	x/Earth's Journey/Earth's Journey Part 3.rsrc	ok	converted Earth's Journey Part 3.rsrc (305 objects, 4 levels) -> Earth-s-Journey-Back-To-The-Stars-Part-3.antaresplugin; 6 conversion notes (see --notes)
+Scenarios/57_Elejees_Decision-Alpha.sit	x/57_Elejees_Decision-Alpha/Elejee's Decision (Alpha).rsrc	ok	converted Elejee's Decision (Alpha).rsrc (334 objects, 10 levels) -> Elejee-s-Decision.antaresplugin; 4 conversion notes (see --notes); about from Read me
+Scenarios/58_Endurance_1.0.sit	x/Endurance 1.0/Endurance.rsrc	ok	converted Endurance.rsrc (286 objects, 5 levels) -> Endurance.antaresplugin; about from Readme
+Scenarios/59_evFD.sit.bin	x/evFD.rsrc	ok	converted evFD.rsrc (66 objects, 1 levels) -> Escape-Velocity-Fighter-Duel.antaresplugin; 2 conversion notes (see --notes)
+Scenarios/60_EVNet.sit	x/EVNet ƒ/EVNet v1.0.rsrc	ok	converted EVNet v1.0.rsrc (117 objects, 6 levels) -> EV-Net.antaresplugin; 5 conversion notes (see --notes); about from Read Me
+Scenarios/61_Fighter Haven 1.0.0 .sit	x/Fighter Haven 1.0.0 ƒ/Fighter Haven.rsrc	ok	converted Fighter Haven.rsrc (301 objects, 1 levels) -> Some-Sort-of-Odd-Plug.antaresplugin; 18 conversion notes (see --notes); about from ReadMe, Eh?
+Scenarios/61_Fighter Haven 1.0.0 .sit	x/Fighter Haven 1.0.0 ƒ/Multiplayer.rsrc	ok	converted Multiplayer.rsrc (303 objects, 1 levels) -> Some-Sort-of-Odd-Plug (Multiplayer).antaresplugin; 18 conversion notes (see --notes); about from ReadMe, Eh?
+Scenarios/62_FighterPower v1.0.2.sit	x/Fighter Power v1.0.2/Fighter Power v 1.0.2.rsrc	ok	converted Fighter Power v 1.0.2.rsrc (303 objects, 9 levels) -> Fighter-Power.antaresplugin; about from Readme
+Scenarios/63_Footsteps of Pyrrhus.sit.Bin	x/Footsteps of Pyrrhus ƒ/Footsteps of Pyrrhus.rsrc	ok	converted Footsteps of Pyrrhus.rsrc (147 objects, 13 levels) -> Footsteps-of-Pyrrhus.antaresplugin; 35 conversion notes (see --notes)
+Scenarios/64_Former_Single_Player_Levels_1.1	x/Former Single Player Levels 1.1.x/Former Single Player Levels 1/Former Single Player Levels.rsrc	ok	converted Former Single Player Levels.rsrc (301 objects, 16 levels) -> Former-Single-Player-Levels.antaresplugin; 14 conversion notes (see --notes); about from Read Me or DIE
+Scenarios/65_FrozenHeartNET.sea.Bin	x/FrozenheartforNET folder/Net Frozen Heart1.rsrc	ok	converted Net Frozen Heart1.rsrc (254 objects, 1 levels) -> Frozen-Heart.antaresplugin; 10 conversion notes (see --notes); about from Read Me please
+Scenarios/66_Gate ships.sit.hqx	x/66_Gate ships/Gate Ship.rsrc	ok	converted Gate Ship.rsrc (281 objects, 32 levels) -> Gate-Ships.antaresplugin; 25 conversion notes (see --notes); about from README
+Scenarios/67_GundamWingPlusSingle.sit	x/One on One/Gundam Wing Plus (Single) O-o-O.rsrc	ok	converted Gundam Wing Plus (Single) O-o-O.rsrc (243 objects, 1 levels) -> Gundam-Wing-Plus-Single-O-o-O.antaresplugin; 2 conversion notes (see --notes)
+Scenarios/68_HopelessCause.sit	x/68_HopelessCause/A Hopeless Cause ƒ/A Hopeless Cause.rsrc	ok	converted A Hopeless Cause.rsrc (273 objects, 41 levels) -> A-Hopeless-Cause.antaresplugin; 21 conversion notes (see --notes); about from A Hopeless Cause Readme NOW!
+Scenarios/69_HR Preview Installer.bin	x/HR Preview Installer.x/HR Preview Installer/Human's Revenge Preview.rsrc	ok	converted Human's Revenge Preview.rsrc (114 objects, 7 levels) -> Human-s-Revenge.antaresplugin; 3 conversion notes (see --notes); about from Human's Revenge-READ ME FIRST!
+Scenarios/70_Humans_Revenge_Part_1.sea	x/70_Humans_Revenge_Part_1/Human's Revenge Part 1.rsrc	ok	converted Human's Revenge Part 1.rsrc (133 objects, 11 levels) -> Human-s-Revenge-Part-1.antaresplugin; 3 conversion notes (see --notes); about from Readme First!
+Scenarios/71_Infestation.sit.bin	x/Infestation 1.0.0 ƒ/Infestation ƒ.rsrc	ok	converted Infestation ƒ.rsrc (94 objects, 2 levels) -> Infestation.antaresplugin; 2 conversion notes (see --notes); about from Read Me (Or Else!)
+Scenarios/72_Ishiman Overkill Mod.sit.hqx	x/72_Ishiman Overkill Mod/Ishiman Overkill Mod .rsrc	ok	converted Ishiman Overkill Mod .rsrc (274 objects, 31 levels) -> Ishiman-Overkill-Ares-Mod.antaresplugin; 21 conversion notes (see --notes); about from README OR SUFFER!
+Scenarios/73_Ishiman Quest.sit	x/Ishiman Quest/Ishiman Quest.rsrc	ok	converted Ishiman Quest.rsrc (322 objects, 6 levels) -> Ishiman-Quest.antaresplugin; 2 conversion notes (see --notes); about from Readme, Ishiman Quest
+Scenarios/74_Ishiman v Ishiman.sit	x/Ishiman v Ishiman/Ishiman vs. Ishiman 1.0.2.rsrc	ok	converted Ishiman vs. Ishiman 1.0.2.rsrc (275 objects, 1 levels) -> Ishiman-vs-Ishiman.antaresplugin; about from ReadMe!
+Scenarios/75_IshimanVsGaitori.bin	x/IshimanVsGaitori.bin.x/Ishiman Vs. Gaitori.rsrc	ok	converted Ishiman Vs. Gaitori.rsrc (312 objects, 8 levels) -> Ishiman-Vs-Gaitori.antaresplugin; 3 conversion notes (see --notes)
+Scenarios/76_ItsWar v1.03.sit.Bin	x/ItsWar v1.03/Its War!!!.rsrc	ok	converted Its War!!!.rsrc (340 objects, 19 levels) -> Its-War.antaresplugin; rotation: obi/engineer: 24 -> 60 directions; about from Its War!! read me 
+Scenarios/77_ItsWarPart2v1o6.sit.Bin	x/Its War Part 2 v1.0.6/Its War p2.rsrc	ok	converted Its War p2.rsrc (463 objects, 23 levels) -> Its-War-p2.antaresplugin; rotation: obi/etc/engineer-pod: 24 -> 60 directions; rotation: ish/etc/rocket-pod: 24 -> 36 directions; 4 conversion notes (see --notes)
+Scenarios/78_Jimmy_Page_Theory_of_Ares.sit		no plugin	no Ares scenario data inside
+Scenarios/79_magladder.sit.tgz	x/magladder.sit.x/MaG Ladder v2.rsrc	ok	converted MaG Ladder v2.rsrc (286 objects, 13 levels) -> MaG-Net-Ladder.antaresplugin; 5 conversion notes (see --notes)
+Scenarios/80_Malamar_.hqx	x/Malamar ƒ/Malamar 1.1.rsrc	ok	converted Malamar 1.1.rsrc (380 objects, 31 levels) -> Malamar.antaresplugin; 54 conversion notes (see --notes)
+Scenarios/81_Malamar_.sit.hqx	x/Malamar ƒ/Malamar.rsrc	ok	converted Malamar.rsrc (415 objects, 31 levels) -> Malamar (#81).antaresplugin; 55 conversion notes (see --notes)
+Scenarios/82_Mission-Impossible.sit.Bin	x/Mission-Impossible.rsrc	ok	converted Mission-Impossible.rsrc (137 objects, 4 levels) -> Mission-Impossible.antaresplugin; rotation: ele/etc/cruiser: 36 -> 60 directions; 5 conversion notes (see --notes)
+Scenarios/83_Net_Levels_Galore_.sit.hqx	x/Net Levels Galore ƒ/Net Levels Galore.rsrc	ok	converted Net Levels Galore.rsrc (196 objects, 4 levels) -> Net-Levels-Galore.antaresplugin; 3 conversion notes (see --notes); about from NLG ReadMe
+Scenarios/84_Net_Pak.sea.hqx	x/Net Pak.rsrc	ok	converted Net Pak.rsrc (271 objects, 32 levels) -> Net-Pak.antaresplugin; 37 conversion notes (see --notes)
+Scenarios/85_Netz Gamez.sit.hqx	x/Netz Gamez/Netz Gamez.rsrc	ok	converted Netz Gamez.rsrc (146 objects, 4 levels) -> Netz-Gamez.antaresplugin; 7 conversion notes (see --notes); about from Netz Gamez ReadMe
+Scenarios/86_NewPICTs1.0.sit.bin	x/New PICTs 1.0/Ares Scenarios New.rsrc	ok	converted Ares Scenarios New.rsrc (300 objects, 31 levels) -> Ares (Ares-Scenarios-New).antaresplugin; 22 conversion notes (see --notes); about from New PICTs Read Me
+Scenarios/87_NicePlug.sit.Bin	x/Nice Net Plug!.rsrc	ok	converted Nice Net Plug!.rsrc (313 objects, 1 levels) -> Alpha-To-Omega (Nice-Net-Plug).antaresplugin; 4 conversion notes (see --notes)
+Scenarios/88_ObainReversal-Alpha.sit	x/88_ObainReversal-Alpha/Obain-Strategy.rsrc	ok	converted Obain-Strategy.rsrc (530 objects, 6 levels) -> Obain-Strategy.antaresplugin; rotation: obi/etc/transport-7: 24 -> 60 directions; rotation: obi/etc/transport-8: 24 -> 60 directions; 1 conversion notes (see --notes); about from Read Me First!!!
+Scenarios/88_ObainReversal-Alpha.sit	x/88_ObainReversal-Alpha/Reversal.rsrc	ok	converted Reversal.rsrc (274 objects, 28 levels) -> Reversal.antaresplugin; 4 conversion notes (see --notes); about from Read Me First!!!
+Scenarios/89_ObainvsGaitorv1.2.0.sit.bin	x/Obain versus Gaitor/ObainVsGaitor Easier.rsrc	ok	converted ObainVsGaitor Easier.rsrc (281 objects, 1 levels) -> Obain-versus-Gaitor.antaresplugin
+Scenarios/89_ObainvsGaitorv1.2.0.sit.bin	x/Obain versus Gaitor/ObainVsGaitor Easiest.rsrc	ok	converted ObainVsGaitor Easiest.rsrc (281 objects, 1 levels) -> Obain-versus-Gaitor (ObainVsGaitor-Easiest).antaresplugin
+Scenarios/89_ObainvsGaitorv1.2.0.sit.bin	x/Obain versus Gaitor/ObainVsGaitor Super Hard.rsrc	ok	converted ObainVsGaitor Super Hard.rsrc (281 objects, 1 levels) -> Obain-versus-Gaitor (ObainVsGaitor-Super-Hard).antaresplugin
+Scenarios/90_Obish VS Elejeetian Folder.hqx	x/Obish VS Elejeetian Folder/Obish VS Elejeetian.rsrc	ok	converted Obish VS Elejeetian.rsrc (303 objects, 5 levels) -> Obish-VS-Elejeetian.antaresplugin; about from Readme not
+Scenarios/91_Pirates.sit.hqx	x/Pirates/Pirates.rsrc	ok	converted Pirates.rsrc (14 objects, 0 levels) -> Pirate-s-Life.antaresplugin; 2 conversion notes (see --notes); about from Read Me (really)
+Scenarios/92_Reversal_1.1.sit.hqx	x/Reversal 1.1.rsrc	ok	converted Reversal 1.1.rsrc (274 objects, 28 levels) -> Reversal-1-1.antaresplugin; 4 conversion notes (see --notes)
+Scenarios/93_Scenario Contest.hqx	x/Scenario Contest.rsrc	ok	converted Scenario Contest.rsrc (347 objects, 2 levels) -> Scenearo-Contest.antaresplugin; 5 conversion notes (see --notes)
+Scenarios/94_SETR Multiplayer Lite.sit.hqx	x/SETR Multiplayer Edition Lite.rsrc	ok	converted SETR Multiplayer Edition Lite.rsrc (190 objects, 4 levels) -> Star-s-End-The-Raiders-Multiplayer-Edition-Lite.antaresplugin; 18 conversion notes (see --notes)
+Scenarios/95_ShootoutAtMidnight.sit	x/Shootout At Midnight.rsrc	ok	converted Shootout At Midnight.rsrc (208 objects, 12 levels) -> Shootout-At-Midnight.antaresplugin
+Scenarios/96_Space Marines NET.sit.bin	x/Space Marines ƒ/Space Marines.rsrc	ok	converted Space Marines.rsrc (275 objects, 1 levels) -> Space-Marines.antaresplugin; 1 conversion notes (see --notes); about from Read Me if you Dare
+Scenarios/97_Space Marines.sit.bin	x/Space Marinesƒ/Space Marines.rsrc	ok	converted Space Marines.rsrc (275 objects, 1 levels) -> Space-Marines (#97).antaresplugin; about from Read Me if you Dare
+Scenarios/98_SpaceRaceTheMusical.sit.bin	x/Space Race Networked b2.sit.2.x/Space Race Networked b2.rsrc	ok	converted Space Race Networked b2.rsrc (286 objects, 1 levels) -> Space-Race-The-Musical-Networked.antaresplugin; 1 conversion notes (see --notes)
+Scenarios/99_STARES.sit.hqx	x/STARES/STARES.rsrc	ok	converted STARES.rsrc (367 objects, 13 levels) -> Star-Trek.antaresplugin; rotation: zz4/cruiser: 24 -> 12 directions; 2 conversion notes (see --notes); about from Read Me.rtf
+Scenarios/100_starsarefire.sit.bin	x/Stars Are Fire ƒ/The Stars Are Fire.rsrc	ok	converted The Stars Are Fire.rsrc (173 objects, 15 levels) -> The-Stars-Are-Fire.antaresplugin; 8 conversion notes (see --notes); about from Read Me
+Scenarios/101_Survival.sit	x/Survival ƒ/Survival.rsrc	ok	converted Survival.rsrc (350 objects, 7 levels) -> Survival.antaresplugin; 3 conversion notes (see --notes); about from Read me
+Scenarios/102_template.sit	x/template/empty template file.rsrc	ok	converted empty template file.rsrc (302 objects, 0 levels) -> Its-War-p2 (empty-template-file).antaresplugin; rotation: obi/etc/engineer-pod: 24 -> 60 directions
+Scenarios/103_The Audemedon Crisis v1.0.sit	x/The Audemedon Crisis v1.0.0ß/The Audemedon Crisis v 1.0.0.rsrc	ok	converted The Audemedon Crisis v 1.0.0.rsrc (1188 objects, 5 levels) -> The-Audemedon-Crisis.antaresplugin; 4 conversion notes (see --notes); about from To Read Me or not To Read Me
+Scenarios/104_The Iron Fist.sea.hqx	x/The Iron Fist/The Iron Fist.rsrc	ok	converted The Iron Fist.rsrc (302 objects, 14 levels) -> The-Iron-Fist.antaresplugin; 6 conversion notes (see --notes); about from Read Me & FAQ
+Scenarios/105_The Rogue.sit	x/The Rogue/The Rogue.rsrc	ok	converted The Rogue.rsrc (341 objects, 16 levels) -> The-Rogue.antaresplugin; 19 conversion notes (see --notes); about from Read Me, or I'll Fry Your HD!
+Scenarios/106_TheMijees.sit.bin	x/Created Ares/The Next  Chapter.rsrc	ok	converted The Next  Chapter.rsrc (181 objects, 12 levels) -> The-Next-Chapter.antaresplugin; about from READ ME FIRST!!!.rtf
+Scenarios/107_TheSequel.sit	x/The Sequel 1.0.0 ƒ/Net Scenarios.rsrc	ok	converted Net Scenarios.rsrc (505 objects, 10 levels) -> The-Sequel-s-Net-Scenarios.antaresplugin; 36 conversion notes (see --notes); about from ReadMe
+Scenarios/107_TheSequel.sit	x/The Sequel 1.0.0 ƒ/The Sequel.rsrc	ok	converted The Sequel.rsrc (630 objects, 23 levels) -> The-Sequel.antaresplugin; 21 conversion notes (see --notes); about from ReadMe
+Scenarios/108_TOR.bin	x/TOR v1.0.rsrc	ok	converted TOR v1.0.rsrc (211 objects, 6 levels) -> The-Other-Races-Net.antaresplugin; 9 conversion notes (see --notes)
+Scenarios/109_Toughlevels.sit.bin	x/Toughlevels.rsrc	ok	converted Toughlevels.rsrc (58 objects, 2 levels) -> Untitled.antaresplugin
+Scenarios/110_UEICTP.sit.hqx	x/UEICTP/Black Hole Teaser.rsrc	ok	converted Black Hole Teaser.rsrc (54 objects, 1 levels) -> Black-Hole-Teaser.antaresplugin; 5 conversion notes (see --notes); about from UEICTP Readme
+Scenarios/110_UEICTP.sit.hqx	x/UEICTP/UEICTP.rsrc	ok	converted UEICTP.rsrc (304 objects, 5 levels) -> UEICTP.antaresplugin; 7 conversion notes (see --notes); about from UEICTP Readme
+Scenarios/111_UltimateNet.hqx	x/Ultimate Net 1.0.1.rsrc	ok	converted Ultimate Net 1.0.1.rsrc (277 objects, 26 levels) -> Ultimate-Net-1-0-1.antaresplugin; 19 conversion notes (see --notes)
+Scenarios/111_UltimateNet.hqx.data	x/Ultimate Net 1.0.1.rsrc	duplicate	same as Ultimate-Net-1-0-1.antaresplugin
+Scenarios/112_Vengeance_1.0.0_	x/Vengeance 1.0.0 ƒ/Vengeance 1.0.0.rsrc	ok	converted Vengeance 1.0.0.rsrc (407 objects, 28 levels) -> Vengeance.antaresplugin; 75 conversion notes (see --notes); about from ReadMe
+Scenarios/112_Vengeance_1.0.0_.data	x/Vengeance 1.0.0 ƒ/Vengeance 1.0.0.rsrc	ok	converted Vengeance 1.0.0.rsrc (407 objects, 28 levels) -> Vengeance (Vengeance-1-0-0).antaresplugin; 75 conversion notes (see --notes); about from ReadMe
+Scenarios/113_Violent Sounds.sea		no plugin	no Ares scenario data inside
+Scenarios/114_War.sit	x/114_War/War.rsrc	ok	converted War.rsrc (134 objects, 1 levels) -> War.antaresplugin; 12 conversion notes (see --notes); about from Readme
+Scenarios/115_WhiteVersusWhite.sit.bin	x/WhiteVersusWhite.rsrc	ok	converted WhiteVersusWhite.rsrc (234 objects, 7 levels) -> White-Vs-White.antaresplugin; 8 conversion notes (see --notes)
+Scenarios/116_WOTFPreview.sit.bin	x/WOTF Preview/Wrath Of The Fallen Preview.rsrc	ok	converted Wrath Of The Fallen Preview.rsrc (53 objects, 23 levels) -> Wrath-of-The-Fallen.antaresplugin; 13 conversion notes (see --notes); about from Readme!+FAQ
+Utilities/117_3d Models Obish VS Elejee.sit		no plugin	no Ares scenario data inside
+Utilities/118_Ares Cheat.sea	x/Ares Cheat/Ares Cheat.rsrc	ok	converted Ares Cheat.rsrc (274 objects, 31 levels) -> Hitech-Ares.antaresplugin; 23 conversion notes (see --notes)
+Utilities/119_Ares Music.sea.hqx		no plugin	no Ares scenario data inside
+Utilities/120_Ares_Music.sit.bin		no plugin	no Ares scenario data inside
+Utilities/121_Ares_Music2.sit.bin		no plugin	no Ares scenario data inside
+Utilities/122_aresnetportraits.sit.bin		no plugin	no Ares scenario data inside
+Utilities/123_AresPicts.sit		no plugin	no Ares scenario data inside
+Utilities/124_Audemedons Attack.sit	x/124_Audemedons Attack/Audemedons Attack.rsrc	ok	converted Audemedons Attack.rsrc (282 objects, 31 levels) -> Audemedons-Attack.antaresplugin; rotation: aud/defdrone: 24 -> 36 directions; 22 conversion notes (see --notes); about from Read Me
+Utilities/125_ChangeofPace.sit.hqx	x/ChangeofPace.sit.1.x/ChangeofPace/Insane.rsrc	ok	converted Insane.rsrc (274 objects, 31 levels) -> Insane.antaresplugin; 21 conversion notes (see --notes)
+Utilities/125_ChangeofPace.sit.hqx	x/ChangeofPace.sit.1.x/ChangeofPace/Trainee.rsrc	ok	converted Trainee.rsrc (274 objects, 31 levels) -> Trainee.antaresplugin; 21 conversion notes (see --notes)
+Utilities/126_Doomtroopers.mp3		error	scan failed: Command '['/usr/bin/unar', '-q', '-forks', 'visible', '-o', '/tmp/tmpnbmsn05x', '/tmp/claude-0/-home-user-Documents/73bc1e4f-f747-468b-bb15-8be64e998380/scratchpad/work/126/orig']' returned non-zero exit status 1.
+Utilities/126_Doomtroopers.mp3		no plugin	no Ares scenario data inside
+Utilities/127_Elejee.sit	x/127_Elejee/Elejee.rsrc	ok	converted Elejee.rsrc (322 objects, 31 levels) -> Elejee.antaresplugin; rotation: obi/etc/transport-2: 24 -> 60 directions; rotation: obi/etc/transport-3: 24 -> 60 directions; rotation: ele/etc/transport: 24 -> 60 directions; 21 conversion notes (see --notes); about from Readme
+Utilities/128_Extra_Things_for_plug.sit	x/Extra Things for plug/show thing.rsrc	ok	converted show thing.rsrc (292 objects, 8 levels) -> Galactic-Domination-Part-1.antaresplugin; 3 conversion notes (see --notes)
+Utilities/129_fbwn.sit.hqx	x/Final Battle with nova.rsrc	ok	converted Final Battle with nova.rsrc (274 objects, 1 levels) -> The-Final-Battle.antaresplugin
+Utilities/130_Humans.sit	orig	ok	converted orig (278 objects, 31 levels) -> Humans.antaresplugin; 21 conversion notes (see --notes)
+Utilities/131_movies.sea.hqx		no plugin	no Ares scenario data inside
+Utilities/132_New Ares Interface.sit		no plugin	no Ares scenario data inside
+Utilities/133_NewShips.sit.hqx		no plugin	no Ares scenario data inside
+Utilities/134_newsprites.sit.bin		no plugin	no Ares scenario data inside
+Utilities/135_Obain.sit	x/135_Obain/Obain.rsrc	ok	converted Obain.rsrc (321 objects, 31 levels) -> Obain.antaresplugin; rotation: obi/etc/transport: 24 -> 60 directions; rotation: obi/etc/transport-2: 24 -> 60 directions; 21 conversion notes (see --notes); about from Read Me
+Utilities/136_ObishVSElejeetian.sit		no plugin	no Ares scenario data inside
+Utilities/137_Plug developer extra.sit	x/Plug developer extra/test plug for animated ship.rsrc	ok	converted test plug for animated ship.rsrc (281 objects, 28 levels) -> Untitled (test-plug-for-animated-ship).antaresplugin; 3 conversion notes (see --notes); about from Info
+Utilities/138_Salrilians.sea	x/Those Interrupting Salrilians../Those Interrupting Salrilians...rsrc	ok	converted Those Interrupting Salrilians...rsrc (277 objects, 21 levels) -> Those-Interrupting-Salrilians.antaresplugin; rotation: sal/engineer: 24 -> 36 directions; 1 conversion notes (see --notes); about from Please don't read me!
+Utilities/139_Strata Exports.sit.hqx		no plugin	no Ares scenario data inside
+Utilities/140_SWA.sea		no plugin	no Ares scenario data inside

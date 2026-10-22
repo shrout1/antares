@@ -1,0 +1,106 @@
+objects:
+    0 ish/etc/frigate                          Frigate
+    1 misc/nuclear-explosion                   Nuclear Explosion
+    2 misc/nuclear-missile                     Nuclear Missile
+    3 dev/nuclear-missile-l                    Nuclear Missile L
+    4 misc/holding-position                    Holding Position
+    5 misc/plasma                              Plasma
+    6 misc/plasma-2                            Plasma
+    7 misc/plasma-3                            Plasma
+    8 dev/plasma-shot-2                        Plasma Shot 2
+    9 misc/fleeing-system                      Fleeing system
+   10 ish/etc/assault-cruiser                  Assault Cruiser
+   11 misc/alter-object-own                    Alter object own
+   12 dev/change-owner                         Change owner
+   13 dev/assault/can                          Assault Team
+   14 can/etc/eva-trooper                      EVA Trooper
+   15 misc/sensor-buoy                         Sensor Buoy
+   16 misc/object-shooter                      Object Shooter
+   17 misc/planet                              Planet
+   18 misc/stargate                            Stargate
+   19 ish/etc/eva-trooper                      EVA Trooper
+   20 dev/assault-team                         Assault Team
+   21 ish/etc/assault-cruiser-2                Assault Cruiser
+   22 misc/small-explosion                     Small Explosion
+   23 ish/etc/transport                        Transport
+   24 misc/nuclear-explosion-2                 Nuclear Explosion
+   25 misc/outpost                             Outpost
+   26 misc/med-explosion                       Med Explosion
+   27 misc/asteroid                            Asteroid
+   28 misc/freighter-shoot-u                   Freighter Shoot U
+   29 misc/plasma-4                            Plasma
+   30 dev/plasma-shot-1                        Plasma Shot 1
+   31 dev/hv-machine-turret                    Hv Machine Turret
+   32 can/evat                                 Corvette
+   33 misc/asteroid-2                          Asteroid
+   34 ast/shoot/narrow/up                      Asteroid Shoot Up
+   35 ast/shoot/narrow/down                    Ast Shoot Down
+   36 ish/class40                              Carrier
+   37 dev/neutron-missile-l                    Neutron Missile L
+   38 misc/smoke                               Smoke
+   39 ish/class30                              Light Cruiser
+   40 misc/planet-2                            Planet
+   41 dev/neutron-missile-l-2                  Neutron Missile L
+   42 misc/heat-explosion                      Heat Explosion
+   43 misc/neutron-missile                     Neutron Missile
+   44 dev/nuke-launcher                        Nuke Launcher
+   45 misc/bullet                              Bullet
+   46 dev/machinegun                           Machinegun
+   47 sfx/warp/out                             Warp Out Flare
+   48 sfx/warp/in                              Warp In Flare
+   49 sfx/explosion/missile-hit                Missile Hit
+   50 sfx/energy                               Energy
+   51 ish/class1                               Fighter
+   52 dev/railgun                              Railgun
+   53 misc/shell                               Shell
+   54 misc/ricochet                            Ricochet
+   55 misc/med-explosion-2                     Med Explosion
+   56 sfx/debris/a                             Debris
+   57 sfx/explosion/energy                     Energy Explosion
+   58 sfx/crew                                 Castaway Crew Mem
+   59 can/class1                               Heavy Fighter
+   60 sfx/gunsmoke                             Gunsmoke
+   61 ish/evat                                 Frigate
+   62 dev/machinegun-turret                    Machinegun Turret
+   63 misc/bullet-2                            Bullet
+   64 misc/smoke-2                             Smoke
+   65 misc/large-explosion                     Large Explosion
+   66 misc/small-explosion-2                   Small Explosion
+   67 sfx/debris/c                             Debris
+   68 ish/class20                              Destroyer
+   69 misc/nuclear-missile-2                   Nuclear Missile
+   70 dev/railgun-turret                       Railgun Turret
+   71 misc/shell-2                             Shell
+   72 dev/fighterbay-12                        Fighterbay (12)
+   73 ish/etc/merchant-cruiser                 Merchant Cruiser
+   74 ish/etc/freighter                        Freighter
+   75 misc/ast-shoot-down                      Ast Shoot Down
+   76 misc/asteroid-3                          Asteroid
+   77 ast/regular/medium                       Asteroid Fragment
+   78 ast/regular/small                        Asteroid Debris
+   79 misc/asteroid-shoot-up                   Asteroid Shoot Up
+   80 misc/plasma-exhale                       Plasma Exhale
+   81 zz1/class1                               Corvette
+   82 zz1/etc/cruiser                          Cruiser
+   83 misc/large-explosion-2                   Large Explosion
+   84 misc/sun                                 Sun
+   85 misc/ast-shoot-upperri                   Ast Shoot Upperri
+   86 misc/ast-shoot-downrig                   Ast Shoot downrig
+   87 misc/asteroid-4                          Asteroid
+   88 misc/asteroid-shoot-up-2                 Asteroid Shoot Up
+   89 misc/ast-shoot-down-2                    Ast Shoot Down
+   90 can/class20                              Escort Carrier
+   91 zz1/class40                              Cruiser
+   92 misc/ast-shoot-down-3                    Ast Shoot Down
+   93 misc/asteroid-shoot-up-3                 Asteroid Shoot Up
+   94 misc/asteroid-5                          Asteroid
+   95 zz1/etc/disabled-cruiser                 Disabled Cruiser
+   96 misc/stargate-2                          Stargate
+   97 misc/warp-out-flare                      Warp Out Flare
+   98 dev/fighterbay-2                         Fighterbay (2)
+   99 can/class30                              Heavy Destroyer
+
+notes:
+     2 x sound 555 not found; dropped
+     1 x sound 576 not found; dropped
+     1 x sound 574 not found; dropped

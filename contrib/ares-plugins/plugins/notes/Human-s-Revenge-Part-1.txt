@@ -1,0 +1,137 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 zz1/etc/u-n-s-shiloh                     U.N.S. Shiloh
+    6 dev/photo/gun                            Phtorctr Pls Cann
+    7 dev/photo/pulse                          Photoreactor Puls
+    8 dev/laser/turret                         Laser Turret
+    9 dev/laser/gun-bolt                       Laser
+   10 sfx/explosion/energy                     Energy Explosion
+   11 dev/magneto/rapid                        Rapid Magneto
+   12 dev/magneto/pulse                        Magneto Pulse
+   13 sfx/explosion/giant                      Giant Explosion
+   14 sfx/debris/a                             Debris
+   15 sfx/debris/b                             Debris
+   16 zz1/cruiser                              Cruiser
+   17 dev/magneto/gun                          Magneto Pulse Gun
+   18 dev/laser/gun                            Laser Cannon
+   19 dev/laser/turret-bolt                    Laser
+   20 can/carrier                              Carrier
+   21 dev/cm/launcher                          C Missile Launch
+   22 dev/cm/missile                           C Missile
+   23 sfx/explosion/gas                        Gas Explosion
+   24 dev/cluster/turret                       ClusterCell Array
+   25 dev/cluster/pulse                        Cluster Cell
+   26 dev/bay/can                              Launching Bay
+   27 can/fighter                              Fighter
+   28 dev/pk/ish/gun                           P-K Beam Cannon
+   29 dev/pk/ish/bolt                          P-K Beam
+   30 misc/small-destruction                   Small Destruction
+   31 can/cruiser                              Cruiser
+   32 dev/antimatter-pulse                     Antimatter Pulse 
+   33 dev/anti1/pulse                          Antimatter Pulse
+   34 dev/stealth/item                         Stealth Field
+   35 sfx/explosion/large                      Large Explosion
+   36 loc/planet                               Planet
+   37 zz1/fighter                              Fighter
+   38 can/gunship                              Gunship
+   39 dev/antimatter-pulse-2                   Antimatter Pulse 
+   40 misc/antimatter-pulse                    Antimatter Pulse 
+   41 dev/anti2/pulse2                         Antimatter Pulse
+   42 misc/large-hit-explosi                   Large Hit Explosi
+   43 zz1/gunship                              Gunship
+   44 can/transport                            Transport
+   45 zz1/transport                            Transport
+   46 zz1/hvc                                  Heavy Cruiser
+   47 dev/fast-magneto                         Fast Magneto
+   48 dev/twin-laser-cannon                    Twin Laser Cannon
+   49 dev/cm/five                              C Missiles(5)
+   50 can/hvc                                  Heavy Cruiser
+   51 dev/anti1/rapid                          Rap A Pulse React
+   52 can/defdrone                             Defense Drone
+   53 dev/pk/ish/rapid                         Rapid P-K Cannon
+   54 dev/pk/can/bolt                          P-K Beam
+   55 zz1/class105                             Heavy Fighter
+   56 zz1/etc/carrier                          Carrier
+   57 dev/bay/sal                              Launching Bay
+   58 can/hvd                                  Heavy Destroyer
+   59 dev/quasi/gun                            Quasimatter Gun
+   60 dev/quasi/pulse                          Quasimatter Pulse
+   61 sfx/explosion/quasi                      Quasimatter Exp
+   62 loc/jump/gate                            Jump Gate
+   63 zz1/etc/transport                        Transport
+   64 sfx/jump/small                           Jump Gate Effect
+   65 loc/jump/node                            Jump Gate Non
+   66 ast/shoot/wide/up                        Asteroid Shoot Up
+   67 ast/rand-dir                             Asteroid
+   68 sfx/explosion/asteroid                   Large Explosion
+   69 ast/regular/medium                       Asteroid Fragment
+   70 ast/regular/small                        Asteroid Debris
+   71 zrb/base                                 Zerbilite
+   72 zrb/spawn                                Zerbilite Spawn
+   73 ast/nasty                                Nastiroid
+   74 ast/shoot/wide/down                      AsteroidShootDown
+   75 misc/bunker-station                      Bunker Station
+   76 can/aslttran                             Assault Transport
+   77 dev/assault/can                          Assault Team
+   78 can/evat                                 EVA Trooper
+   79 dev/pk/ish/hand                          Hand PK Beam
+   80 zz1/aslttran                             Assault Transport
+   81 dev/assault/ish                          Assault Team
+   82 ish/evat                                 EVA Trooper
+   83 misc/assault-station                     Assault Station
+   84 dev/pp/twin                              Twin Pulse Cannon
+   85 dev/pp/pulse                             Protopulse
+   86 dev/photo/light                          Light Phtoreactor
+   87 loc/bunker                               Bunker Station
+   88 dev/pp/turret                            ProtoPulse Cannon
+   89 dev/repulser/turret                      Repulser
+   90 dev/repulser/bolt                        Repulser Beam
+   91 sal/carrier                              Carrier
+   92 dev/tspace/gun                           T-Space Bolt Rod
+   93 dev/tspace/ray                           Trans-Space Bolt
+   94 dev/magno/turret                         Magno Launcher
+   95 dev/magno/pulse                          Magno Pulse
+   96 dev/bay/aud                              Launching Bay
+   97 sal/fighter                              Fighter
+   98 dev/pk/sal/gun                           LRPK Beam Cannon
+   99 dev/pk/sal/bolt                          LR PK Beam
+  100 sal/gunship                              Gunship
+  101 dev/fireball/gun                         Plasma Ball
+  102 dev/fireball/pulse                       Fireball
+  103 dev/fireball/trail                       Fireball Trail
+  104 misc/planet                              Planet
+  105 misc/planet-2                            Planet
+  106 zz1/class1801                            Transport
+  107 misc/btrsprt-platform                    BTRSPRT Platform
+  108 zz1/class802                             Bomb Transport
+  109 loc/power                                Power Station
+  110 zz1/etc/enhanced-carrier                 Enhanced Carrier
+  111 dev/cruiserlaunch-bay                    CruiserLaunch Bay
+  112 can/etc/enhanced-carrier                 Enhanced Carrier
+  113 dev/trazer/gun                           Trazer Cannon
+  114 dev/trazer/ray                           Trazer Beam
+  115 sal/hvd                                  Heavy Destroyer
+  116 dev/chronon/gun                          Chronon Prtcl Gun
+  117 dev/chronon/pulse                        Chronon Particle
+  118 sal/cruiser                              Cruiser
+  119 sal/transport                            Transport
+  120 loc/moon                                 Moon
+  121 zz1/etc/u-n-s-shiloh-2                   U.N.S. Shiloh
+  122 zz1/etc/heavy-destroyer                  Heavy Destroyer
+  123 sal/hvc                                  Heavy Cruiser
+  124 zz1/etc/battleship                       Battleship
+  125 dev/magntopulseturret                    MagntoPulseTurret
+  126 misc/magneto-pulse                       Magneto Pulse
+  127 dev/laser-turret                         Laser Turret
+  128 misc/laser                               Laser
+  129 dev/n-missile-launch                     N Missile Launch
+  130 misc/n-missile                           N Missile
+  131 sfx/debris/c                             Debris
+  132 misc/nova-explosion                      Nova Explosion
+
+notes:
+     3 x non-reflexive create (destination semantics differ slightly)

@@ -1,0 +1,67 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 can/cruiser                              Frigate
+    6 dev/nova-pulse-launch                    Nova Pulse Launch
+    7 misc/nova-pulse                          Nova Pulse
+    8 sfx/explosion/energy                     Energy Explosion
+    9 sfx/explosion/gas                        Gas Explosion
+   10 dev/protonbeamturret                     ProtonBeamTurret
+   11 misc/proton-beam                         Proton Beam
+   12 sfx/explosion/shrikeolator               Large Energy Exp
+   13 can/fighter                              Fighter
+   14 misc/small-destruction                   Small Destruction
+   15 ish/class150                             Heavy Fighter
+   16 dev/laser-beam-cannon                    Laser Beam Cannon
+   17 misc/laser-beam                          Laser Beam
+   18 ish/fighter                              Light Fighter
+   19 ast/shoot/lite/up                        Ast Shoot Up Lite
+   20 ast/otr/big                              Asteroid
+   21 sfx/explosion/asteroid                   Large Explosion
+   22 ast/regular/medium                       Asteroid Fragment
+   23 ast/regular/small                        Asteroid Debris
+   24 misc/small-destruction-2                 Small Destruction
+   25 ast/nasty                                Nastiroid
+   26 sfx/explosion/giant                      Giant Explosion
+   27 sfx/debris/a                             Debris
+   28 misc/energy-explosion                    Energy Explosion
+   29 ast/shoot/narrow/down                    Ast Shoot Down
+   30 can/transport                            Transport
+   31 misc/large-explosion                     Large Explosion
+   32 ish/cruiser                              Gunboat
+   33 dev/rapid-laser                          Rapid Laser
+   34 dev/laser-beam-turret                    Laser Beam Turret
+   35 misc/laser-beam-2                        Laser Beam
+   36 loc/planet                               Planet
+   37 loc/sun                                  Sun
+   38 ish/transport                            Transport
+   39 misc/defense-station                     Defense Station
+   40 dev/fighter-launch-9                     Fighter Launch(9)
+   41 can/etc/carrier                          Carrier
+   42 sfx/explosion/supernova                  Super Nova
+   43 ish/etc/carrier                          Carrier
+   44 dev/missile-launch                       Missile Launch
+   45 misc/cruise-missile                      Cruise Missile
+   46 dev/h-fighter-launch                     H. Fighter Launch
+   47 loc/moon                                 Moon
+   48 misc/defense-station-2                   Defense Station
+   49 misc/defense-station-3                   Defense Station
+   50 dev/emp-shot-gun                         EMP Shot Gun
+   51 misc/emp-shot                            EMP Shot
+   52 ish/etc/gunship                          Gunship
+
+notes:
+     2 x text refers to unknown picture 8003
+     2 x text refers to unknown picture 8004
+     1 x object 5 portrait 8003 missing
+     1 x object 13 portrait 8004 missing
+     1 x object 39 portrait 8002 missing
+     1 x object 41 portrait 8001 missing
+     1 x object 48 portrait 8005 missing
+     1 x text refers to unknown picture 8002
+     1 x text refers to unknown picture 8001
+     1 x text refers to unknown picture 8005
+     1 x race #3 duplicates race id 300 (gai); Ares never used it, skipped

@@ -1,0 +1,71 @@
+objects:
+    0 misc/pellet-b                            pellet b
+    1 dev/seeker-launch                        Seeker Launch
+    2 misc/fusion-beam                         Fusion Beam
+    3 dev/fusion-cannon                        Fusion Cannon
+    4 gro/etc/alien-fighter                    Alien Fighter
+    5 misc/javelin                             Javelin
+    6 dev/javelin-pod                          Javelin Pod
+    7 misc/rocket                              Rocket
+    8 dev/rocket-launch-6                      Rocket Launch (6)
+    9 sfx/crew                                 Castaway Crew Mem
+   10 sfx/explosion/missile-hit                Missile Hit
+   11 sfx/energy                               Energy
+   12 sfx/warp/in                              Warp In Flare
+   13 sfx/warp/out                             Warp Out Flare
+   14 ast/shoot/wide/up                        Asteroid Shoot Up
+   15 ast/rand-dir                             Asteroid
+   16 sfx/explosion/asteroid                   Large Explosion
+   17 ast/regular/medium                       Asteroid Fragment
+   18 ast/regular/small                        Asteroid Debris
+   19 misc/small-destruction                   Small Destruction
+   20 zrb/base                                 Zerbilite
+   21 zrb/spawn                                Zerbilite Spawn
+   22 ast/nasty                                Nastiroid
+   23 sfx/explosion/giant                      Giant Explosion
+   24 sfx/debris/a                             Debris
+   25 sfx/explosion/energy                     Energy Explosion
+   26 sfx/debris/b                             Debris
+   27 sfx/debris/c                             Debris
+   28 ast/shoot/wide/down                      AsteroidShootDown
+   29 can/etc/manta-fighter                    Manta Fighter
+   30 dev/laser-cannon-3                       Laser Cannon (3)
+   31 misc/laser-beam                          Laser Beam
+   32 dev/missile-launch-2                     Missile Launch(2)
+   33 misc/missile                             Missile
+   34 sfx/explosion/gas                        Gas Explosion
+   35 gai/etc/patrol-fighter                   Patrol Fighter
+   36 dev/proton-gun-4                         Proton Gun (4)
+   37 misc/proton-pulse                        Proton Pulse
+   38 misc/missile-hit                         Missile Hit
+   39 ish/etc/shuttle                          Shuttle
+   40 sal/etc/rapier-fighter                   Rapier Fighter
+   41 dev/torpedo-rack                         Torpedo Rack
+   42 misc/torpedo                             Torpedo
+   43 misc/large-hit-explosi                   Large Hit Explosi
+   44 sfx/sparkle                              Sparkle
+   45 obi/etc/hawk-fighter                     Hawk Fighter
+   46 dev/laser-cannon-4                       Laser Cannon (4)
+   47 baz/etc/lightning-fighter                Lightning Fighter
+   48 dev/missile-launch-4                     Missile Launch(4)
+   49 aud/etc/clipper                          Clipper
+   50 ele/etc/defender                         Defender
+   51 loc/flak                                 Flak Drone
+   52 dev/antimatter-pulse                     Antimatter Pulse 
+   53 dev/anti1/pulse                          Antimatter Pulse
+   54 dev/flak/turret                          Flak Artillery
+   55 dev/flak/pulse                           Flak Shell
+   56 dev/flak/flak                            Flak
+   57 sfx/explosion/flak                       Flak Explosion
+   58 dev/cm/launcher                          C Missile Launch
+   59 dev/cm/missile                           C Missile
+   60 misc/gas-explosion                       Gas Explosion
+   61 sfx/explosion/large                      Large Explosion
+   62 misc/debris                              Debris
+   63 misc/castaway-crew-mem                   Castaway Crew Mem
+   64 misc/pellet-a                            pellet a
+   65 misc/fusion-beam-b                       Fusion Beam B
+
+notes:
+     1 x object 39 portrait 1013 missing
+     1 x missing text 10051

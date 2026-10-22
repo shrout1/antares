@@ -1,0 +1,97 @@
+diff -ru -x __pycache__ a/ares2antares/cli.py b/ares2antares/cli.py
+--- a/ares2antares/cli.py	2026-10-20 10:38:38.000000000 -0500
++++ b/ares2antares/cli.py	2026-10-20 11:37:43.405832496 -0500
+@@ -162,7 +162,12 @@
+             f.write(snd.to_aiff(P.sounds[i]))
+     sprite_frames = {}
+     for i, data in P.sprites.items():
+-        pn, image, overlay = smiv.convert(data)
++        try:
++            pn, image, overlay = smiv.convert(data)
++        except Exception as e:
++            log('warning: SMIV %d not converted (Ares copy used instead): %s' % (i, e))
++            del extra_sprites[i]
++            continue
+         base = os.path.join(out, 'sprites', extra_sprites[i])
+         write_pn(base + '.pn', pn)
+         os.makedirs(base, exist_ok=True)
+diff -ru -x __pycache__ a/ares2antares/convert.py b/ares2antares/convert.py
+--- a/ares2antares/convert.py	2026-10-20 10:37:36.000000000 -0500
++++ b/ares2antares/convert.py	2026-10-20 12:44:39.086979176 -0500
+@@ -194,6 +194,9 @@
+         out = []
+         check = False
+         for k in idx:
++            if k >= len(self.s.actions):
++                self.warn('action %d past end of action table (%d); dropped' % (k, len(self.s.actions)))
++                break
+             a = self.s.actions[k]
+             if a['verb'] == 'none':
+                 break
+@@ -323,7 +326,8 @@
+             kw['volume'] = a['volume_min']
+             return self.act(a, 'play', **kw)
+         if v == 'sparks':
+-            age = ticks(round(1023 / a['speed'])) if a['speed'] > 0 else ticks(1023)
++            # decay above 1023 faded the spark within a frame; Antares divides by the age
++            age = ticks(max(1, round(1023 / a['speed']))) if a['speed'] > 0 else ticks(1023)
+             return self.act(a, 'spark', count=a['count'], hue=HUES[a['color'] & 0xf],
+                             velocity=fixed(a['velocity_range']), age=age)
+         if v == 'release-energy':
+@@ -340,6 +344,10 @@
+                 t = self.text(a['res_id'] + p)
+                 if t is not None:
+                     pages.append(t)
++            if not pages:
++                # Antares crashes on a message with no pages; Ares had nothing to show
++                self.warn('message %d has no text; dropped' % a['res_id'])
++                return []
+             return self.act(a, 'message', id=a['res_id'], pages=pages)
+         if v == 'score':
+             counter = {'which': a['which']}
+@@ -1023,9 +1031,8 @@
+                 d['earning_power'] = fixed(p['earning'])
+             else:
+                 d = {'type': 'human' if pi == 0 else 'cpu', 'race': race}
+-                nm = self.string(p['name_res'], p['name_str'])
+-                if nm:
+-                    d['name'] = nm
++                # Antares requires a name; Ares showed a blank one when the string was missing
++                d['name'] = self.string(p['name_res'], p['name_str']) or ''
+                 d['earning_power'] = fixed(p['earning'])
+                 if pi == 0:
+                     human_race = race
+@@ -1089,8 +1096,33 @@
+             t = self.text(10000 + chapter)
+             if t:
+                 x['no_ships'] = t
++        self.check_initial_refs(x, len(x['initials']))
+         return x
+ 
++    def check_initial_refs(self, x, n):
++        """Point references past the level's initials at no object (-1) instead.
++
++        Ares read whatever followed the initials table; Antares indexes out of bounds.
++        """
++        if isinstance(x, list):
++            for v in x:
++                self.check_initial_refs(v, n)
++            return
++        if not isinstance(x, dict):
++            return
++        for k, v in x.items():
++            if k == 'initial' and isinstance(v, list):
++                ok = [i for i in v if 0 <= i < n]
++                if len(ok) != len(v):
++                    self.warn('initial references %s past %d initials; dropped'
++                              % ([i for i in v if not 0 <= i < n], n))
++                    x[k] = ok
++            elif k == 'initial' and isinstance(v, int) and v >= n:
++                self.warn('initial reference %d past %d initials; set to none' % (v, n))
++                x[k] = -1
++            else:
++                self.check_initial_refs(v, n)
++
+     # ---------------- races, info
+     def convert_race(self, i):
+         r = self.s.races[i]

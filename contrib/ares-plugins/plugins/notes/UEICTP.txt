@@ -1,0 +1,310 @@
+objects:
+    0 misc/guided-newo-beam                    Guided Newo Beam
+    1 dev/guidednewo-cannon                    GuidedNewo Cannon
+    2 dev/rapid-onas-pulse                     Rapid Onas Pulse
+    3 ele/hvd                                  Heavy Destroyer
+    4 ele/etc/barrage-drone                    Barrage Drone
+    5 dev/muiltbeam-cannon                     Muiltbeam Cannon
+    6 misc/muiltbeam                           Muiltbeam
+    7 obi/etc/beam-tester                      Beam Tester
+    8 dev/rap-f-pulseturr                      Rap F PulseTurr
+    9 ish/etc/gate-ship                        Gate Ship
+   10 misc/large-explosion                     Large Explosion
+   11 dev/chronon/gun                          Chronon Prtcl Gun
+   12 misc/energy-explosion                    Energy Explosion
+   13 dev/fireball/pulse                       Fireball
+   14 dev/assault/ish                          Assault Team
+   15 misc/p-k-beam                            P-K Beam
+   16 dev/quasi/gun                            Quasimatter Gun
+   17 misc/z-beam                              Z Beam
+   18 dev/rplasma/gun                          R-Plasma Launcher
+   19 dev/atomic/turret                        Atomic Pulse Gun
+   20 misc/antimatter-pulse                    Antimatter Pulse 
+   21 dev/lepton-beam-canno                    Lepton Beam Canno
+   22 dev/fullerene/gun                        Fullerene Gun
+   23 dev/reactivator/p1                       Reactivator
+   24 dev/reactivator/p2                       Reactivator
+   25 dev/kl/gun                               KL Beam Cannon
+   26 zzz/dev/inert/turret                     Inert Beam Cannon
+   27 dev/pk/ish/hand                          Hand PK Beam
+   28 dev/zbeam/turret                         Z Beam Cannon
+   29 dev/r-plasma-launcher                    R-Plasma Launcher
+   30 dev/atomic-pulse-gun                     Atomic Pulse Gun
+   31 dev/pp2/gun                              Protopulse 2 Gun
+   32 dev/pp/turret                            ProtoPulse Cannon
+   33 dev/anti1/rapid                          Rap A Pulse React
+   34 dev/mine/gun                             Lightwave Cannon
+   35 dev/antimatter-pulse                     Antimatter Pulse 
+   36 dev/lepton-beam-canno-2                  Lepton Beam Canno
+   37 dev/fusion/rapid                         Rap F Pulse React
+   38 dev/bay/can                              Launching Bay
+   39 dev/cluster/turret                       ClusterCell Array
+   40 dev/bay/ish                              Launching Bay
+   41 dev/bay/gai                              Launching Bay
+   42 gai/etc/spawner/item                     Enemy Object Wpn
+   43 dev/neutron/gun                          Neutron Pulse Gun
+   44 dev/flak/turret                          Flak Artillery
+   45 dev/antimatter-pulse-2                   Antimatter Pulse 
+   46 dev/pp/twin                              Twin Pulse Cannon
+   47 dev/assault/can                          Assault Team
+   48 dev/pk/ish/rapid                         Rapid P-K Cannon
+   49 can/etc/spawner/item                     Enemy Shooter Wpn
+   50 dev/laser/gun                            Laser Cannon
+   51 dev/magneto/gun                          Magneto Pulse Gun
+   52 dev/shrikeolator/turret                  Shrikeolator
+   53 dev/bay/sal                              Launching Bay
+   54 dev/holo/item                            Holo Generator
+   55 dev/inasa/gun                            Inasa Pulse Gun
+   56 dev/inasa/rapid                          Rapid Inasa Pulse
+   57 dev/assault/gai                          Assault Team
+   58 dev/bay/aud                              Launching Bay
+   59 dev/trazer/gun                           Trazer Cannon
+   60 dev/amissile/launcher                    A Missile Launch
+   61 dev/asb/gun                              ASB Beam Cannon
+   62 dev/cform/gun                            C-Form Cannon
+   63 dev/newo/gun                             Newo Beam Cannon
+   64 dev/cm/launcher                          C Missile Launch
+   65 dev/repulser/turret                      Repulser
+   66 dev/bay/uns                              Launching Bay
+   67 dev/tspace/gun                           T-Space Bolt Rod
+   68 dev/fireball/gun                         Plasma Ball
+   69 dev/assault/aud                          Assault Team
+   70 dev/onas/gun                             Onas Pulse Gun
+   71 dev/jammer/turret                        Electronic Jam
+   72 dev/magno/turret                         Magno Launcher
+   73 dev/assault/sal                          Assault Team
+   74 dev/conc/gun                             Concsv Pellet Gun
+   75 dev/assault-team                         Assault Team
+   76 dev/cm/five                              C Missiles(5)
+   77 dev/pk/ish/gun                           P-K Beam Cannon
+   78 dev/quasimatter-gun                      Quasimatter Gun
+   79 dev/stealth/item                         Stealth Field
+   80 dev/pk/sal/gun                           LRPK Beam Cannon
+   81 dev/chronon-prtcl-gun                    Chronon Prtcl Gun
+   82 dev/magneto/rapid                        Rapid Magneto
+   83 dev/laser/turret                         Laser Turret
+   84 dev/photo/gun                            Phtorctr Pls Cann
+   85 dev/photo/light                          Light Phtoreactor
+   86 dev/pk/can/gun                           P-K Beam Cannon
+   87 dev/fusion/gun                           F Pulse Reactor
+   88 ish/etc/cruiser/tut3                     Cruiser
+   89 can/etc/transport/tut1                   Transport
+   90 gro/cruiser                              Light Cruiser
+   91 gro/ctf/flag/p2                          Player 2's Flag
+   92 gro/ctf/flag/p1                          Player 1's Flag
+   93 uns/hvd                                  Heavy Destroyer
+   94 sal/hvd                                  Heavy Destroyer
+   95 can/hvd                                  Heavy Destroyer
+   96 uns/aslttran                             Assault Transport
+   97 gai/aslttran                             Assault Transport
+   98 ast/shoot/lite/down                      Ast Shoot Down Lt
+   99 ast/shoot/lite/up                        Ast Shoot Up Lite
+  100 ast/shoot/nasty                          Nastiroid Shooter
+  101 can/gateship/damaged                     Gate Ship
+  102 ish/etc/hvc/mod                          Modified Cruiser
+  103 uns/class1801                            Transport
+  104 ish/etc/research                         Research Vessel
+  105 aud/etc/device                           Massive Device
+  106 sal/aslttran                             Assault Transport
+  107 sal/transport                            Transport
+  108 sal/gunship                              Gunship
+  109 sal/carrier                              Carrier
+  110 ish/etc/tug                              Tractor Tug
+  111 ele/etc/escape-pod                       Escape Pod
+  112 ele/etc/liner/disabled                   Luxury Liner
+  113 loc/outpost                              Outpost Station
+  114 ele/cruiser                              Cruiser
+  115 aud/transport                            Transport
+  116 aud/hvd                                  Heavy Destroyer
+  117 aud/carrier                              Carrier
+  118 aud/aslttran                             Assault Transport
+  119 aud/gunship                              Gunship
+  120 aud/cruiser                              Cruiser
+  121 ast/shoot/wide/down                      AsteroidShootDown
+  122 ast/shoot/wide/up                        Asteroid Shoot Up
+  123 uns/carrier                              Carrier
+  124 can/gateship/dying                       Gate Ship
+  125 uns/transport                            Transport
+  126 uns/gunship                              Gunship
+  127 uns/cruiser                              Cruiser
+  128 loc/jump/node                            Jump Gate Non
+  129 loc/jump/gate                            Jump Gate
+  130 zzz/ish/etc/prctcdrn                     Practice Drone
+  131 can/etc/spawner/obj                      Enemy Shooter Obj
+  132 ast/shoot/narrow/down                    Ast Shoot Down
+  133 ast/shoot/narrow/up                      Asteroid Shoot Up
+  134 gai/etc/transport/ch1                    Transport
+  135 can/aslttran                             Assault Transport
+  136 ish/aslttran                             Assault Transport
+  137 can/engineer                             Engineer Pod
+  138 ish/etc/cargo                            Cargo Ship
+  139 uns/etc/bttlship                         Battleship
+  140 loc/shipyard                             Orbital Shipyard
+  141 sal/cruiser                              Cruiser
+  142 sal/etc/lab/base                         Lab
+  143 uns/ares                                 U.N.S. Ares
+  144 loc/moon                                 Moon
+  145 loc/power                                Power Station
+  146 loc/flak                                 Flak Drone
+  147 gai/hvd                                  Heavy Destroyer
+  148 ish/engineer                             Engineer Pod
+  149 gai/engineer                             Engineer Pod
+  150 gai/etc/spawner/obj                      Enmy Object Shoot
+  151 gai/etc/lab/burning                      Lab
+  152 obi/etc/liner                            Passenger Liner
+  153 gai/carrier                              Carrier
+  154 gai/transport                            Transport
+  155 can/etc/border-drone                     Border Drone
+  156 loc/moor                                 Tractor Moor
+  157 baz/etc/bttlship/moored                  Battleship-Moored
+  158 ish/carrier                              Carrier
+  159 can/carrier                              Carrier
+  160 can/defdrone                             Defense Drone
+  161 ish/defdrone                             Defense Drone
+  162 can/transport                            Transport
+  163 ish/transport                            Transport
+  164 ish/gunship                              Gunship
+  165 ish/cruiser                              Cruiser
+  166 can/gunship                              Gunship
+  167 loc/planet                               Planet
+  168 ast/otr/big                              Asteroid
+  169 ish/etc/astrominer                       Astrominer
+  170 can/hvc                                  Heavy Cruiser
+  171 loc/sun                                  Sun
+  172 loc/bunker                               Bunker Station
+  173 obi/escort                               Escort
+  174 gai/gunship                              Gunship
+  175 misc/sensor-relay-stat                   Sensor Relay Stat
+  176 dev/pk/ish/bolt                          P-K Beam
+  177 dev/fusion/pulse                         Fusion Pulse
+  178 misc/antimatter-pulse-2                  Antimatter Pulse 
+  179 dev/anti1/pulse                          Antimatter Pulse
+  180 dev/pk/can/bolt                          P-K Beam
+  181 dev/anti2/pulse2                         Antimatter Pulse
+  182 dev/lepton/bolt                          Lepton Beam
+  183 sfx/gunsmoke                             Gunsmoke
+  184 dev/conc/pellet                          Concussive Pellet
+  185 dev/pp/pulse                             Protopulse
+  186 ish/fighter                              Fighter
+  187 dev/cluster/pulse                        Cluster Cell
+  188 sfx/debris/a                             Debris
+  189 dev/atomic/pulse                         Atomic Pulse
+  190 sfx/sparkle                              Sparkle
+  191 dev/rplasma/pulse                        R-Plasma
+  192 dev/zbeam/bolt                           Z Beam
+  193 baz/bttlship                             Battleship
+  194 sfx/explosion/missile-hit                Missile Hit
+  195 dev/mine/pulse                           Lightwave Pulse
+  196 ast/otr/medium                           Astroid Fragment
+  197 ast/otr/small                            Asteroid Debris
+  198 dev/repulser/bolt                        Repulser Beam
+  199 ish/evat                                 EVA Trooper
+  200 sfx/explosion/flak                       Flak Explosion
+  201 dev/flak/flak                            Flak
+  202 dev/flak/pulse                           Flak Shell
+  203 sfx/debris/b                             Debris
+  204 sfx/debris/c                             Debris
+  205 can/evat                                 EVA Trooper
+  206 ish/hvc                                  Heavy Cruiser
+  207 dev/fullerene/pulse                      Fullerene Pulse
+  208 sal/fighter                              Fighter
+  209 dev/pk/sal/bolt                          LR PK Beam
+  210 dev/magno/pulse                          Magno Pulse
+  211 dev/inasa/pulse                          Inasa Pulse
+  212 dev/asb/bolt                             ASB Beam
+  213 aud/fighter                              Fighter
+  214 dev/onas/pulse                           Onas Pulse
+  215 sfx/explosion/gas                        Gas Explosion
+  216 dev/newo/bolt                            Newo Beam
+  217 dev/amissile/missile                     Missile
+  218 dev/holo/decoy                           Holographic Decoy
+  219 sfx/jump/small                           Jump Gate Effect
+  220 dev/pp2/pulse                            Protopulse 2
+  221 uns/fighter                              Fighter
+  222 dev/laser/gun-bolt                       Laser
+  223 dev/magneto/pulse                        Magneto Pulse
+  224 dev/laser/turret-bolt                    Laser
+  225 can/gateship/base                        Gate Ship
+  226 ast/regular/medium                       Asteroid Fragment
+  227 sfx/explosion/asteroid                   Large Explosion
+  228 zrb/base                                 Zerbilite
+  229 can/schooner                             Schooner
+  230 can/fighter                              Fighter
+  231 can/cruiser                              Cruiser
+  232 zzz/ish/etc/trgtdrne                     Target Drone
+  233 zzz/ish/etc/trgtdrne/dead                Target Drone Dead
+  234 zrb/spawn                                Zerbilite Spawn
+  235 misc/small-destruction                   Small Destruction
+  236 ast/regular/small                        Asteroid Debris
+  237 dev/shrikeolator/pulse                   Temp Pulse
+  238 sfx/explosion/shrikeolator               Large Energy Exp
+  239 zzz/dev/inert/bolt                       Inert PK Beam
+  240 zzz/ish/cruiser/active                   Cruiser
+  241 zzz/ish/cruiser/inactive                 Cruiser Dead
+  242 uns/etc/human/waving                     Human
+  243 sal/etc/lab/burning                      Lab
+  244 uns/etc/human/turning                    Human
+  245 obi/etc/obiard/waving                    Obiard
+  246 gai/etc/lab/base                         Lab
+  247 obi/etc/obiard/turning                   Obiard
+  248 sfx/explosion/lab                        Giant Explosion
+  249 gai/fighter                              Fighter
+  250 gai/cruiser                              Cruiser
+  251 sfx/explosion/supernova                  Super Nova
+  252 misc/large-hit-explosi                   Large Hit Explosi
+  253 sfx/explosion/giant                      Giant Explosion
+  254 can/gateship/jump                        Gate Ship
+  255 sfx/jump/large                           Jump Effect Large
+  256 dev/kl/bolt                              Kinetic Laser
+  257 ast/regular/big                          Asteroid
+  258 dev/quasi/pulse                          Quasimatter Pulse
+  259 sfx/explosion/quasi                      Quasimatter Exp
+  260 dev/cform/pulse                          Charged Form
+  261 dev/chronon/pulse                        Chronon Particle
+  262 dev/photo/pulse                          Photoreactor Puls
+  263 dev/neutron/pulse                        Neutron Pulse
+  264 sfx/explosion/large                      Large Explosion
+  265 gai/evat                                 EVA Trooper
+  266 aud/evat                                 EVA Trooper
+  267 sal/evat                                 EVA Trooper
+  268 dev/cm/missile                           C Missile
+  269 dev/tspace/ray                           Trans-Space Bolt
+  270 sfx/explosion/energy                     Energy Explosion
+  271 dev/trazer/ray                           Trazer Beam
+  272 dev/fireball/trail                       Fireball Trail
+  273 misc/fireball                            Fireball
+  274 ast/nasty                                Nastiroid
+  275 ast/rand-dir                             Asteroid
+  276 gro/ctf/cruiser/p1-inactive              Cruiser
+  277 gro/ctf/cruiser/p2-inactive              Cruiser
+  278 gro/ctf/moor/p1-inactive                 Tractor Moor
+  279 gro/ctf/moor/p1-active                   Tractor Moor
+  280 gro/ctf/moor/p2-inactive                 Tractor Moor
+  281 gro/ctf/moor/p2-active                   Tractor Moor
+  282 gro/ctf/cruiser/p1-active                Cruiser
+  283 gro/ctf/cruiser/p2-active                Cruiser
+  284 zzz/gai/etc/kamipulse                    Clustercell 2
+  285 ele/etc/liner                            Luxury Liner
+  286 ish/hvd                                  Heavy Destroyer
+  287 ish/etc/hvd/rescue                       Destroyer
+  288 uns/etc/human/returning                  Human
+  289 obi/transport                            Transport
+  290 obi/etc/transport/rescue                 Transport
+  291 obi/etc/obiard/returning                 Obiard
+  292 sfx/energy                               Energy
+  293 sfx/crew                                 Castaway Crew Mem
+  294 sfx/warp/out                             Warp Out Flare
+  295 sfx/warp/in                              Warp In Flare
+  296 uns/etc/carrier                          Carrier
+  297 can/etc/transport                        Transport
+  298 obi/etc/battleship                       Battleship
+  299 misc/fusion-pulse                        Fusion Pulse
+  300 dev/energy-recharger                     Energy Recharger
+  301 dev/jumpgate-creator                     Jumpgate Creator
+  302 misc/cruiser-gate                        Cruiser Gate
+  303 dev/launching-bay                        Launching Bay
+
+notes:
+     3 x initial build list truncated to 6
+     3 x non-reflexive create (destination semantics differ slightly)
+     1 x object 3 portrait 1278 missing

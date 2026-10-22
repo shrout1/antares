@@ -1,0 +1,38 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 ele/etc/elejeetian-cruise                Elejeetian-Cruise
+    6 dev/onas-x-pulse-gun                     Onas X Pulse Gun
+    7 misc/onas-x-pulse                        Onas X Pulse
+    8 sfx/explosion/gas                        Gas Explosion
+    9 dev/flak/turret                          Flak Artillery
+   10 dev/flak/pulse                           Flak Shell
+   11 dev/flak/flak                            Flak
+   12 sfx/explosion/energy                     Energy Explosion
+   13 sfx/explosion/flak                       Flak Explosion
+   14 dev/atomic-puls-gun3                     Atomic Puls Gun3
+   15 dev/atomic/pulse                         Atomic Pulse
+   16 misc/large-hit-explosi                   Large Hit Explosi
+   17 sfx/sparkle                              Sparkle
+   18 misc/giant-explosion                     Giant Explosion
+   19 sfx/debris/a                             Debris
+   20 sfx/debris/b                             Debris
+   21 sfx/debris/c                             Debris
+   22 ele/etc/boss-ship                        Boss-Ship
+   23 dev/trazer/gun                           Trazer Cannon
+   24 dev/trazer/ray                           Trazer Beam
+   25 dev/tspace/gun                           T-Space Bolt Rod
+   26 dev/tspace/ray                           Trans-Space Bolt
+   27 dev/onas-pulse-turret                    Onas Pulse Turret
+   28 misc/onas-pulse-turret                   Onas Pulse turret
+   29 ele/etc/elejeetian-cruise-2              Elejeetian-Cruise
+   30 gai/cruiser                              Cruiser
+   31 dev/conc/gun                             Concsv Pellet Gun
+   32 dev/conc/pellet                          Concussive Pellet
+   33 sfx/gunsmoke                             Gunsmoke
+   34 sfx/explosion/large                      Large Explosion
+
+notes:

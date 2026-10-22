@@ -1,0 +1,86 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 ele/etc/elejeetian-cruise                Elejeetian-Cruise
+    6 dev/h-missile-launch                     H Missile Launch
+    7 misc/hyper-missile                       Hyper-Missile
+    8 sfx/explosion/energy                     Energy Explosion
+    9 misc/hgas-explosion                      HGas Explosion
+   10 misc/large-explosion                     Large Explosion
+   11 sfx/debris/a                             Debris
+   12 uns/carrier                              Carrier
+   13 sfx/explosion/giant                      Giant Explosion
+   14 sfx/debris/b                             Debris
+   15 sfx/debris/c                             Debris
+   16 gai/carrier                              Carrier
+   17 sal/carrier                              Carrier
+   18 aud/carrier                              Carrier
+   19 ele/etc/carrier                          Carrier
+   20 can/gateship/damaged                     Gate Ship
+   21 can/gateship/dying                       Gate Ship
+   22 sfx/explosion/supernova                  Super Nova
+   23 misc/large-hit-explosi                   Large Hit Explosi
+   24 sal/etc/battle-ship-speci                Battle Ship Speci
+   25 loc/planet                               Planet
+   26 gai/fighter                              Fighter
+   27 dev/kl/gun                               KL Beam Cannon
+   28 dev/kl/bolt                              Kinetic Laser
+   29 misc/small-destruction                   Small Destruction
+   30 gai/cruiser                              Cruiser
+   31 dev/conc/gun                             Concsv Pellet Gun
+   32 dev/conc/pellet                          Concussive Pellet
+   33 sfx/gunsmoke                             Gunsmoke
+   34 sfx/explosion/large                      Large Explosion
+   35 ish/cruiser                              Cruiser
+   36 dev/fusion/gun                           F Pulse Reactor
+   37 dev/fusion/pulse                         Fusion Pulse
+   38 dev/pk/ish/gun                           P-K Beam Cannon
+   39 dev/pk/ish/bolt                          P-K Beam
+   40 can/cruiser                              Cruiser
+   41 dev/antimatter-pulse                     Antimatter Pulse 
+   42 dev/anti1/pulse                          Antimatter Pulse
+   43 dev/pk/can/gun                           P-K Beam Cannon
+   44 dev/pk/can/bolt                          P-K Beam
+   45 dev/stealth/item                         Stealth Field
+   46 gai/etc/cruiser                          Cruiser
+   47 obi/etc/escort                           Escort
+   48 dev/pp2/gun                              Protopulse 2 Gun
+   49 dev/pp2/pulse                            Protopulse 2
+   50 sal/cruiser                              Cruiser
+   51 dev/pk/sal/gun                           LRPK Beam Cannon
+   52 dev/pk/sal/bolt                          LR PK Beam
+   53 uns/cruiser                              Cruiser
+   54 dev/magneto/gun                          Magneto Pulse Gun
+   55 dev/magneto/pulse                        Magneto Pulse
+   56 dev/laser/gun                            Laser Cannon
+   57 dev/laser/gun-bolt                       Laser
+   58 aud/cruiser                              Cruiser
+   59 dev/inasa/gun                            Inasa Pulse Gun
+   60 dev/inasa/pulse                          Inasa Pulse
+   61 dev/asb/gun                              ASB Beam Cannon
+   62 dev/asb/bolt                             ASB Beam
+   63 dev/holo/item                            Holo Generator
+   64 dev/holo/decoy                           Holographic Decoy
+   65 ele/etc/elejeetian-cruise-2              Elejeetian-Cruise
+   66 dev/onas-x-pulse-gun                     Onas X Pulse Gun
+   67 misc/onas-x-pulse                        Onas X Pulse
+   68 sfx/explosion/gas                        Gas Explosion
+   69 dev/flak/turret                          Flak Artillery
+   70 dev/flak/pulse                           Flak Shell
+   71 dev/flak/flak                            Flak
+   72 sfx/explosion/flak                       Flak Explosion
+   73 dev/atomic-puls-gun3                     Atomic Puls Gun3
+   74 dev/atomic/pulse                         Atomic Pulse
+   75 sfx/sparkle                              Sparkle
+   76 ish/etc/cruiser                          Cruiser
+   77 can/etc/cruiser                          Cruiser
+   78 gai/etc/cruiser-2                        Cruiser
+   79 obi/etc/escort-2                         Escort
+   80 sal/etc/cruiser                          Cruiser
+   81 uns/etc/cruiser                          Cruiser
+   82 aud/etc/cruiser                          Cruiser
+
+notes:

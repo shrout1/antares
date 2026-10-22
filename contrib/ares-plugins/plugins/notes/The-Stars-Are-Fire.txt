@@ -1,0 +1,183 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 misc/ex8-missile-hit                     Ex8 Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 misc/planet                              Planet
+    6 obi/fighter                              Fighter
+    7 dev/laser-relb-type3                     Laser RELB Type3
+    8 misc/laser                               Laser
+    9 misc/ex2-energy-explos                   Ex2 Energy Explos
+   10 dev/stealth/item                         Stealth Field
+   11 misc/ex9-small-destruc                   Ex9 Small Destruc
+   12 ish/fighter                              Fighter
+   13 dev/laser-type1                          Laser Type1
+   14 misc/laser-2                             Laser
+   15 obi/cruiser                              Cruiser
+   16 dev/cannon-antimatter                    Cannon Antimatter
+   17 misc/pulse-anttimatter                   Pulse Anttimatter
+   18 dev/laser-relb-type1                     Laser RELB Type1
+   19 misc/ex4-large-explosi                   Ex4 Large Explosi
+   20 misc/debris                              Debris
+   21 misc/castaway-crew-mem                   Castaway Crew Mem
+   22 ish/cruiser                              Cruiser
+   23 dev/cannon-rayon                         Cannon Rayon
+   24 misc/pulse-rayon                         Pulse Rayon
+   25 dev/machine-gun                          Machine gun
+   26 misc/bullet                              Bullet
+   27 sfx/gunsmoke                             Gunsmoke
+   28 ish/hvc                                  Heavy Cruiser
+   29 dev/cannon-fusion                        Cannon Fusion
+   30 misc/pulse-fusion                        Pulse Fusion
+   31 ish/aslttran                             Assault Transport
+   32 dev/lero-laser-cannon                    Lero Laser Cannon
+   33 misc/lero-laser                          Lero laser
+   34 misc/lero-laser-2                        Lero laser
+   35 dev/assault-team                         Assault Team
+   36 ish/etc/eva-trooper                      EVA Trooper
+   37 misc/ex1-giant-explosi                   Ex1 Giant Explosi
+   38 misc/debris-2                            Debris
+   39 misc/debris-3                            Debris
+   40 misc/sun                                 Sun
+   41 ish/carrier                              Carrier
+   42 dev/dual-m-launcher                      Dual M-Launcher
+   43 misc/c-missile1                          C Missile1
+   44 misc/ex3-gas-explosion                   Ex3 Gas Explosion
+   45 misc/c-missile2                          C Missile2
+   46 dev/cannon-charge                        Cannon +Charge
+   47 misc/pulse-chargedform                   Pulse ChargedForm
+   48 dev/launching-bay                        Launching Bay
+   49 ish/escort                               Heavy Destroyer
+   50 dev/cannon-egwv                          Cannon EGWV
+   51 misc/pulse-energywave                    Pulse EnergyWave
+   52 dev/ion-cannon                           ION Cannon
+   53 misc/ion-beam                            ION Beam
+   54 misc/ion-beam-2                          ION Beam
+   55 ish/gunship                              Gunship
+   56 dev/m-missle-launcher                    M-Missle Launcher
+   57 misc/c-missile                           C Missile
+   58 dev/cannon-neutron                       Cannon Neutron
+   59 misc/pulse-neutron                       Pulse Neutron
+   60 misc/ex6-netron                          Ex6 Netron
+   61 obi/class900                             Gateship
+   62 dev/cannon-fullerene                     Cannon Fullerene
+   63 misc/pulse-fullerene                     Pulse Fullerene
+   64 dev/relb-turret                          RELB Turret
+   65 misc/laser-3                             Laser
+   66 dev/tri-launching-bay                    Tri-Launching Bay
+   67 sfx/explosion/supernova                  Super Nova
+   68 obi/carrier                              Carrier
+   69 dev/cannon-sowod                         Cannon Sowod
+   70 misc/pulse-superheated                   Pulse Superheated
+   71 dev/relb2-turret                         RELB2 Turret
+   72 dev/launching-bay-2                      Launching Bay
+   73 obi/escort                               Heavy Destroyer
+   74 dev/cannon-photorctor                    Cannon Photorctor
+   75 misc/pulse-photoreactr                   Pulse Photoreactr
+   76 dev/cannon-magneto                       Cannon Magneto
+   77 obi/transport                            Transport
+   78 misc/jump-gate                           Jump Gate
+   79 obi/gunship                              Gunship
+   80 dev/cannon-antimatter-2                  Cannon Antimatter
+   81 aud/escort                               Heavy Destroyer
+   82 dev/cannon-superchill                    Cannon Superchill
+   83 misc/pulse-superchill                    Pulse Superchill
+   84 misc/i-missile                           I Missile
+   85 dev/laser-argsm-type1                    Laser ARGSM Type1
+   86 misc/laser-4                             Laser
+   87 misc/wormholedisrupter                   WormholeDisrupter
+   88 aud/cruiser                              Cruiser
+   89 dev/cannon-hydrogen                      Cannon Hydrogen
+   90 misc/pulse-hydrogen                      Pulse Hydrogen
+   91 misc/station                             Station
+   92 dev/argsm-turret                         ARGSM Turret
+   93 misc/laser-5                             Laser
+   94 dev/i-missle-launcher                    I-Missle Launcher
+   95 ish/etc/science-vessel                   Science Vessel
+   96 sfx/jump/small                           Jump Gate Effect
+   97 aud/fighter                              Fighter
+   98 aud/gunship                              Gunship
+   99 dev/cannon-inasa                         Cannon Inasa
+  100 misc/pulse-inasa                         Pulse Inasa
+  101 ish/transport                            Transport
+  102 aud/transport                            Transport
+  103 sal/carrier                              Carrier
+  104 dev/t-space-bolt-rod                     T-Space Bolt Rod
+  105 misc/trans-space-bolt                    Trans-Space Bolt
+  106 dev/s-missle-launcher                    S-Missle Launcher
+  107 misc/cruise-missile2                     Cruise Missile2
+  108 misc/cruise-missile3                     Cruise Missile3
+  109 dev/launching-bay-3                      Launching Bay
+  110 sal/fighter                              Fighter
+  111 dev/laser-lrpk-type1                     Laser  LRPK Type1
+  112 misc/laser-6                             Laser
+  113 sal/escort                               Heavy Destroyer
+  114 dev/cannon-chronon                       Cannon Chronon
+  115 misc/pulse-cronon                        Pulse Cronon
+  116 sal/cruiser                              Cruiser
+  117 misc/jump-gate-marker                    Jump Gate Marker
+  118 misc/power-station2                      Power Station2
+  119 ast/shoot/narrow/down                    Ast Shoot Down
+  120 ast/otr/big                              Asteroid
+  121 ast/shoot/narrow/up                      Asteroid Shoot Up
+  122 ast/nasty                                Nastiroid
+  123 misc/power-station                       Power Station
+  124 gai/fighter                              Fighter
+  125 dev/laser-sflc-type1                     Laser SFLC Type1
+  126 misc/laser-7                             Laser
+  127 gai/cruiser                              Cruiser
+  128 dev/cannon-protopulse                    Cannon Protopulse
+  129 misc/protopulse                          Protopulse
+  130 dev/laser-sflc-type2                     Laser SFLC Type2
+  131 gai/escort                               Heavy Destroyer
+  132 dev/cannon-electron                      Cannon Electron
+  133 misc/pulse-electron-3                    Pulse Electron 3
+  134 dev/laser-dlid-type1                     Laser DLID Type1
+  135 misc/c1lasert1                           C1LaserT1
+  136 misc/c1lasert2                           C1LaserT2
+  137 gai/carrier                              Carrier
+  138 dev/cannon-electron2                     Cannon Electron2
+  139 misc/pulse-electron                      Pulse Electron
+  140 misc/pulse-electron-2                    Pulse Electron 2
+  141 dev/laser-dlid-type2                     Laser DLID Type2
+  142 misc/c2laserr1                           C2LaserR1
+  143 misc/c2laserr2                           C2LaserR2
+  144 dev/launching-bay-4                      Launching Bay
+  145 gai/transport                            Transport
+  146 dev/mflc-turret                          MFLC Turret
+  147 gai/aslttran                             Assault Transport
+  148 dev/assault-team-2                       Assault Team
+  149 gai/etc/eva-trooper                      EVA Trooper
+  150 gai/hvc                                  Heavy Escort
+  151 dev/c-space-bolt-rod                     C-Space Bolt Rod
+  152 misc/cross-space-bolt                    Cross-Space Bolt
+  153 misc/asteroid-shoot                      Asteroid Shoot ->
+  154 ast/regular/big                          Asteroid
+  155 ast/regular/medium                       Asteroid Fragment
+  156 ast/regular/small                        Asteroid Debris
+  157 misc/asteroid-shoot-2                    Asteroid Shoot\
+  158 ish/etc/freighter                        Freighter
+  159 misc/station-2                           Station
+  160 dev/newo-turret                          NEWO Turret
+  161 misc/laser-8                             Laser
+  162 misc/battleship                          Battleship
+  163 dev/plasma-launcher                      Plasma Launcher
+  164 misc/pulse-plasma                        Pulse Plasma
+  165 dev/laser-relb-type2                     Laser RELB Type2
+  166 misc/z-beam1                             Z Beam1
+  167 misc/z-beam2                             Z Beam2
+  168 misc/z-beam3                             Z Beam3
+  169 dev/twin-pulse-cannon                    Twin Pulse Cannon
+  170 misc/station-3                           Station
+  171 sal/etc/fighter                          Fighter
+  172 misc/planet-2                            Planet
+
+notes:
+     2 x non-reflexive create (destination semantics differ slightly)
+     1 x message 35 has no text; dropped
+     1 x message 36 has no text; dropped
+     1 x initial references [98] past 98 initials; dropped
+     1 x message 37 has no text; dropped
+     1 x message 42 has no text; dropped
+     1 x unknown key bit 25

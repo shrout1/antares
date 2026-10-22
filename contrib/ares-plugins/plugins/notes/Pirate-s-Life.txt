@@ -1,0 +1,18 @@
+objects:
+    0 misc/steal-beam-act                      Steal Beam ACT
+    1 dev/steal-beam                           Steal Beam
+    2 dev/pp/pulse                             Protopulse
+    3 dev/pp/turret                            ProtoPulse Cannon
+    4 sfx/explosion/quasi                      Quasimatter Exp
+    5 dev/quasi/pulse                          Quasimatter Pulse
+    6 dev/quasi/gun                            Quasimatter Gun
+    7 sfx/warp/out                             Warp Out Flare
+    8 sfx/warp/in                              Warp In Flare
+    9 sfx/explosion/missile-hit                Missile Hit
+   10 sfx/crew                                 Castaway Crew Mem
+   11 sfx/energy                               Energy
+   12 misc/pirate-vessel                       Pirate Vessel
+   13 misc/pirate-jump-point                   Pirate Jump Point
+
+notes:
+     2 x non-reflexive create (destination semantics differ slightly)
