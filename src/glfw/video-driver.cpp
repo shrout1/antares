@@ -188,50 +188,19 @@ pn::string_view GLFWVideoDriver::glsl_version() const { return _glsl_version; }
 Point GLFWVideoDriver::get_mouse() {
     double x, y;
     glfwGetCursorPos(_window, &x, &y);
-    return to_screen(x, y);
+    return _layout.from_window(x, y, _game_layout);
 }
 
-// The battlefield is drawn at one point per pixel; the panels and all other screens are scaled
-// up to fit the display, keeping their 640x480 proportions.
-static const Size kOriginalScreenSize = {640, 480};
-
-// With a fixed resolution, the game is laid out as on a display of that size, then stretched to
-// fill the framebuffer.
 void GLFWVideoDriver::update_size() {
     Size window, framebuffer;
     glfwGetWindowSize(_window, &window.width, &window.height);
     glfwGetFramebufferSize(_window, &framebuffer.width, &framebuffer.height);
-    if ((framebuffer.width <= 0) || (framebuffer.height <= 0)) {
-        // Minimized (Windows reports a 0x0 window); keep the last layout until it's restored.
-        return;
-    }
-    _window_size      = window;
-    _framebuffer_size = framebuffer;
-    _pixel_ratio = std::max(1, _framebuffer_size.width / std::max(1, _window_size.width));
-    _resolution  = sys.prefs->resolution();
-    _game_scale  = sys.prefs->game_scale();
-    if (_resolution.as_rect().empty() || !resolution_supported(_resolution)) {
-        _viewport_size  = _framebuffer_size;
-        _viewport_scale = _pixel_ratio;
-    } else {
-        _viewport_scale = std::min(
-                float(_framebuffer_size.width) / _resolution.width,
-                float(_framebuffer_size.height) / _resolution.height);
-        _viewport_size = {
-                int(std::lround(_resolution.width * _viewport_scale)),
-                int(std::lround(_resolution.height * _viewport_scale))};
-    }
-    _ui_scale = std::max<float>(
-            _viewport_scale, std::min(
-                                     float(_viewport_size.width) / kOriginalScreenSize.width,
-                                     float(_viewport_size.height) / kOriginalScreenSize.height));
-    _battlefield_scale           = battlefield_scale(_game_scale);
-    _left_panel_pixels           = std::lround(kLeftPanelWidth * _ui_scale);
-    _right_panel_pixels          = std::lround(kRightPanelWidth * _ui_scale);
-    const int battlefield_pixels = _viewport_size.width - _left_panel_pixels - _right_panel_pixels;
-    _screen_size                 = {
-            kLeftPanelWidth + int(battlefield_pixels / _battlefield_scale) + kRightPanelWidth,
-            int(_viewport_size.height / _battlefield_scale)};
+    _resolution = sys.prefs->resolution();
+    _game_scale = sys.prefs->game_scale();
+    _layout.update(
+            window, framebuffer, resolution_supported(_resolution) ? _resolution : Size{},
+            _game_scale);
+    _window_size = _layout.window_size();
 }
 
 // In a window, a fixed resolution sets the window's size, so the game runs at exactly that many
@@ -278,84 +247,9 @@ void GLFWVideoDriver::fit_window() {
     glfwSetWindowSize(_window, size.width, size.height);
 }
 
-float GLFWVideoDriver::battlefield_scale(GameScale scale) const {
-    switch (scale) {
-        case GameScale::NATIVE: return _viewport_scale;
-        case GameScale::WHOLE:
-            return std::max<float>(
-                    _viewport_scale,
-                    std::floor(float(_viewport_size.height) / kOriginalScreenSize.height));
-        case GameScale::FILL: return _ui_scale;
-    }
-    return _viewport_scale;
-}
-
 bool GLFWVideoDriver::resolution_supported(Size resolution) const {
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     return !mode || ((resolution.width <= mode->width) && (resolution.height <= mode->height));
-}
-
-vec4 GLFWVideoDriver::region_transform(Region region) const {
-    const float k = _ui_scale;
-    const float r = _battlefield_scale;
-    // Panels are laid out around instrument_top(); center them vertically.
-    const int   instrument_top = (_screen_size.height / 2) - (kOriginalScreenSize.height / 2);
-    const float panel_offset   = ((_viewport_size.height - (kOriginalScreenSize.height * k)) / 2) -
-                               (instrument_top * k);
-    switch (region) {
-        case Region::SCREEN: {
-            Rect original = kOriginalScreenSize.as_rect();
-            original.center_in(_screen_size.as_rect());
-            return {k, k,
-                    ((_viewport_size.width - (original.width() * k)) / 2) - (original.left * k),
-                    ((_viewport_size.height - (original.height() * k)) / 2) - (original.top * k)};
-        }
-        case Region::BATTLEFIELD: return {r, r, _left_panel_pixels - (kLeftPanelWidth * r), 0};
-        case Region::OVERLAY: return {k, k, _left_panel_pixels - (kLeftPanelWidth * r), 0};
-        case Region::LEFT_PANEL: return {k, k, 0, panel_offset};
-        case Region::RIGHT_PANEL:
-            return {k, k,
-                    (_viewport_size.width - _right_panel_pixels) -
-                            ((_screen_size.width - kRightPanelWidth) * k),
-                    panel_offset};
-    }
-    return {r, r, 0, 0};
-}
-
-Point GLFWVideoDriver::from_pixels(double x, double y, Region region) const {
-    const vec4 t = region_transform(region);
-    return {int(std::floor((x - t.z) / t.x)), int(std::floor((y - t.w) / t.y))};
-}
-
-Rect GLFWVideoDriver::visible_rect(Region region) const {
-    // Whole points only: the region's points that are entirely within the viewport.
-    const vec4 t = region_transform(region);
-    return Rect(
-            int(std::ceil(-t.z / t.x)), int(std::ceil(-t.w / t.y)),
-            int(std::floor((_viewport_size.width - t.z) / t.x)),
-            int(std::floor((_viewport_size.height - t.w) / t.y)));
-}
-
-Point GLFWVideoDriver::convert(Point p, Region from, Region to) const {
-    const vec4 t = region_transform(from);
-    return from_pixels((p.h * t.x) + t.z, (p.v * t.y) + t.w, to);
-}
-
-Point GLFWVideoDriver::to_screen(double x, double y) const {
-    // Window coordinates to viewport pixels, undoing the stretch.
-    x = x * _viewport_size.width / std::max(1, _window_size.width);
-    y = y * _viewport_size.height / std::max(1, _window_size.height);
-    Region region = Region::SCREEN;
-    if (_game_layout) {
-        if (x < _left_panel_pixels) {
-            region = Region::LEFT_PANEL;
-        } else if (x >= (_viewport_size.width - _right_panel_pixels)) {
-            region = Region::RIGHT_PANEL;
-        } else {
-            region = Region::BATTLEFIELD;
-        }
-    }
-    return from_pixels(x, y, region);
 }
 
 InputMode GLFWVideoDriver::input_mode() const { return KEYBOARD_MOUSE; }
@@ -550,7 +444,7 @@ void GLFWVideoDriver::mouse_button(int button, int action, int mods) {
 }
 
 void GLFWVideoDriver::mouse_move(double x, double y) {
-    MouseMoveEvent(now(), to_screen(x, y)).send(_loop->top());
+    MouseMoveEvent(now(), _layout.from_window(x, y, _game_layout)).send(_loop->top());
 }
 
 void GLFWVideoDriver::window_size(int width, int height) {

@@ -26,6 +26,7 @@
 #include "config/preferences.hpp"
 #include "drawing/color.hpp"
 #include "math/geometry.hpp"
+#include "video/layout.hpp"
 #include "video/opengl-driver.hpp"
 
 struct GLFWwindow;
@@ -41,17 +42,21 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     virtual pn::string_view glsl_version() const;
 
-    virtual Size  viewport_size() const { return _viewport_size; }
-    virtual Rect  viewport_rect() const { return _framebuffer_size.as_rect(); }
+    virtual Size  viewport_size() const { return _layout.viewport_size(); }
+    virtual Rect  viewport_rect() const { return _layout.framebuffer_size().as_rect(); }
     virtual bool  resolution_supported(Size resolution) const;
-    virtual Size  screen_size() const { return _screen_size; }
-    virtual int   scale() const { return _pixel_ratio; }
-    virtual float overlay_scale() const { return _ui_scale / _battlefield_scale; }
-    virtual float battlefield_scale(GameScale scale) const;
+    virtual Size  screen_size() const { return _layout.screen_size(); }
+    virtual int   scale() const { return _layout.pixel_ratio(); }
+    virtual float overlay_scale() const { return _layout.overlay_scale(); }
+    virtual float battlefield_scale(GameScale scale) const {
+        return _layout.battlefield_scale(scale);
+    }
 
     virtual void  set_game_layout(bool game) { _game_layout = game; }
-    virtual Point convert(Point p, Region from, Region to) const;
-    virtual Rect  visible_rect(Region region) const;
+    virtual Point convert(Point p, Region from, Region to) const {
+        return _layout.convert(p, from, to);
+    }
+    virtual Rect visible_rect(Region region) const { return _layout.visible_rect(region); }
 
     virtual Point     get_mouse();
     virtual InputMode input_mode() const;
@@ -66,7 +71,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     void loop(Card* initial);
 
   protected:
-    virtual vec4 region_transform(Region region) const;
+    virtual vec4 region_transform(Region region) const { return _layout.region_transform(region); }
 
   private:
     void        key(int key, int scancode, int action, int mods);
@@ -77,8 +82,6 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     void        window_size(int width, int height);
     void        update_size();
     void        fit_window();
-    Point       to_screen(double x, double y) const;
-    Point       from_pixels(double x, double y, Region region) const;
     void        window_maximize(bool maximized);
     static void key_callback(GLFWwindow* w, int key, int scancode, int action, int mods);
     static void char_callback(GLFWwindow* w, unsigned int code_point);
@@ -90,18 +93,10 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     bool            _fullscreen;
     Size            _window_size;
-    Size            _screen_size;
-    Size            _framebuffer_size;
-    Size            _viewport_size;
+    Layout          _layout;
     Size            _resolution;
-    GameScale       _game_scale         = GameScale::NATIVE;
-    int             _pixel_ratio        = 1;  // pixels per window coordinate
-    float           _viewport_scale     = 1;  // pixels per point at the viewport's own size
-    float           _battlefield_scale  = 1;  // pixels per point on the battlefield
-    float           _ui_scale           = 1;  // pixels per point in panels and SCREEN
-    int             _left_panel_pixels  = 0;
-    int             _right_panel_pixels = 0;
-    bool            _game_layout        = false;
+    GameScale       _game_scale  = GameScale::NATIVE;
+    bool            _game_layout = false;
     pn::string_view _glsl_version;
     GLFWwindow*     _window;
     MainLoop*       _loop;

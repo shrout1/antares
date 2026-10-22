@@ -415,9 +415,11 @@ source_set("libantares-video") {
     "$target_gen_dir/src/video/glsl/fragment.cpp",
     "$target_gen_dir/src/video/glsl/vertex.cpp",
     "include/video/driver.hpp",
+    "include/video/layout.hpp",
     "include/video/opengl-driver.hpp",
     "include/video/transitions.hpp",
     "src/video/driver.cpp",
+    "src/video/layout.cpp",
     "src/video/opengl-driver.cpp",
     "src/video/transitions.cpp",
   ]
