@@ -42,7 +42,8 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     virtual pn::string_view glsl_version() const;
 
     virtual Size  viewport_size() const { return _viewport_size; }
-    virtual Point viewport_origin() const;
+    virtual Rect  viewport_rect() const { return _framebuffer_size.as_rect(); }
+    virtual bool  resolution_supported(Size resolution) const;
     virtual Size  screen_size() const { return _screen_size; }
     virtual int   scale() const { return _pixel_ratio; }
     virtual float overlay_scale() const { return _ui_scale / _battlefield_scale; }
@@ -50,6 +51,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
 
     virtual void  set_game_layout(bool game) { _game_layout = game; }
     virtual Point convert(Point p, Region from, Region to) const;
+    virtual Rect  visible_rect(Region region) const;
 
     virtual Point     get_mouse();
     virtual InputMode input_mode() const;
@@ -74,6 +76,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     void        mouse_move(double x, double y);
     void        window_size(int width, int height);
     void        update_size();
+    void        fit_window();
     Point       to_screen(double x, double y) const;
     Point       from_pixels(double x, double y, Region region) const;
     void        window_maximize(bool maximized);
@@ -90,7 +93,6 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     Size            _screen_size;
     Size            _framebuffer_size;
     Size            _viewport_size;
-    Point           _viewport_offset;  // top-left corner in the framebuffer
     Size            _resolution;
     GameScale       _game_scale         = GameScale::NATIVE;
     int             _pixel_ratio        = 1;  // pixels per window coordinate

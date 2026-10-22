@@ -236,6 +236,16 @@ class OpenGlTextureImpl : public Texture::Impl {
         draw_internal(draw_rect, RgbColor::white());
     }
 
+    virtual void draw_smooth(const Rect& draw_rect) const {
+        glBindTexture(GL_TEXTURE_RECTANGLE, _texture.id);
+        glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        draw(draw_rect);
+        glBindTexture(GL_TEXTURE_RECTANGLE, _texture.id);
+        glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+
     virtual void draw_cropped(const Rect& dest, const Rect& source, const RgbColor& tint) const {
         begin_quads();
         draw_quad(dest, source, tint);
@@ -698,8 +708,8 @@ void OpenGlVideoDriver::MainLoop::draw() {
     }
 
     glClear(GL_COLOR_BUFFER_BIT);
-    const Point origin = _driver.viewport_origin();
-    glViewport(origin.h, origin.v, _driver.viewport_size().width, _driver.viewport_size().height);
+    const Rect pixels = _driver.viewport_rect();
+    glViewport(pixels.left, pixels.top, pixels.width(), pixels.height());
 
     auto viewport = _driver.viewport_size();
     _driver._uniforms.screen.set({viewport.width * 1.0f, viewport.height * 1.0f});
