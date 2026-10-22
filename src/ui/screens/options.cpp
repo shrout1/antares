@@ -19,6 +19,8 @@
 #include "ui/screens/options.hpp"
 
 #include <algorithm>
+#include <cstdio>
+#include <cstring>
 #include <pn/output>
 
 #include "config/keys.hpp"
@@ -272,7 +274,9 @@ VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
                 [scale] { return sys.prefs->game_scale() == scale; },
                 [scale](bool) { sys.prefs->set_game_scale(scale); },
         });
+        _game_scale_labels.push_back(checkbox(s.id)->label().copy());
     }
+    update_game_scale_labels();
 
     button(kDoneButton)
             ->bind({
@@ -310,6 +314,35 @@ VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
 VideoControlScreen::~VideoControlScreen() {}
 
 void VideoControlScreen::overlay() const {}
+
+// The ratios follow the window and the chosen resolution, so check them a few times a second.
+static const usecs kLabelUpdateTime = ticks(15);
+
+bool VideoControlScreen::next_timer(wall_time& time) {
+    time = _next_label_update;
+    return true;
+}
+
+void VideoControlScreen::fire_timer() { update_game_scale_labels(); }
+
+void VideoControlScreen::update_game_scale_labels() {
+    for (size_t i = 0; i < _game_scale_labels.size(); ++i) {
+        // At most two decimal places, without trailing zeros.
+        char ratio[16];
+        snprintf(ratio, sizeof(ratio), "%.2f", sys.video->battlefield_scale(kGameScales[i].scale));
+        char* end = ratio + strlen(ratio);
+        while (end[-1] == '0') {
+            --end;
+        }
+        if (end[-1] == '.') {
+            --end;
+        }
+        *end = '\0';
+        checkbox(kGameScales[i].id)->label() =
+                pn::format("{0} ({1}:1)", _game_scale_labels[i], pn::string_view{ratio});
+    }
+    _next_label_update = now() + kLabelUpdateTime;
+}
 
 static const usecs kFlashTime = ticks(12);
 

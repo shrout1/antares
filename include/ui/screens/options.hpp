@@ -64,8 +64,15 @@ class VideoControlScreen : public InterfaceScreen {
 
     virtual void overlay() const;
 
+    virtual bool next_timer(wall_time& time);
+    virtual void fire_timer();
+
   private:
+    void update_game_scale_labels();
+
     OptionsScreen::State* const _state;
+    std::vector<pn::string>     _game_scale_labels;  // as in the interface, without the ratio
+    wall_time                   _next_label_update;
 };
 
 class KeyControlScreen : public InterfaceScreen {

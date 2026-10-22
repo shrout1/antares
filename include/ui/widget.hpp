@@ -133,8 +133,9 @@ class Button : public Widget {
     bool            active() const { return _active; }
     virtual bool    enabled() const = 0;
 
-    Key& key() { return _key; }
-    Hue& hue() { return _hue; }
+    pn::string& label() { return _label; }
+    Key&        key() { return _key; }
+    Hue&        hue() { return _hue; }
 
   protected:
     Button(const ButtonData& data);
