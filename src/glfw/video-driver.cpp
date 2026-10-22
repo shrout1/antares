@@ -203,39 +203,43 @@ void GLFWVideoDriver::update_size() {
     _pixel_ratio = std::max(1, _framebuffer_size.width / std::max(1, _window_size.width));
     _resolution  = sys.prefs->resolution();
     _game_scale  = sys.prefs->game_scale();
-    float scale;  // pixels per point at the display's or the chosen resolution's own size
     if (_resolution.as_rect().empty()) {
-        _viewport_size = _framebuffer_size;
-        scale          = _pixel_ratio;
+        _viewport_size  = _framebuffer_size;
+        _viewport_scale = _pixel_ratio;
     } else {
-        scale = std::min(
+        _viewport_scale = std::min(
                 float(_framebuffer_size.width) / _resolution.width,
                 float(_framebuffer_size.height) / _resolution.height);
         _viewport_size = {
-                int(std::lround(_resolution.width * scale)),
-                int(std::lround(_resolution.height * scale))};
+                int(std::lround(_resolution.width * _viewport_scale)),
+                int(std::lround(_resolution.height * _viewport_scale))};
     }
     _viewport_offset = {
             (_framebuffer_size.width - _viewport_size.width) / 2,
             (_framebuffer_size.height - _viewport_size.height) / 2};
     _ui_scale = std::max<float>(
-            scale, std::min(
-                           float(_viewport_size.width) / kOriginalScreenSize.width,
-                           float(_viewport_size.height) / kOriginalScreenSize.height));
-    switch (_game_scale) {
-        case GameScale::NATIVE: _battlefield_scale = scale; break;
-        case GameScale::WHOLE:
-            _battlefield_scale = std::max<float>(
-                    scale, std::floor(float(_viewport_size.height) / kOriginalScreenSize.height));
-            break;
-        case GameScale::FILL: _battlefield_scale = _ui_scale; break;
-    }
+            _viewport_scale, std::min(
+                                     float(_viewport_size.width) / kOriginalScreenSize.width,
+                                     float(_viewport_size.height) / kOriginalScreenSize.height));
+    _battlefield_scale           = battlefield_scale(_game_scale);
     _left_panel_pixels           = std::lround(kLeftPanelWidth * _ui_scale);
     _right_panel_pixels          = std::lround(kRightPanelWidth * _ui_scale);
     const int battlefield_pixels = _viewport_size.width - _left_panel_pixels - _right_panel_pixels;
     _screen_size                 = {
             kLeftPanelWidth + int(battlefield_pixels / _battlefield_scale) + kRightPanelWidth,
             int(_viewport_size.height / _battlefield_scale)};
+}
+
+float GLFWVideoDriver::battlefield_scale(GameScale scale) const {
+    switch (scale) {
+        case GameScale::NATIVE: return _viewport_scale;
+        case GameScale::WHOLE:
+            return std::max<float>(
+                    _viewport_scale,
+                    std::floor(float(_viewport_size.height) / kOriginalScreenSize.height));
+        case GameScale::FILL: return _ui_scale;
+    }
+    return _viewport_scale;
 }
 
 Point GLFWVideoDriver::viewport_origin() const {

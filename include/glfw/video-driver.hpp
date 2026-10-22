@@ -46,6 +46,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     virtual Size  screen_size() const { return _screen_size; }
     virtual int   scale() const { return _pixel_ratio; }
     virtual float overlay_scale() const { return _ui_scale / _battlefield_scale; }
+    virtual float battlefield_scale(GameScale scale) const;
 
     virtual void  set_game_layout(bool game) { _game_layout = game; }
     virtual Point convert(Point p, Region from, Region to) const;
@@ -93,6 +94,7 @@ class GLFWVideoDriver : public OpenGlVideoDriver {
     Size            _resolution;
     GameScale       _game_scale         = GameScale::NATIVE;
     int             _pixel_ratio        = 1;  // pixels per window coordinate
+    float           _viewport_scale     = 1;  // pixels per point at the viewport's own size
     float           _battlefield_scale  = 1;  // pixels per point on the battlefield
     float           _ui_scale           = 1;  // pixels per point in panels and SCREEN
     int             _left_panel_pixels  = 0;

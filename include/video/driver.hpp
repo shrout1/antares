@@ -23,6 +23,7 @@
 #include <memory>
 #include <pn/string>
 
+#include "config/preferences.hpp"
 #include "drawing/color.hpp"
 #include "math/geometry.hpp"
 #include "math/units.hpp"
@@ -53,6 +54,8 @@ class VideoDriver {
     // `h` and `v` shift drawing by fractions of a point, rounded toward zero to whole pixels.
     virtual void  set_region(Region region, float h = 0, float v = 0) {}
     virtual float overlay_scale() const { return 1; }
+    // Pixels per point on the battlefield that `scale` gives at the current size.
+    virtual float battlefield_scale(GameScale scale) const { return 1; }
     // If true, mouse input is in the coordinates of the region under the mouse.
     virtual void set_game_layout(bool game) {}
     // The point in `to` that is drawn at the same place as `p` in `from`.
