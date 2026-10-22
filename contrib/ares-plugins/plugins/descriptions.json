@@ -1,0 +1,494 @@
+{
+ "The-Stars-Are-Fire.antaresplugin": {
+  "archive": "Scenarios/100_",
+  "description": "The Stars Are Fire-It's time for a new challenge,\nAre you ready?\nTake on the I'du'main, Angoreans, Sh'arm'en and Addundians in 15 all-new missions that will test your piloting and thinking skills like no other plugin.\nSkyfox-BenSEdwards@aol.com"
+ },
+ "Official/Stars-Are-Fire-1.0/Stars Are Fire.antaresplugin": {
+  "archive": "Scenarios/100_",
+  "description": "The Stars Are Fire-It's time for a new challenge,\nAre you ready?\nTake on the I'du'main, Angoreans, Sh'arm'en and Addundians in 15 all-new missions that will test your piloting and thinking skills like no other plugin.\nSkyfox-BenSEdwards@aol.com"
+ },
+ "Survival.antaresplugin": {
+  "archive": "Scenarios/101_",
+  "description": "Survival - Are you ready for the challenge? 7 missions, one goal: To survive. The first mission is extremely easy, but they get progressively harder. This plug-in is not recommended for rookies/people who get easily frustrated. Enjoy!"
+ },
+ "Its-War-p2 (empty-template-file).antaresplugin": {
+  "archive": "Scenarios/102_",
+  "description": "This is a file which may assist plug in creators.\nIt contains all of the Ares Objects in an empty error-free Hera File. It contains NO Scenarios. Fill those in yourself. They should be created from scratch using this file as a starter. Do not copy in scenarios, this will probably lead to corruption of the file. To transfer existing scenarios you will need to re-create them from scratch.\n\nThe file is compressed as a .sit file using version 5.1, 574K\nReprot any problems to me at: lca@eircom.net"
+ },
+ "The-Audemedon-Crisis.antaresplugin": {
+  "archive": "Scenarios/103_",
+  "description": "This is the final version of The Audemedon Crisis Part 1. It has five relatively simple levels.I have re-jigged things so that the computer is a little less stupid in the way in which it deploys its forces..., this is with due regard to the fact that the levels have to be actually beatable."
+ },
+ "Official/The-Audemedon-Crisis-1.0.0/The Audemedon Crisis.antaresplugin": {
+  "archive": "Scenarios/103_",
+  "description": "This is the final version of The Audemedon Crisis Part 1. It has five relatively simple levels.I have re-jigged things so that the computer is a little less stupid in the way in which it deploys its forces..., this is with due regard to the fact that the levels have to be actually beatable."
+ },
+ "The-Iron-Fist.antaresplugin": {
+  "archive": "Scenarios/104_",
+  "description": "Iron Fist 1.0.3: The Gaitori are at it again and it is up to an Obish Lieutenant to prevent the subjugation of his people. With additional scripting to the levels and a harder opponent, Iron Fist is a tough one.\n\nWhile their cultures have changed, their peoples have had new concerns, and their leaderships have drastically been altered, Gaitor and Obain have always been enemies. After the liberation of Earth, the Cantharan Order started losing it's grip on the Galactic East. And after a successful and bloody rebellion by the Gaitori Isolationists, Gaitor also won it's independence. However, the apple doesn't fall far from the tree, and Gaitor and Obain once again went to war against one another. Iron fist is the first all-new mission replacement plugin for Ares. Unlike most other plugins, including Ares itself, which are 'interactive novels', Iron fist has an interactive ever-deepening plot and a branching storyline with three alternate endings. My programming skills were tested to the limit so your pilot skills could also be tested, as some of these levels are more complexly and heavily scripted than those in Ares! The decision is yours, Commander, how the war will end. -Slug gajet@pacbell.net"
+ },
+ "Official/The-Iron-Fist-1.1.0/The Iron Fist.antaresplugin": {
+  "archive": "Scenarios/104_",
+  "description": "Iron Fist 1.0.3: The Gaitori are at it again and it is up to an Obish Lieutenant to prevent the subjugation of his people. With additional scripting to the levels and a harder opponent, Iron Fist is a tough one.\n\nWhile their cultures have changed, their peoples have had new concerns, and their leaderships have drastically been altered, Gaitor and Obain have always been enemies. After the liberation of Earth, the Cantharan Order started losing it's grip on the Galactic East. And after a successful and bloody rebellion by the Gaitori Isolationists, Gaitor also won it's independence. However, the apple doesn't fall far from the tree, and Gaitor and Obain once again went to war against one another. Iron fist is the first all-new mission replacement plugin for Ares. Unlike most other plugins, including Ares itself, which are 'interactive novels', Iron fist has an interactive ever-deepening plot and a branching storyline with three alternate endings. My programming skills were tested to the limit so your pilot skills could also be tested, as some of these levels are more complexly and heavily scripted than those in Ares! The decision is yours, Commander, how the war will end. -Slug gajet@pacbell.net"
+ },
+ "The-Rogue.antaresplugin": {
+  "archive": "Scenarios/105_",
+  "description": "The UNS Rouge was launched one year after the Apollo 2200. This is version 1.0.4, and several other bugs and grammer errors,              etc., have been fixed. I've also added a bonus level, for those of you who can find it! - Mag Steelglass"
+ },
+ "Official/The-Rogue-1.0.4/The Rogue.antaresplugin": {
+  "archive": "Scenarios/105_",
+  "description": "The UNS Rouge was launched one year after the Apollo 2200. This is version 1.0.4, and several other bugs and grammer errors,              etc., have been fixed. I've also added a bonus level, for those of you who can find it! - Mag Steelglass"
+ },
+ "The-Next-Chapter.antaresplugin": {
+  "archive": "Scenarios/106_",
+  "description": "My levels are basically about a new race that the humans found called the Mijees that are on the brink of extinction by, of course, the Audomedons. There are 12 levels. The first 11 are easy but the twelfth one will really surprise you. I did something that I'm not even sure Nathan Lamont thought of so I wont tell you what it is. You'll have to find out yourself. I would like you to read the \"READ ME FIRST!!!\" file highlighted in yellow. It has some important information about the file. Thanks!!!  :-)"
+ },
+ "The-Sequel-s-Net-Scenarios.antaresplugin": {
+  "archive": "Scenarios/107_",
+  "description": "As the name implies, this is a seqel. More specifically, it is a sequel to Continuation Thingy and is, in my opinion, quite a lot better. There are nine complete races whose ships are pretty much all-new (though related to the original Ares ships to varying degrees). Plotwise, the player begins as a fighter pilot for the pitifully weak Rimshot Rebellion, though they keep being promoted until they're a commodore for the last few missions. - Mag Steelglass (vertical_file@yahoo.com)"
+ },
+ "The-Sequel.antaresplugin": {
+  "archive": "Scenarios/107_",
+  "description": "As the name implies, this is a seqel. More specifically, it is a sequel to Continuation Thingy and is, in my opinion, quite a lot better. There are nine complete races whose ships are pretty much all-new (though related to the original Ares ships to varying degrees). Plotwise, the player begins as a fighter pilot for the pitifully weak Rimshot Rebellion, though they keep being promoted until they're a commodore for the last few missions. - Mag Steelglass (vertical_file@yahoo.com)"
+ },
+ "The-Other-Races-Net.antaresplugin": {
+  "archive": "Scenarios/108_",
+  "description": "The Other Races v1.0: This collection of net levels adds Elejeetian, Obish, and Bazidanese to the race selection for Rock vrs Rock, Scratching Post, as well as opening all races for Space Warz.  Also humans are added to Location, Location, Location.  It also adds a new competitive, and a new cooperative level to the level selection. - KMQ http://welcome.to/ISDesign"
+ },
+ "Untitled.antaresplugin": {
+  "archive": "Scenarios/109_",
+  "description": "Toughlevels- These are two new very very hard single player missions.You will have to be a very good pilot to win.\n\t\t-Patrick"
+ },
+ "Black-Hole-Teaser.antaresplugin": {
+  "archive": "Scenarios/110_",
+  "description": "The United Earth Interplanetary Combat Training Program is a set of 5 unrelated single-player missions I made. They are quite playable, well-tested, and include a couple of new ships. Also included is a teaser for my upcoming major plugin, Black Hole.\n - Gul Banana"
+ },
+ "UEICTP.antaresplugin": {
+  "archive": "Scenarios/110_",
+  "description": "The United Earth Interplanetary Combat Training Program is a set of 5 unrelated single-player missions I made. They are quite playable, well-tested, and include a couple of new ships. Also included is a teaser for my upcoming major plugin, Black Hole.\n - Gul Banana"
+ },
+ "Ultimate-Net-1-0-1.antaresplugin": {
+  "archive": "Scenarios/111_",
+  "description": "Ultimate Net 1.0.1 this is the updated version for Ultimate Net it fixes alot of bugs that I have found it also lets you play Space Race The Musical! and fixes the levels prologue to say the chapter and name and stuff. I hope you enjoy this plug, Capt Ginew.\nif you have any problems email me at dustin_nabess@hotmail.com"
+ },
+ "Vengeance.antaresplugin": {
+  "archive": "Scenarios/112_",
+  "description": "Vengeance 1.0.0 - Ares RPG plugin. Travel between the worlds of Ares on your quest for revenge against your former Cantharan slavemaster. Tons of systems and secret levels to explore! Created by Mag Steelglass"
+ },
+ "Vengeance (Vengeance-1-0-0).antaresplugin": {
+  "archive": "Scenarios/112_",
+  "description": "Vengeance 1.0.0 - Ares RPG plugin. Travel between the worlds of Ares on your quest for revenge against your former Cantharan slavemaster. Tons of systems and secret levels to explore! Created by Mag Steelglass"
+ },
+ "Official/Vengeance-1.0/Vengeance.antaresplugin": {
+  "archive": "Scenarios/112_",
+  "description": "Vengeance 1.0.0 - Ares RPG plugin. Travel between the worlds of Ares on your quest for revenge against your former Cantharan slavemaster. Tons of systems and secret levels to explore! Created by Mag Steelglass"
+ },
+ "War.antaresplugin": {
+  "archive": "Scenarios/114_",
+  "description": "War: The new generation of net games. Includes several new ships and new concepts, such as recycling wreckage for money. PPC recommended. - Submitted by Anonymous"
+ },
+ "White-Vs-White.antaresplugin": {
+  "archive": "Scenarios/115_",
+  "description": "I am Commander Yosho.  Welcome to my first Ares Scenario.  Except for Level 4, you are commanding human ships to fight the Gaitori.  The difficulty ranges from easy to moderate.  There are only a few new craft, exposed in the final level (number 7), but otherwise it will be new takes on the original ships and levels.  Thank you for your interest, and good luck.  P.S.  This is a beta version (0.5.0), it might have a few bugs."
+ },
+ "Wrath-of-The-Fallen.antaresplugin": {
+  "archive": "Scenarios/116_",
+  "description": "Wrath Of The Fallen Preview: This is a preview of my upcoming TC for Ares. It includes the first five levels. Join the ranks of the Triplanetary Confederation's finest as they struggle to fight back against the evil Sol Empire. -Patrick Cavanaugh( gbcdoj@mediaone.net )"
+ },
+ "Aaaagh.antaresplugin": {
+  "archive": "Scenarios/22_",
+  "description": "This plug replaces all Ishiman ships with Gaitori ships, and makes it so that when you can build Human ships, you can still only build Gaitori ships. This isn't meant to be a huge, super-duper plug. It's just a little thing, to provide people with a little more challenge than Ares normally provides (don't worry, it's still possible to beat the game). - Mag Steelglass (this new version fixes a couple bugs I found)"
+ },
+ "The-Aftermath.antaresplugin": {
+  "archive": "Scenarios/23_",
+  "description": "The Aftermath 1.2 By Patrick (email: gbcdoj@mediaone.net)\nThe Aftermath picks up where Ares left off. It has 8 new levels and 1 new ship with a new sprite."
+ },
+ "Ares-1-5.antaresplugin": {
+  "archive": "Scenarios/24_",
+  "description": "Here it is, my third plug-in. It puts Mag Steelglass' UNS Rogue and the Nova into the original story of Ares. Other than that, nothing else is changed. Well, almost nothing. Download and read the ReadMe for more info. Comments, suggestions, money, send to darthkev@gns2000.com. Enjoy!"
+ },
+ "Ares-Net-Scenarios-remix.antaresplugin": {
+  "archive": "Scenarios/25_",
+  "description": "Six Ares net levels, including Location x 3 arguably the most strategic Ares Net Scenario now released, it will likely take more than rushing to win this match.  The classic \"...Into the Fire\" from single player now in net, The Hard Way, tight combat with nine moons in Jovian Chronicles, Scratching Post Pluss, more green asteroids, more Zerbilites, and changes to make rushing a strategy, not the ultimate choice, and more.  Also included is a -secondary- version of the level set with \"semi-fair\" across the board new weapons, and enhancements to old favorites.  Including more cloaking ships for the Salrilian, and a Gaitori Gunship that will hang back with its target ship rather than flying into the fire.  Don't forget the Audemedon, their new weapon is good for taking out fleets...but who's? - KMQ http://welcome.to/ISDesign"
+ },
+ "Ares-Net-Scenarios-remix (Ares-Net-remix).antaresplugin": {
+  "archive": "Scenarios/25_",
+  "description": "Six Ares net levels, including Location x 3 arguably the most strategic Ares Net Scenario now released, it will likely take more than rushing to win this match.  The classic \"...Into the Fire\" from single player now in net, The Hard Way, tight combat with nine moons in Jovian Chronicles, Scratching Post Pluss, more green asteroids, more Zerbilites, and changes to make rushing a strategy, not the ultimate choice, and more.  Also included is a -secondary- version of the level set with \"semi-fair\" across the board new weapons, and enhancements to old favorites.  Including more cloaking ships for the Salrilian, and a Gaitori Gunship that will hang back with its target ship rather than flying into the fire.  Don't forget the Audemedon, their new weapon is good for taking out fleets...but who's? - KMQ http://welcome.to/ISDesign"
+ },
+ "Ascender.antaresplugin": {
+  "archive": "Scenarios/27_",
+  "description": "Firstly I'd just like to say that this description isn't exactly going to persuade people do download this scenario, but I'm no good at this sort of writing, so please dwonload it so you can see what it's like. Anyway, this is the first thing I've ever submitted, and it's not complete, but the levels are mainly completed, so I thought I'd submit it to see whether it would be worth continuing it. Basically, it is a scenario in which you play as one of two ships doing various things, depending on the mission. If you can think of a better name for it please e-mail me as I don't really like the name but I can't think of anything else."
+ },
+ "After-The-War-Net-Scenarios.antaresplugin": {
+  "archive": "Scenarios/28_",
+  "description": "After The War Net Scenarios Update 2(v1.0.2) This changes the number of players in Quadworld from 1 to 3 so now it should work."
+ },
+ "Audemedon-Battles.antaresplugin": {
+  "archive": "Scenarios/29_",
+  "description": "This plugin contains three levels set in a time after the original game.  It is based around a new Audemedon Battleship.  It is about twice as hard to kill as the carrier. Some ships have little upgrades or changes to make it interesting.  I hope you enjoy playing it. E-mail: deranger@bungie.net ."
+ },
+ "B5-Ares.antaresplugin": {
+  "archive": "Scenarios/30_",
+  "description": "Yeeaaay. At last a plug with movies, sounds, missions, ships, weapons and even a splashscreen. It's kinda the first release and as such is gonna have bugs, and room for improvement. So do your best to find a fault and suggest improvements..."
+ },
+ "Battlecruisers.antaresplugin": {
+  "archive": "Scenarios/31_",
+  "description": "This plug features a new class of ships -- battlecruisers. This is kinda crappy, it's my first plug, so it might have bugs. Well, here goes anyway...\n\nContact me at jerome_li@hotmail.com\n--Blood Eagle"
+ },
+ "Battlestations.antaresplugin": {
+  "archive": "Scenarios/32_",
+  "description": "Two motherships, capable of building attack and defense craft. The object of the game is to destroy your opponents mothership (Network only)."
+ },
+ "Alpha-To-Omega.antaresplugin": {
+  "archive": "Scenarios/33_",
+  "description": "This is big blobing a plug useing my ships from Alpha to omega its one plug in with infinet kills!\nThis is big blobing a plug useing my ships from Alpha to omega its one plug in with infinet kills!\nEMINEM"
+ },
+ "Black-Seas.antaresplugin": {
+  "archive": "Scenarios/34_",
+  "description": "What if the Dark Ages never took Place? What if mankind advanced enough to make transwarp technology? What if they were able to fight back when the Gatori and Cantharan came to take Earth? With new ships, weapons, 1 new race and a new story Black seas is a great plug. By Admiral Devo (Jumpingbeans40@yahoo.co.uk) This bug-fixing update was created by Patrick(gbcdoj@mediaone.net). This fixes lots of the bugs: All 15 levels can now be accessed. The White Knight no longer causes a crash. Asteriods no longer glow when hit. Beating levels takes you to the next one."
+ },
+ "Catharan-Crusades.antaresplugin": {
+  "archive": "Scenarios/35_",
+  "description": "Yes, the title may sound like some cool, comepletely new scenario, but alls it really is a basic with plug with a nice name.  It allows you to take the Catharan through the factory levels.  This made the game a little bit harder.  Also, it adds 1 new ship (yes, I actually made a ship).  I made this really to try to improve my plug making skills.  However, there are about four bugs, and none of them mess the game up.  I may release another version with 2 new levels and 1 semi-new level.  Enjoy!  Created by ExtremeSpeed  Contact on GR about the plug.\n\nDisclaimer:  I am not responceble for any confusion, frustration, or death caused by obsessive playing."
+ },
+ "Challenger.antaresplugin": {
+  "archive": "Scenarios/36_",
+  "description": "Challenger is Destiny Plug's first Ares scenario. It basically makes every level much more challenging. For example, in Assasin, the Cantharans have an established base and are building ships, while you have to make do with your assult fleet. The longer you wait to strike, the more ships you'll be up against. And they also have a Heavy Destroyer escorting each carrier. In addition to those kind of things, some enemy ships have been enhanced. For example, the Gatori Carrier now has a Duel Atomic pulse launcher instead of a Conculsive Missle launcher. This scenario will offer new challenges to even the most seasoned veterans. I have extensivly tested this, and I've never beat Make Way, And It Feels So Good, or The Mothership Connection(the versions in this one), and I've only beat Hornet's Nest twice."
+ },
+ "Cold-Days-and-Long-Nights-III.antaresplugin": {
+  "archive": "Scenarios/38_",
+  "description": "Cold Days and Long Nights is a plugin that charts the development of the nascent Human empire as it struggles against old and new foes in a realistic post-Ares universe.  Human ships have been completely redesigned and rearmed, and include some novel new weapons (especially cruisers).  Many of the missions have been heavily scripted, most have strings and briefings, and all follow a cohesive narrative.  The plot is extremely ambitious and attempts to tie many strands of the Ares universe together.  CDALN includes 10 complete missions, with more on the way if the initial reception is good."
+ },
+ "Official/Cold-Days-and-Long-Nights-3.0.1/Cold Days and Long Nights.antaresplugin": {
+  "archive": "Scenarios/38_",
+  "description": "Cold Days and Long Nights is a plugin that charts the development of the nascent Human empire as it struggles against old and new foes in a realistic post-Ares universe.  Human ships have been completely redesigned and rearmed, and include some novel new weapons (especially cruisers).  Many of the missions have been heavily scripted, most have strings and briefings, and all follow a cohesive narrative.  The plot is extremely ambitious and attempts to tie many strands of the Ares universe together.  CDALN includes 10 complete missions, with more on the way if the initial reception is good."
+ },
+ "Colisseum.antaresplugin": {
+  "archive": "Scenarios/39_",
+  "description": "This is my first Ares Net Scenario, and I made it as a result of numerous requests to make a larger selection of ships of Space Warz. I orginally thought of making just a cruiser combat scenario, but i had so mush fun with it that i decided to make more ship types to battle with. This is the end result."
+ },
+ "comp-killers.antaresplugin": {
+  "archive": "Scenarios/40_",
+  "description": "Single player versions of the standard multiplayer scenarios."
+ },
+ "Continuation-Thingy.antaresplugin": {
+  "archive": "Scenarios/41_",
+  "description": "Well, well, it's finally done. I got tired of Ares at around the beginning of this school year, and didn't get back into it until 3/22/03. After two days' work, it's done. Bloody annoying.\n\nAnyway, this plug takes place one year after Ares ends. The UNS is in trouble and has become somewhat corrupt. You're an aspiring commander, and, with your help, the UNS manages to stabilize itself and start winning its wars.\n\n- Mag Steelglass (vertical_file@yahoo.com)"
+ },
+ "Crazy-Net-Scenarios.antaresplugin": {
+  "archive": "Scenarios/42_",
+  "description": "Crazy Net Scenarios! is my third plug for the Ares Community. I have made seven fun, challenging scenarios, such as the Ring of Fire, Dominion, and more! This features one new race. Send any bug reports or comments to jerome_li@hotmail.com.  -Blood Eagle"
+ },
+ "Cruiser-vs-Schooner.antaresplugin": {
+  "archive": "Scenarios/43_",
+  "description": "To put an end to the elusive 'Cruiser vs Schooner' and 'Human gunship vs Escort' argument, I have compiled together 2 net levels of the aforesaid ships - Count Altair El Alemein @ countaltair@yahoo.com.au"
+ },
+ "Cantharan-vs-Ishiman.antaresplugin": {
+  "archive": "Scenarios/44_",
+  "description": "This plugin adds four new net only levels. I guess you could call this my summer break gift to the Ares community.\n\n--Brookeview"
+ },
+ "Cantharan-vs-Ishiman (#45).antaresplugin": {
+  "archive": "Scenarios/45_",
+  "description": "This plugin adds four new net only levels. I guess you could call this my summer break gift to the Ares community... This is version 1.01 and fixes level 3 \"EVAT Assault \" and makes the gateship in level one more balanced."
+ },
+ "Destructive-Elejeetian-For-Net.antaresplugin": {
+  "archive": "Scenarios/46_",
+  "description": "enormous gaping anus"
+ },
+ "Destructive-Elejeetian-Part-1.antaresplugin": {
+  "archive": "Scenarios/47_",
+  "description": "The Destructive Elejeetian:This is the part1 and 2 of Destructive Elejeetian series. It is adventure of Elejeetian. The Elejeetian made a strongest cruiser. That's name is \"Elejeetian-Cruiser\". The cruiser destroyed many spaceship. And if you use this cruiser,enemies will be destroyed. Elejeetian wants to rule the Universe,and you can help them."
+ },
+ "Destructive-Elejeetian-Part-2.antaresplugin": {
+  "archive": "Scenarios/47_",
+  "description": "The Destructive Elejeetian:This is the part1 and 2 of Destructive Elejeetian series. It is adventure of Elejeetian. The Elejeetian made a strongest cruiser. That's name is \"Elejeetian-Cruiser\". The cruiser destroyed many spaceship. And if you use this cruiser,enemies will be destroyed. Elejeetian wants to rule the Universe,and you can help them."
+ },
+ "Destructive-Elejeetian-Part-3.antaresplugin": {
+  "archive": "Scenarios/48_",
+  "description": "The Destructive Elejeetian part3 and 4:This is an Ares scenario file,the part of Destructive Elejeetian series. In the part2,the Elejeetian ruled the Universe. So Elejeetian made a new ship. That is new Elejeetian-Cruiser. Elejeetian reconstruct the Gaitori's machin gun in Part4. You can destroy many ships by this cruiser.\nEnjoy!"
+ },
+ "Destructive-Elejeetian-Part-4.antaresplugin": {
+  "archive": "Scenarios/48_",
+  "description": "The Destructive Elejeetian part3 and 4:This is an Ares scenario file,the part of Destructive Elejeetian series. In the part2,the Elejeetian ruled the Universe. So Elejeetian made a new ship. That is new Elejeetian-Cruiser. Elejeetian reconstruct the Gaitori's machin gun in Part4. You can destroy many ships by this cruiser.\nEnjoy!"
+ },
+ "Destructive-Elejeetian-Part-5.antaresplugin": {
+  "archive": "Scenarios/49_",
+  "description": "Destructive Elejeetian Part5:A new missile for Elejeetian-Cruiser. The missile is very strong and it can kill a gateship only 1 missile."
+ },
+ "Destructive-Elejeetian-Marching.antaresplugin": {
+  "archive": "Scenarios/50_",
+  "description": "Destructive Elejeetian set: It is a set containing all the scenarios of the Destructive-Elejeetian series. One scenario for the Internet and the scenario of Part1-5 for the single play mode. In these series, it deals with the adventure of Elejeetian and invigorating destruction, new arms, etc. can be enjoyed. The author is ike. I am waiting by GameRanger.    E-Mail:ike@ma.u-netsurf.jp  HomePage(Japanese):http://www.geocities.jp/ike_blackandwhite/index.html  My HomePage which can download these:http://www.geocities.jp/heavy_download/index.html"
+ },
+ "Destructive-Elejeetian-Part-1 (#50).antaresplugin": {
+  "archive": "Scenarios/50_",
+  "description": "Destructive Elejeetian set: It is a set containing all the scenarios of the Destructive-Elejeetian series. One scenario for the Internet and the scenario of Part1-5 for the single play mode. In these series, it deals with the adventure of Elejeetian and invigorating destruction, new arms, etc. can be enjoyed. The author is ike. I am waiting by GameRanger.    E-Mail:ike@ma.u-netsurf.jp  HomePage(Japanese):http://www.geocities.jp/ike_blackandwhite/index.html  My HomePage which can download these:http://www.geocities.jp/heavy_download/index.html"
+ },
+ "Destructive-Elejeetian-Part-2 (#50).antaresplugin": {
+  "archive": "Scenarios/50_",
+  "description": "Destructive Elejeetian set: It is a set containing all the scenarios of the Destructive-Elejeetian series. One scenario for the Internet and the scenario of Part1-5 for the single play mode. In these series, it deals with the adventure of Elejeetian and invigorating destruction, new arms, etc. can be enjoyed. The author is ike. I am waiting by GameRanger.    E-Mail:ike@ma.u-netsurf.jp  HomePage(Japanese):http://www.geocities.jp/ike_blackandwhite/index.html  My HomePage which can download these:http://www.geocities.jp/heavy_download/index.html"
+ },
+ "Domination.antaresplugin": {
+  "archive": "Scenarios/51_",
+  "description": "One day, I was just lying around, bored, with nothing to do. So I made a net level. This is the end result. The concept was taken directly from Unreal Tournament. First one to reach 100 points wins."
+ },
+ "Doom.antaresplugin": {
+  "archive": "Scenarios/52_",
+  "description": "In Doom, you play the part of a UNS Commander who has been selected to Command the UNS's newest capital ship. The story involves fighting almost every race the game has to offer, becoming allies with the ones you don't fight, and begins about 60 years after the point where Ares left off. Read the ReadMe and the new game intro for more information. Enjoy!"
+ },
+ "Duel.antaresplugin": {
+  "archive": "Scenarios/53_",
+  "description": "Duel!\nHone your skills at one-on-one dogfighting with Duel. This is a single player version of the Spaze Warz net scenario with many different ships.\n\nThe flak drones have been removed to eliminate computer player suicide.\nBy Shrout1 Jan 2002. Vers 1.0.0"
+ },
+ "Star-s-End-The-Raiders.antaresplugin": {
+  "archive": "Scenarios/54_",
+  "description": "This is the resubmitted Earth Quest preview. For those of you who downloaded the original, Earth Quest resubmitted adds to the previous experience, with 3 more levels taken out of my own upcoming plugin, Star's End: The Raiders. Battle the possession of the trade routes with the pirates, thwart the corruption of the ESF and even take the battle to the dark realm of the Union itself with totally new ships, totally new sounds, totally new levels and do it with a totally new style of gameplay. - Count Altair El Alemein aka Captain Calculas @ Countaltair@yahoo.com"
+ },
+ "Earth-s-Journey-2-0.antaresplugin": {
+  "archive": "Scenarios/55_",
+  "description": "Here is a Christmas gift for the Ares community. Earth's Journey Back To The Stars v 2.0 has several new and updated missions and just a bit of net play."
+ },
+ "Earth-s-Journey-Back-To-The-Stars-Part-1.antaresplugin": {
+  "archive": "Scenarios/56_",
+  "description": "Earth's Journey Back To The Stars.  v 1.0.0 7/27/01\nby Brookeview\nbrookeview2@mac.com\nEarth's Journey continues and finishes the Ares story line in 13 new exciting and sometimes difficult missions."
+ },
+ "Earth-s-Journey-Back-To-The-Stars-Part-2.antaresplugin": {
+  "archive": "Scenarios/56_",
+  "description": "Earth's Journey Back To The Stars.  v 1.0.0 7/27/01\nby Brookeview\nbrookeview2@mac.com\nEarth's Journey continues and finishes the Ares story line in 13 new exciting and sometimes difficult missions."
+ },
+ "Earth-s-Journey-Back-To-The-Stars-Part-3.antaresplugin": {
+  "archive": "Scenarios/56_",
+  "description": "Earth's Journey Back To The Stars.  v 1.0.0 7/27/01\nby Brookeview\nbrookeview2@mac.com\nEarth's Journey continues and finishes the Ares story line in 13 new exciting and sometimes difficult missions."
+ },
+ "Elejee-s-Decision.antaresplugin": {
+  "archive": "Scenarios/57_",
+  "description": "FINALLY, a new plug-in for Ares. It's still in alpha, but don't worry, I'll be done pretty soon. This plug uses the ships from Shrout's Elejee plug. It's still in alpha, so it has only 10 of the 20-odd missions in the final plug. It's multi-threaded (Hooray). It may have some bugs. Report any bugs to argon_lazer@hotmail.com. Enjoy! -Anonymous"
+ },
+ "Endurance.antaresplugin": {
+  "archive": "Scenarios/58_",
+  "description": "Endurance 1.0\nThis plug adds 5 levels called survival levels.  This is a new and (hopefully) original concept that I thought of.  These are levels that you can't win, you just keep fighting until you die trying to survive for as long as you can.  Then keep track of how long you survived and how many enemies you killed.  Post your records on the ares webboards and try to break other people's records.  Have fun!"
+ },
+ "Escape-Velocity-Fighter-Duel.antaresplugin": {
+  "archive": "Scenarios/59_",
+  "description": "BEV:Fighter Duel v1.0/B DDThis is a predecessor to the upcoming [no release date] EV:Net Ares scenario set.  This is the current well rounded v1.0 not the 0.5 that was uploaded without my knowledge by one of my beta testers.  It includes all new recreated EV ship graphics, and faithfully ported stats [such as was practical given engine differences] for Shuttle, Manta Fighter, Patrol Fighter, Hawk Fighter, Lightning Fighter, Rapier Fighter, Cliper, Defender, and Alien Fighter. BR A HREF=\"http://welcome.to/ISDesign\"welcome.to/ISDesign/ABRBR - KMQBR"
+ },
+ "EV-Net.antaresplugin": {
+  "archive": "Scenarios/60_",
+  "description": "Prepare to face off with your friends as never before, with the classic ships from the hit game EV.  Six net levels, fully remade and to scale ships, faithfully ported stats, three governments, and of course through the Ares engine net play.\n\n- Lethe Cydonia\n- A Bold Move\n- Chaos Hour\n- Fusion\n- Font Lines\n- Fighter Duel\n\n- KMQ\n- http://welcome.to/ISDesign/"
+ },
+ "Some-Sort-of-Odd-Plug.antaresplugin": {
+  "archive": "Scenarios/61_",
+  "description": "This is a funky, unusual plug that I didn't origionally intend to submit. But recently, I decided that it was pretty good, and the new multiplayer option is very fun, so I'm submitting it. As the name implies, fighters can survive quite decently in this plug, and are deadly in groups. All of the ships in it have been modified or are new, and interact quite well. There isn't really any way to describe it well, except that it's funky and the map is pretty small. - Mag Steelglass (vertical_file@yahoo.com)"
+ },
+ "Some-Sort-of-Odd-Plug (Multiplayer).antaresplugin": {
+  "archive": "Scenarios/61_",
+  "description": "This is a funky, unusual plug that I didn't origionally intend to submit. But recently, I decided that it was pretty good, and the new multiplayer option is very fun, so I'm submitting it. As the name implies, fighters can survive quite decently in this plug, and are deadly in groups. All of the ships in it have been modified or are new, and interact quite well. There isn't really any way to describe it well, except that it's funky and the map is pretty small. - Mag Steelglass (vertical_file@yahoo.com)"
+ },
+ "Fighter-Power.antaresplugin": {
+  "archive": "Scenarios/62_",
+  "description": "Ever want to kick butt in a fighter? You can, without even cheating. This\nplugin is a set of training missions to improve your skills with basic\nfighters. First to qualify you have to test your skills against other fighters\nand then you're off to training. Skilled pilots required, there's no room for\nrookies in here. This is version 1.0.2.  It has some fixes, see the version history in the readme for more info."
+ },
+ "Footsteps-of-Pyrrhus.antaresplugin": {
+  "archive": "Scenarios/63_",
+  "description": "Follow the course of a desperate war waged by a fledgeling race on the brink of extinction. Test your piloting prowess in half a dozen new vessels over the course of thirteen missions featuring some of the most sophisticated coding yet seen in a plug-in. Are you ready for it? Footsteps of Pyrrhus 1.0.1 -Sundered Angel"
+ },
+ "Official/Footsteps-of-Pyrrhus-1.2.0/Footsteps of Pyrrhus.antaresplugin": {
+  "archive": "Scenarios/63_",
+  "description": "Follow the course of a desperate war waged by a fledgeling race on the brink of extinction. Test your piloting prowess in half a dozen new vessels over the course of thirteen missions featuring some of the most sophisticated coding yet seen in a plug-in. Are you ready for it? Footsteps of Pyrrhus 1.0.1 -Sundered Angel"
+ },
+ "Former-Single-Player-Levels.antaresplugin": {
+  "archive": "Scenarios/64_",
+  "description": "Yes, its 1.1.  Whats so special?  Well, it contains 2 bug fixes and 3 more scenarios: Easy Street, The Stars Have Ears, and Hornet's Nest.  I figured that a skilled player could tackle these on the net.  It also contains in the readme the known bugs that I can't fix.  If someone could only tell me how...  One fair warning.  The Mothership Connection has a HUGE bug.  Check readme for details.\nThanks to EVWeb (GR name) for helping me discover a few of the bugs.  Another thanks to the people who did DL it.  Contact me the same way as before, still haven't gotten a way to block all the spam mail....  Keep a look out for a version with bug fixes...it may actually appear."
+ },
+ "Frozen-Heart.antaresplugin": {
+  "archive": "Scenarios/65_",
+  "description": "This Fixes the Bug in the Other on and it fixs alot of bugs This Fixes the Bug in the Other on and it fixs alot of bugs Sorry -EMINEM"
+ },
+ "Gate-Ships.antaresplugin": {
+  "archive": "Scenarios/66_",
+  "description": "This mod adds the Ishiman Gate ship and a new net level \"Showdown at Noon (No Pistols)\" where two gateships duke it out for the cosmos.Goes well with Ishiman and Human Overkill.Zell (zellkickass@hotmail.com)"
+ },
+ "Gundam-Wing-Plus-Single-O-o-O.antaresplugin": {
+  "archive": "Scenarios/67_",
+  "description": "Gundam Wing Plus (Single) Ver. 1.0.0 contains: 4 new single player levels,\n and a couple new races, plus its even more realistic."
+ },
+ "A-Hopeless-Cause.antaresplugin": {
+  "archive": "Scenarios/68_",
+  "description": "At the end of mission 6, the Gaitori hang back, defeated, for the moment...\n\tThey hold on to their planet and one flak drone, and are seriously disabled...\n\tBut they find a new commander...\n\tOne who believes in the Hopeless Cause...\n\n\t10 cool new net scenarios, including the one described above. Made by Capt. Jordarrin."
+ },
+ "Human-s-Revenge.antaresplugin": {
+  "archive": "Scenarios/69_",
+  "description": "Preview for the upcoming plug, \"Human's Revenge\". Contains 7 out of the 22 levels in the final version. Please post comments, suggestions, or bug reports on the boards. -Macintosh Man"
+ },
+ "Human-s-Revenge-Part-1.antaresplugin": {
+  "archive": "Scenarios/70_",
+  "description": "Human's Revenge Part 1 finally released. This contanins 11 levels, with part 2 (and 11 more levels) yet to come."
+ },
+ "Infestation.antaresplugin": {
+  "archive": "Scenarios/71_",
+  "description": "Infestation 1.0.0: In this new scenario by Consul Bob, a lone UNS patrol fleet is sent to scan and clear out a remote sector of a new, but familiar menace. Forward all flames to consul.bob@gmail.com."
+ },
+ "Ishiman-Overkill-Ares-Mod.antaresplugin": {
+  "archive": "Scenarios/72_",
+  "description": "Basically this Mod makes all the Ishiman ships dead powerful and adds a variety to hte weapons of the Ishiman ships.If you continously get stuck on the single player or are lokign to spice up your internet games then this is the Mod for you.\n\nZell (zellkickass@hotmail.com)"
+ },
+ "Ishiman-Quest.antaresplugin": {
+  "archive": "Scenarios/73_",
+  "description": "When the Sol Federation sent three of it's Expeditionary Forces to help the Argeisian Empire, one never made it.  Riding on the wings of new and unproven Sub-Etheric Transits, the 3rd Expeditionary Force was presumed lost forever.  Only a full 2 thousand years later was the truth of what happened to them discovered."
+ },
+ "Ishiman-vs-Ishiman.antaresplugin": {
+  "archive": "Scenarios/74_",
+  "description": "This is an Ishiman versus Ishiman net level.\nIt requires Ares 1.2.0 to play it.\nThe planets are very close to each other and you can only build fighters, schooners and transports. You start in a Heavy Crusier."
+ },
+ "Ishiman-Vs-Gaitori.antaresplugin": {
+  "archive": "Scenarios/75_",
+  "description": "MY first ares plugin, that I made for netplay, adds one net level, that will keep you playing until your modem fries!  Have fun!"
+ },
+ "Its-War.antaresplugin": {
+  "archive": "Scenarios/76_",
+  "description": "Its War (Part 1). A sequel to The Audemedon Crisis. - A Multi-threaded single player scenario. The Audemedon Axis have invaded. You're not dealing with Cantharian softies this time, the real boys are comming out to play... In a classic pincer movement, they attempt to encircle and cut off the Earth-Pionii pocket as a prelude to crushing the Humans once and for all. Just when you thought it was safe to retire to that safe little condo on Proxima ll, humanity needs you again to save it from the horrible alien hoards...\nThere should be no bugs in this plug. It has been tested to destruction and beyond!\nComments, suggestions etc welcome: lcanic@eircom.net or on the web board."
+ },
+ "Its-War-p2.antaresplugin": {
+  "archive": "Scenarios/77_",
+  "description": "It's War Part2 (v1.0.6)\nFighting the Green Menace!\nYour mission... Continuing to defend Allied Space against invasion, and leading elite Terran and Piioni forces into battle against the Cantharian Order in a fight to the finish. Finally take the battle far into the heart of Cantharian Space...\nWin or Lose, take command fleets of powerful new ships armed with nasty new weapons. Take on the full might of the Cantharian Starfleet, and decide whether it is they or Earth which faces twilight...\nCompressed with Stuffit 6.0\nPosted by Lord commander Anic\nEnjoy :)"
+ },
+ "MaG-Net-Ladder.antaresplugin": {
+  "archive": "Scenarios/79_",
+  "description": "Macintosh Gaming League Ladder Scenarios - these are the official addon net levels for the MaG Ares ladder. Usable in all tournaments and ladder games unless otherwise stated. www.magleague.net for account signups, http://www.magleague.net/bbs2/tourney_cp.php?action=status for tournament signups. -Patrick"
+ },
+ "Malamar.antaresplugin": {
+  "archive": "Scenarios/80_",
+  "description": "This plug allows you to take the Malamar ships through all of the standard Ares missions, just like many of Chris Shrouts plugs. Anyway, I hope you like it. It doesn't have any of the briefings changed, but it does have a short commentary that tells the story of the Malamar, and also gives detailed information about the ships.\nThis revision has a new and improved Network Option.  It lets you do all the net levels that allow race choice to use any race that is compatible with the level.\nFor more information regarding Malamar, visit www.geocities.com/aresmalamar\nThis was posted by Tyranitar"
+ },
+ "Malamar (#81).antaresplugin": {
+  "archive": "Scenarios/81_",
+  "description": "I am posting this file as a sort of test and preview of Beyond Reversal.  It allows you to take the Malamar ships through all of the standard Ares missions, just like many of Chris Shrouts plugs.  Anyway, I hope you like it.  It doesn't have any of the briefings changed, but it does have a short commentary that tells the story of the Malamar, and also give detailed information about the ships.  I will not release any similar plugs until after Beyond Reversal is complete.  There are 2 more new races that you will encounter in Beyond Reversal. Tyranitar"
+ },
+ "Mission-Impossible.antaresplugin": {
+  "archive": "Scenarios/82_",
+  "description": "Piloting skills wanted. Here are a few hard levels i cooked up. I made these because i was kinda board. Good luck and enjoy!\nSkyfox-BenSEdwards@aol.com"
+ },
+ "Net-Levels-Galore.antaresplugin": {
+  "archive": "Scenarios/83_",
+  "description": "Hello, again. Here is my second plug, 'Net Levels Galore.' It contains four net missions with no particular story, including an upgraded version of Capture the Flagpod. If you encounter problems, want to send praise or ideas for my next plug, send it to the e-mail in the ReadMe. Keep checking in for my third plug, Ares 1.5, and my fourth plug, 'Heroes of the Stars.' Until then, enjoy!"
+ },
+ "Net-Pak.antaresplugin": {
+  "archive": "Scenarios/84_",
+  "description": "Net Pak contains 2 net games. One is called \"Money, money, and more money\" each player has a planet, a heavy desroyer, and two power stations. a flak drone resides in the middle, and there are two bunker stations. The other is called \"E M P T Y N E S S\". Each player ONLY has a Heavy destroyer. I cannot gaurentee that \"E M P T Y N E S S\" will work."
+ },
+ "Netz-Gamez.antaresplugin": {
+  "archive": "Scenarios/85_",
+  "description": "Netz Gamez is a collection of four unique and new multiplayer levels for Ares. Whether you're in the mood to combine forces against a computer opponent or duke it out over an entire galaxy, Netz Gamez will fit the occasion. Enjoy!   -Slug,  Axis Software Integrated"
+ },
+ "Ares (Ares-Scenarios-New).antaresplugin": {
+  "archive": "Scenarios/86_",
+  "description": "New PICTs 1.0 changes all the Cantharan ship PICTs to Gatori ship PICTs, and vice versa. This is my first Ares plug-in. Have fun and enjoy! - Captain Carnotaur"
+ },
+ "Alpha-To-Omega (Nice-Net-Plug).antaresplugin": {
+  "archive": "Scenarios/87_",
+  "description": "Hi this  is eminem i hope u enjoy this its  a  good netlevel   with É1level!\nHi this  is eminem i hope u enjoy this its  a  good netlevel   with É1level!"
+ },
+ "Obain-Strategy.antaresplugin": {
+  "archive": "Scenarios/88_",
+  "description": "Reversal and Obain Stragety - ALPHA!\n\nThese two plugs are the alpha versions of Reversal and Obain strategy, good ideas which I gave up on a while ago. I've uploaded them so that you can play what I did manage to complete.\n\nReversal pits you as the Gaitori fighting the Ishiman advance in the first six levels. Now, instead of destroying the Space Dishes, you must defend them. You will be attempting to do all the opposite things that you were doing as the Ishimans.\n\nObain - Strategy\nObain strategy is an attempt to create battles which can truly challenge the might of the Obish fleet from the plug Obish Vs. Elejeetian. 6 battles, all in alpha stages, some more challenging than others.\n\nPlease read the attached documents, and enjoy!\n\n-Shrout1\nMade Jan, 2002 - Alpha Version"
+ },
+ "Reversal.antaresplugin": {
+  "archive": "Scenarios/88_",
+  "description": "Reversal and Obain Stragety - ALPHA!\n\nThese two plugs are the alpha versions of Reversal and Obain strategy, good ideas which I gave up on a while ago. I've uploaded them so that you can play what I did manage to complete.\n\nReversal pits you as the Gaitori fighting the Ishiman advance in the first six levels. Now, instead of destroying the Space Dishes, you must defend them. You will be attempting to do all the opposite things that you were doing as the Ishimans.\n\nObain - Strategy\nObain strategy is an attempt to create battles which can truly challenge the might of the Obish fleet from the plug Obish Vs. Elejeetian. 6 battles, all in alpha stages, some more challenging than others.\n\nPlease read the attached documents, and enjoy!\n\n-Shrout1\nMade Jan, 2002 - Alpha Version"
+ },
+ "Obain-versus-Gaitor.antaresplugin": {
+  "archive": "Scenarios/89_",
+  "description": "This is version 1.2 of Obain versus Gaitor. The level now will end when the Gaitori fleet is destroyed"
+ },
+ "Obain-versus-Gaitor (ObainVsGaitor-Easiest).antaresplugin": {
+  "archive": "Scenarios/89_",
+  "description": "This is version 1.2 of Obain versus Gaitor. The level now will end when the Gaitori fleet is destroyed"
+ },
+ "Obain-versus-Gaitor (ObainVsGaitor-Super-Hard).antaresplugin": {
+  "archive": "Scenarios/89_",
+  "description": "This is version 1.2 of Obain versus Gaitor. The level now will end when the Gaitori fleet is destroyed"
+ },
+ "Obish-VS-Elejeetian.antaresplugin": {
+  "archive": "Scenarios/90_",
+  "description": "This plug enables you to play as either as the Obish and the Elejeetain with loads of new sprites for each race! This Plug is part of an upcoming mod by Viper called The Space: Rules of War. Enjoy! (Zell and Viper) the.dillons@btnternet.com"
+ },
+ "Pirate-s-Life.antaresplugin": {
+  "archive": "Scenarios/91_",
+  "description": "Ever wanted a pirate in your levels? Now you can have one. This plug contains all the data you need, instructions are included. Submitted by Agent_Vast. Graphics by Skyfox."
+ },
+ "Reversal-1-1.antaresplugin": {
+  "archive": "Scenarios/92_",
+  "description": "The original Reversal was incomplete, so we completed the rest of the missions.  We were only able to finish some of the briefings due to time constraints.  Missions that we can't get to work properly are skipped.  The final mission (Mothership Connection) has been completely recoded.  We hope you enjoy this plug.  There are no bugs in the part we coded to my knowledge.  We give the credit for both the idea and the original Reversal to Chris Shrout.  Enjoy this plug.  -Tyranitar and Phoenix\nP.S. There may be a cleanup revision at a future date."
+ },
+ "Scenearo-Contest.antaresplugin": {
+  "archive": "Scenarios/93_",
+  "description": "This is my entry for spacecowboy's contest. You play as the Cantharan fighting off your enemies. It also includes one new ship. Have Fun!"
+ },
+ "Star-s-End-The-Raiders-Multiplayer-Edition-Lite.antaresplugin": {
+  "archive": "Scenarios/94_",
+  "description": "Well, here it is.  Finally.  After about a year of work I've taken some time off to compile 4 really good net scenarios that will help to show of some of SETR's finer aspects.  It includes the 2 main races of my TC, the Earth-Sol Federation (ESF) and Union of Worlds.  Unfortunately the Naarad could not be included, but will be and 4 more races when I finish SETR.  Anyway, may your lives be lasting and your fusion rockets burn brightly! - Count Altair El Alemein (Joveia on gr) email at countaltair@yahoo.com.au"
+ },
+ "Shootout-At-Midnight.antaresplugin": {
+  "archive": "Scenarios/95_",
+  "description": "Shootout At Midnight has several standard and modified Ares missions, in addition to the original net levels, and should provide hours of Ares-style enemy-blasting fun.\n\nVersion: 1.0.\nRelease Date: 2/19/04\n-Consul Bob"
+ },
+ "Space-Marines.antaresplugin": {
+  "archive": "Scenarios/96_",
+  "description": "A fun level where you use Space Marines instead of ships.\nThis is the NET level. Made By Daniel Haskins"
+ },
+ "Space-Marines (#97).antaresplugin": {
+  "archive": "Scenarios/97_",
+  "description": "This is a fun game where you use Space Marines instead of\nships! This is the Single Player Version of Space Marines!\nHave Fun!\n\nMap Made By Daniel Haskins"
+ },
+ "Space-Race-The-Musical-Networked.antaresplugin": {
+  "archive": "Scenarios/98_",
+  "description": "This file contains Space Race, The Musical: Network Edition. Space Race requires Ares 1.2.0B5"
+ },
+ "Star-Trek.antaresplugin": {
+  "archive": "Scenarios/99_",
+  "description": "Star Trek: Ares puts you in the fight to save a small race from Dominion occupation. You will get to fly Federation Starships and realistic Star Trek weaponry through out 13 levels of Star Trek fun."
+ },
+ "Hitech-Ares.antaresplugin": {
+  "archive": "Utilities/118_",
+  "description": "Wow! Who saw this coming?\n\nThis is my fourth Plugin for the Ares Community, except this one is for the new Ares 1.2. Basically, this is a cheat plug. All it does is change most of the levels so both sides can build carriers, Heavy Destroyers, etc. I was bored so that's why I built this plug (also, I badly need the experience with Hera).\n\n-Slug\ngajet@pacbell.net\nhttp://my.treeway.com/slugsoft"
+ },
+ "Audemedons-Attack.antaresplugin": {
+  "archive": "Utilities/124_",
+  "description": "Audemedons Attack! - Allows you to play through the game as the Audemedon. Same format type as \"Those Interrupting Salrillians....\" It's nice to have superiority once in a while.\nFinished 11/22/01, By Shrout1, Version 1.0.0"
+ },
+ "Insane.antaresplugin": {
+  "archive": "Utilities/125_",
+  "description": "A set of two files.  Each changes the difficulty level of Ares.  The first, Trainee, makes all computer-controlled ships extremely stupid the second, Insane, will make all computer-controlled ships very smart and aggressive.  None of the physical specs of the ships have been changed."
+ },
+ "Trainee.antaresplugin": {
+  "archive": "Utilities/125_",
+  "description": "A set of two files.  Each changes the difficulty level of Ares.  The first, Trainee, makes all computer-controlled ships extremely stupid the second, Insane, will make all computer-controlled ships very smart and aggressive.  None of the physical specs of the ships have been changed."
+ },
+ "Elejee.antaresplugin": {
+  "archive": "Utilities/127_",
+  "description": "Elejee - A complimentary plug to Obain. This plug uses Fiction Software's Elejeetian ships from the plug \"Obish Vs. Elejeetian\" and allows you to play the game through with them. Created 12/28/01 Version 1.0.0 By Shrout1"
+ },
+ "Galactic-Domination-Part-1.antaresplugin": {
+  "archive": "Utilities/128_",
+  "description": "Are you tired of the explosions that ares have... well nows your chance to get a completly new set  with higher quality) I't also includes some new space things and a plug that shows how to use them. Like always I hope someone out there will have some kind of use for this. Created and uploaded by VIPER"
+ },
+ "The-Final-Battle.antaresplugin": {
+  "archive": "Utilities/129_",
+  "description": "The Final Battle- The Way it Was Supposed to Be.\n\nFor reasons unknown to me, the distribution version of the Ares stock scenario does not use an effect that was apparently intended for the death of the final death of the Cantharan Gate Ship.  This scenario provides a modification that reinstates this effect, and the last level of the game.  - KMQ"
+ },
+ "Humans.antaresplugin": {
+  "archive": "Utilities/130_",
+  "description": "This is a small plug that just makes it so that you use the humans throughout the game, as opposed to the Ishiman being used for most of it. I didn't bother to change the briefings, and I made this as a request on the boards.\n- Mag Steelglass (vertical_file@yahoo.com)"
+ },
+ "Obain.antaresplugin": {
+  "archive": "Utilities/135_",
+  "description": "Obain - Allows you to play through the game using ships from Fiction Software's \"Obish vs. Elejeetian\" plug. Created 12/2/01 by Shrout1. Version 1.0.0"
+ },
+ "Untitled (test-plug-for-animated-ship).antaresplugin": {
+  "archive": "Utilities/137_",
+  "description": "Well I have put up this plug thing for the lazy people that dont want to do there own graphic and sounds. There are only one complete race but there are also 6 fighters, 8 cruisers, 9 gunships, 8 carriers, 4 heavy destroyers and 4 transports to chose frome all with a different look. And as a bonus i have given away all my 35 planets sprites 25 of them are like the ones in ares but 10 are animated oh and there are allso 6 sounds,16 new weapons and some explosions. All these thing are old stuff that i made about 2 years ago.\nViper\ntmq932x@tninet.se"
+ },
+ "Those-Interrupting-Salrilians.antaresplugin": {
+  "archive": "Utilities/138_",
+  "description": "A while ago, someone asked me to make a plugin where the player can go through the game as a Salrilian. Well, after three days of work, here is the plugin! All of the missions are the same, but the player can now build and pilot Salrilian vessels. I have played it my self several times to ensure that it is playable (though a bit buggy due to the current version of Hera). You need Ares 1.2 and Hera to play this file.\n\nAlso, instead of a Ishiman interface (like in normal Ares) this plugin gives you a sleek Salrilian interface and a new title screen. I hops you have fun with this (my second Ares 1.2 plugin).\n\n-Slug\ngajet@pacbell.net\nhttp://my.treeway.com/slugsoft"
+ }
+}

@@ -61,6 +61,7 @@ static constexpr char kVolDownButton[] = "volume-down";
 static constexpr char kVolRect[]       = "volume";
 
 static constexpr char kFullscreenButton[] = "fullscreen";
+static constexpr char kWindowedButton[]   = "windowed";
 
 // An empty size fills the display.
 static const struct {
@@ -256,16 +257,28 @@ void SoundControlScreen::overlay() const {
 
 VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
         : InterfaceScreen("options/video", {0, 0, 640, 480}), _state(state) {
+    // Fullscreen and windowed are a pair: exactly one is checked, like the resolutions.
     checkbox(kFullscreenButton)
             ->bind({
                     [] { return sys.prefs->fullscreen(); },
-                    [](bool on) { sys.prefs->set_fullscreen(on); },
+                    [](bool) { sys.prefs->set_fullscreen(true); },
+            });
+    checkbox(kWindowedButton)
+            ->bind({
+                    [] { return !sys.prefs->fullscreen(); },
+                    [](bool) { sys.prefs->set_fullscreen(false); },
             });
     for (const auto& r : kResolutions) {
         const Size size = r.size;
+        // A saved resolution the display can't show runs as "Fill Screen", so it's checked instead.
         checkbox(r.id)->bind({
-                [size] { return sys.prefs->resolution() == size; },
+                [size] {
+                    const Size current = sys.prefs->resolution();
+                    return sys.video->resolution_supported(current) ? (current == size)
+                                                                    : size.as_rect().empty();
+                },
                 [size](bool) { sys.prefs->set_resolution(size); },
+                [size] { return sys.video->resolution_supported(size); },
         });
     }
     for (const auto& s : kGameScales) {

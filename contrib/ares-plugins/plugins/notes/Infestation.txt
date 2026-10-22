@@ -1,0 +1,98 @@
+objects:
+    0 dev/inasa/rapid                          Rapid Inasa Pulse
+    1 aud/gunship                              Gunship
+    2 dev/cform/pulse                          Charged Form
+    3 dev/cform/gun                            C-Form Cannon
+    4 aud/hvd                                  Heavy Destroyer
+    5 dev/pk/sal/bolt                          LR PK Beam
+    6 dev/pk/sal/gun                           LRPK Beam Cannon
+    7 sal/fighter                              Fighter
+    8 dev/bay/sal                              Launching Bay
+    9 dev/magno/pulse                          Magno Pulse
+   10 dev/magno/turret                         Magno Launcher
+   11 dev/tspace/ray                           Trans-Space Bolt
+   12 dev/tspace/gun                           T-Space Bolt Rod
+   13 sal/carrier                              Carrier
+   14 dev/holo/decoy                           Holographic Decoy
+   15 dev/holo/item                            Holo Generator
+   16 dev/inasa/pulse                          Inasa Pulse
+   17 dev/inasa/gun                            Inasa Pulse Gun
+   18 aud/cruiser                              Cruiser
+   19 dev/asb/bolt                             ASB Beam
+   20 dev/asb/gun                              ASB Beam Cannon
+   21 aud/fighter                              Fighter
+   22 dev/bay/aud                              Launching Bay
+   23 dev/trazer/ray                           Trazer Beam
+   24 dev/trazer/gun                           Trazer Cannon
+   25 dev/newo/bolt                            Newo Beam
+   26 dev/newo/gun                             Newo Beam Cannon
+   27 dev/amissile/missile                     Missile
+   28 dev/amissile/launcher                    A Missile Launch
+   29 aud/carrier                              Carrier
+   30 loc/planet                               Planet
+   31 loc/sun                                  Sun
+   32 sfx/jump/small                           Jump Gate Effect
+   33 loc/jump/gate                            Jump Gate
+   34 dev/stealth/item                         Stealth Field
+   35 misc/active-beacon                       Active Beacon
+   36 misc/zerbshootdown                       ZerbShootDown
+   37 ast/shoot/wide/down                      AsteroidShootDown
+   38 sfx/jump/large                           Jump Effect Large
+   39 misc/zerbilite-nest                      Zerbilite Nest
+   40 misc/zerb-shoot-up                       Zerb Shoot Up
+   41 ast/nasty                                Nastiroid
+   42 ast/regular/small                        Asteroid Debris
+   43 ast/regular/medium                       Asteroid Fragment
+   44 ast/rand-dir                             Asteroid
+   45 ast/shoot/wide/up                        Asteroid Shoot Up
+   46 dev/pk/ish/bolt                          P-K Beam
+   47 dev/pk/ish/hand                          Hand PK Beam
+   48 ish/evat                                 EVA Trooper
+   49 dev/assault/ish                          Assault Team
+   50 dev/cm/five                              C Missiles(5)
+   51 uns/aslttran                             Assault Transport
+   52 loc/jump/node                            Jump Gate Non
+   53 dev/bay/uns                              Launching Bay
+   54 uns/carrier                              Carrier
+   55 dev/photo/pulse                          Photoreactor Puls
+   56 dev/photo/gun                            Phtorctr Pls Cann
+   57 uns/hvd                                  Heavy Destroyer
+   58 sfx/debris/a                             Debris
+   59 sfx/debris/b                             Debris
+   60 sfx/explosion/giant                      Giant Explosion
+   61 dev/twin-magneto                         Twin Magneto
+   62 uns/gunship                              Gunship
+   63 sfx/debris/c                             Debris
+   64 sfx/explosion/large                      Large Explosion
+   65 dev/laser/gun-bolt                       Laser
+   66 dev/laser/turret                         Laser Turret
+   67 dev/magneto/pulse                        Magneto Pulse
+   68 dev/magneto/gun                          Magneto Pulse Gun
+   69 uns/cruiser                              Heavy Cruiser
+   70 dev/laser/turret-bolt                    Laser
+   71 dev/laser/gun                            Laser Cannon
+   72 uns/fighter                              Fighter
+   73 zz2/carrier                              Infested Asteroid
+   74 zz2/hvd                                  Zerbilite Infuser
+   75 sfx/explosion/asteroid                   Large Explosion
+   76 zz2/gunship                              Zerbilite Queen
+   77 zz2/cruiser                              Zerbilite
+   78 misc/small-destruction                   Small Destruction
+   79 zz2/fighter                              Zerbilite Spawn
+   80 sfx/explosion/gas                        Gas Explosion
+   81 sfx/explosion/energy                     Energy Explosion
+   82 dev/cm/missile                           C Missile
+   83 dev/cm/launcher                          C Missile Launch
+   84 dev/repulser/bolt                        Repulser Beam
+   85 dev/repulser/turret                      Repulser
+   86 dev/pp/pulse                             Protopulse
+   87 dev/pp/turret                            ProtoPulse Cannon
+   88 loc/bunker                               Bunker Station
+   89 sfx/warp/out                             Warp Out Flare
+   90 sfx/warp/in                              Warp In Flare
+   91 sfx/energy                               Energy
+   92 sfx/explosion/missile-hit                Missile Hit
+   93 sfx/crew                                 Castaway Crew Mem
+
+notes:
+     2 x non-reflexive create (destination semantics differ slightly)

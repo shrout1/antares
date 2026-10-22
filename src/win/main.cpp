@@ -96,6 +96,33 @@ void extract_data() {
     extractor.extract(&observer);
 }
 
+// The Windows keys are fire keys, but Windows opens the Start menu when one is pressed and
+// released alone, taking the game out of the foreground. While a window of ours has the
+// keyboard, take them from Windows and post them to that window, where GLFW reads them as
+// GLFW_KEY_LEFT_SUPER and GLFW_KEY_RIGHT_SUPER. (Linux and macOS leave this to the desktop.)
+LRESULT CALLBACK windows_key_hook(int code, WPARAM wparam, LPARAM lparam) {
+    if (code == HC_ACTION) {
+        const KBDLLHOOKSTRUCT* k      = reinterpret_cast<const KBDLLHOOKSTRUCT*>(lparam);
+        HWND                   window = GetForegroundWindow();
+        DWORD                  pid    = 0;
+        GetWindowThreadProcessId(window, &pid);
+        if (((k->vkCode == VK_LWIN) || (k->vkCode == VK_RWIN)) &&
+            (pid == GetCurrentProcessId())) {
+            const bool up    = k->flags & LLKHF_UP;
+            WORD       flags = static_cast<WORD>(k->scanCode & 0xff);
+            if (k->flags & LLKHF_EXTENDED) {
+                flags |= KF_EXTENDED;
+            }
+            if (up) {
+                flags |= KF_REPEAT | KF_UP;
+            }
+            PostMessageW(window, up ? WM_KEYUP : WM_KEYDOWN, k->vkCode, MAKELPARAM(1, flags));
+            return 1;
+        }
+    }
+    return CallNextHookEx(nullptr, code, wparam, lparam);
+}
+
 // Quotes an argument so that CommandLineToArgvW() reads it back unchanged.
 std::wstring quote_argument(pn::string_view arg) {
     std::wstring in          = arg.cpp_wstr();
@@ -116,7 +143,10 @@ std::wstring quote_argument(pn::string_view arg) {
     return out + L"\"";
 }
 
-void restart(pn::string_view program, const std::vector<pn::string>& arguments) {
+// Windows has no exec(), so run the new game as a child and stand in for it until it exits: it
+// gets this process's output, and whatever started Antares (a launcher, a shell) sees it run on
+// and gets its exit status, as with execvp() on Linux and macOS.
+[[noreturn]] void restart(pn::string_view program, const std::vector<pn::string>& arguments) {
     std::wstring command_line = quote_argument(program);
     for (const pn::string& arg : arguments) {
         command_line += L" " + quote_argument(arg);
@@ -127,18 +157,26 @@ void restart(pn::string_view program, const std::vector<pn::string>& arguments) 
                 pn::format("GetModuleFileName: error {0}", static_cast<int64_t>(GetLastError()))
                         .c_str());
     }
-    STARTUPINFOW        startup_info{sizeof(STARTUPINFOW)};
+    STARTUPINFOW startup_info{sizeof(STARTUPINFOW)};
+    startup_info.dwFlags    = STARTF_USESTDHANDLES;
+    startup_info.hStdInput  = GetStdHandle(STD_INPUT_HANDLE);
+    startup_info.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    startup_info.hStdError  = GetStdHandle(STD_ERROR_HANDLE);
     PROCESS_INFORMATION process_info;
     if (!CreateProcessW(
-                path, &command_line[0], nullptr, nullptr, FALSE, 0, nullptr, nullptr,
+                path, &command_line[0], nullptr, nullptr, TRUE, 0, nullptr, nullptr,
                 &startup_info, &process_info)) {
         throw std::runtime_error(pn::format(
                                          "CreateProcess: {0}: error {1}", program,
                                          static_cast<int64_t>(GetLastError()))
                                          .c_str());
     }
-    CloseHandle(process_info.hProcess);
     CloseHandle(process_info.hThread);
+    WaitForSingleObject(process_info.hProcess, INFINITE);
+    DWORD exit_code = 1;
+    GetExitCodeProcess(process_info.hProcess, &exit_code);
+    CloseHandle(process_info.hProcess);
+    exit(static_cast<int>(exit_code));
 }
 
 }  // namespace
@@ -224,7 +262,13 @@ void main(int argc, char* const* argv) {
 #endif
         GLFWVideoDriver video;
         enable_plugin_switching();
+        // Called on this thread, from the message loop that GLFW runs each frame.
+        HHOOK hook = SetWindowsHookExW(
+                WH_KEYBOARD_LL, windows_key_hook, GetModuleHandleW(nullptr), 0);
         video.loop(new Master(scenario, time(nullptr)));
+        if (hook) {
+            UnhookWindowsHookEx(hook);
+        }
     }
 
     if (plugin_requested()) {

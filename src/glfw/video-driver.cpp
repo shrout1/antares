@@ -19,15 +19,15 @@
 #include "glfw/video-driver.hpp"
 
 #include <GLFW/glfw3.h>
+#include <algorithm>
+#include <cmath>
 
 #include <game/sys.hpp>
 #include <pn/output>
 #include <sfz/sfz.hpp>
 
 #ifdef _MSC_VER
-#include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <thread>
 #else
 #include <unistd.h>
@@ -201,15 +201,22 @@ Point GLFWVideoDriver::get_mouse() {
 // up to fit the display, keeping their 640x480 proportions.
 static const Size kOriginalScreenSize = {640, 480};
 
-// With a fixed resolution, the game is laid out as on a display of that size, then scaled to fit
-// the framebuffer, centered.
+// With a fixed resolution, the game is laid out as on a display of that size, then stretched to
+// fill the framebuffer.
 void GLFWVideoDriver::update_size() {
-    glfwGetWindowSize(_window, &_window_size.width, &_window_size.height);
-    glfwGetFramebufferSize(_window, &_framebuffer_size.width, &_framebuffer_size.height);
+    Size window, framebuffer;
+    glfwGetWindowSize(_window, &window.width, &window.height);
+    glfwGetFramebufferSize(_window, &framebuffer.width, &framebuffer.height);
+    if ((framebuffer.width <= 0) || (framebuffer.height <= 0)) {
+        // Minimized (Windows reports a 0x0 window); keep the last layout until it's restored.
+        return;
+    }
+    _window_size      = window;
+    _framebuffer_size = framebuffer;
     _pixel_ratio = std::max(1, _framebuffer_size.width / std::max(1, _window_size.width));
     _resolution  = sys.prefs->resolution();
     _game_scale  = sys.prefs->game_scale();
-    if (_resolution.as_rect().empty()) {
+    if (_resolution.as_rect().empty() || !resolution_supported(_resolution)) {
         _viewport_size  = _framebuffer_size;
         _viewport_scale = _pixel_ratio;
     } else {
@@ -220,9 +227,6 @@ void GLFWVideoDriver::update_size() {
                 int(std::lround(_resolution.width * _viewport_scale)),
                 int(std::lround(_resolution.height * _viewport_scale))};
     }
-    _viewport_offset = {
-            (_framebuffer_size.width - _viewport_size.width) / 2,
-            (_framebuffer_size.height - _viewport_size.height) / 2};
     _ui_scale = std::max<float>(
             _viewport_scale, std::min(
                                      float(_viewport_size.width) / kOriginalScreenSize.width,
@@ -234,6 +238,50 @@ void GLFWVideoDriver::update_size() {
     _screen_size                 = {
             kLeftPanelWidth + int(battlefield_pixels / _battlefield_scale) + kRightPanelWidth,
             int(_viewport_size.height / _battlefield_scale)};
+}
+
+// In a window, a fixed resolution sets the window's size, so the game runs at exactly that many
+// pixels (fewer if the display can't hold it). "Fill Screen" keeps whatever size the window has.
+void GLFWVideoDriver::fit_window() {
+    const Size resolution = sys.prefs->resolution();
+    if (_fullscreen || resolution.as_rect().empty() || !resolution_supported(resolution)) {
+        return;
+    }
+    Size window, framebuffer;
+    glfwGetWindowSize(_window, &window.width, &window.height);
+    glfwGetFramebufferSize(_window, &framebuffer.width, &framebuffer.height);
+    if ((framebuffer.width <= 0) || (framebuffer.height <= 0)) {
+        return;
+    }
+    // Window sizes are in screen coordinates, which are not always pixels (e.g. on Wayland).
+    Size size = {
+            int(std::lround(double(resolution.width) * window.width / framebuffer.width)),
+            int(std::lround(double(resolution.height) * window.height / framebuffer.height))};
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    Rect         area;
+#if GLFW_VERSION_MINOR >= 3
+    glfwGetMonitorWorkarea(monitor, &area.left, &area.top, &area.right, &area.bottom);
+    area.right += area.left;
+    area.bottom += area.top;
+#else
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    area                    = Rect{0, 0, mode->width, mode->height};
+#endif
+    int frame_left, frame_top, frame_right, frame_bottom;
+    glfwGetWindowFrameSize(_window, &frame_left, &frame_top, &frame_right, &frame_bottom);
+    const double shrink = std::min(
+            {1.0, double(area.width() - frame_left - frame_right) / size.width,
+             double(area.height() - frame_top - frame_bottom) / size.height});
+    size = {int(size.width * shrink), int(size.height * shrink)};
+    if (size == window) {
+        return;
+    }
+
+    Rect window_rect{Point{0, 0}, size};
+    window_rect.center_in(area);
+    glfwSetWindowPos(_window, window_rect.left, std::max(window_rect.top, area.top + frame_top));
+    glfwSetWindowSize(_window, size.width, size.height);
 }
 
 float GLFWVideoDriver::battlefield_scale(GameScale scale) const {
@@ -248,9 +296,9 @@ float GLFWVideoDriver::battlefield_scale(GameScale scale) const {
     return _viewport_scale;
 }
 
-Point GLFWVideoDriver::viewport_origin() const {
-    return {_viewport_offset.h,
-            _framebuffer_size.height - _viewport_offset.v - _viewport_size.height};
+bool GLFWVideoDriver::resolution_supported(Size resolution) const {
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    return !mode || ((resolution.width <= mode->width) && (resolution.height <= mode->height));
 }
 
 vec4 GLFWVideoDriver::region_transform(Region region) const {
@@ -285,14 +333,24 @@ Point GLFWVideoDriver::from_pixels(double x, double y, Region region) const {
     return {int(std::floor((x - t.z) / t.x)), int(std::floor((y - t.w) / t.y))};
 }
 
+Rect GLFWVideoDriver::visible_rect(Region region) const {
+    // Whole points only: the region's points that are entirely within the viewport.
+    const vec4 t = region_transform(region);
+    return Rect(
+            int(std::ceil(-t.z / t.x)), int(std::ceil(-t.w / t.y)),
+            int(std::floor((_viewport_size.width - t.z) / t.x)),
+            int(std::floor((_viewport_size.height - t.w) / t.y)));
+}
+
 Point GLFWVideoDriver::convert(Point p, Region from, Region to) const {
     const vec4 t = region_transform(from);
     return from_pixels((p.h * t.x) + t.z, (p.v * t.y) + t.w, to);
 }
 
 Point GLFWVideoDriver::to_screen(double x, double y) const {
-    x = (x * _framebuffer_size.width / std::max(1, _window_size.width)) - _viewport_offset.h;
-    y = (y * _framebuffer_size.height / std::max(1, _window_size.height)) - _viewport_offset.v;
+    // Window coordinates to viewport pixels, undoing the stretch.
+    x = x * _viewport_size.width / std::max(1, _window_size.width);
+    y = y * _viewport_size.height / std::max(1, _window_size.height);
     Region region = Region::SCREEN;
     if (_game_layout) {
         if (x < _left_panel_pixels) {
@@ -541,6 +599,7 @@ void GLFWVideoDriver::window_maximize(bool maximized) {
     glfwSetWindowMonitor(
             _window, monitor, window_rect.left, window_rect.top, window_rect.width(),
             window_rect.height(), mode->refreshRate);
+    fit_window();
 #endif
 }
 
@@ -642,6 +701,8 @@ void GLFWVideoDriver::loop(Card* initial) {
     for (const auto hint_version : {hint_opengl32, hint_opengl20}) {
         glfwDefaultWindowHints();
         _glsl_version = hint_version();
+        // Shown once fit_window() has sized it.
+        glfwWindowHint(GLFW_VISIBLE, false);
         if (mode) {
             glfwWindowHint(GLFW_RED_BITS, mode->redBits);
             glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -668,6 +729,8 @@ void GLFWVideoDriver::loop(Card* initial) {
     glfwSetWindowSizeCallback(_window, window_size_callback);
     glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
     glfwSetWindowFocusCallback(_window, focus_callback);
+    fit_window();
+    glfwShowWindow(_window);
 
     /* Make the _window's context current */
     glfwMakeContextCurrent(_window);
@@ -679,8 +742,14 @@ void GLFWVideoDriver::loop(Card* initial) {
     while (!main_loop.done() && !glfwWindowShouldClose(_window)) {
         glfwPollEvents();
         log_held_keys();
+#if GLFW_VERSION_MINOR >= 2
+        if (sys.prefs->fullscreen() != _fullscreen) {
+            window_maximize(sys.prefs->fullscreen());
+        }
+#endif
         if ((sys.prefs->resolution() != _resolution) || (sys.prefs->game_scale() != _game_scale)) {
             update_size();
+            fit_window();
         }
         _loop->draw();
         glfwSwapBuffers(_window);

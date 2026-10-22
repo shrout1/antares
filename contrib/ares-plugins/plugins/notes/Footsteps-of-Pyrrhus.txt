@@ -1,0 +1,164 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 ast/shoot/narrow/down                    Ast Shoot Down
+    6 misc/asteroid                            Asteroid
+    7 sfx/explosion/asteroid                   Large Explosion
+    8 ast/shoot/narrow/up                      Asteroid Shoot Up
+    9 ast/nasty                                Nastiroid
+   10 sfx/explosion/giant                      Giant Explosion
+   11 sfx/debris/a                             Debris
+   12 sfx/explosion/energy                     Energy Explosion
+   13 sfx/debris/b                             Debris
+   14 sfx/debris/c                             Debris
+   15 zz2/etc/cruiser                          Cruiser
+   16 dev/pulse-cannon                         Pulse Cannon
+   17 misc/firebolt                            Firebolt
+   18 misc/firebolt-expire                     Firebolt Expire
+   19 misc/yellow-explosion                    Yellow Explosion
+   20 dev/twin-chainguns                       Twin Chainguns
+   21 misc/concussive-bullet                   Concussive Bullet
+   22 misc/tracer-round                        Tracer Round
+   23 sfx/gunsmoke                             Gunsmoke
+   24 sfx/explosion/large                      Large Explosion
+   25 misc/zerbilite-still                     Zerbilite (Still)
+   26 misc/small-destruction                   Small Destruction
+   27 zrb/spawn                                Zerbilite Spawn
+   28 misc/carrier-chunk                       Carrier Chunk
+   29 misc/carrier-chunk-2                     Carrier Chunk
+   30 misc/carrier-chunk-3                     Carrier Chunk
+   31 misc/carrier-chunk-4                     Carrier Chunk
+   32 misc/unarmed-station                     Unarmed Station
+   33 zz2/cruiser                              Cruiser
+   34 zz2/gunship                              Gunship
+   35 dev/twin-hp-cannons                      Twin HP Cannons
+   36 zz2/fighter                              Fighter
+   37 can/carrier                              Carrier
+   38 dev/cm/launcher                          C Missile Launch
+   39 dev/cm/missile                           C Missile
+   40 sfx/explosion/gas                        Gas Explosion
+   41 dev/cluster/turret                       ClusterCell Array
+   42 dev/cluster/pulse                        Cluster Cell
+   43 dev/bay/can                              Launching Bay
+   44 can/fighter                              Fighter
+   45 dev/pk/ish/gun                           P-K Beam Cannon
+   46 dev/pk/ish/bolt                          P-K Beam
+   47 can/cruiser                              Cruiser
+   48 dev/antimatter-pulse                     Antimatter Pulse 
+   49 dev/anti1/pulse                          Antimatter Pulse
+   50 dev/stealth/item                         Stealth Field
+   51 misc/chiuata-station                     Chi'uata Station
+   52 dev/dart-missile-rack                    Dart Missile Rack
+   53 misc/dart-missile                        Dart Missile
+   54 dev/newo/gun                             Newo Beam Cannon
+   55 dev/newo/bolt                            Newo Beam
+   56 dev/bay/ish                              Launching Bay
+   57 zz2/etc/fighter                          Fighter
+   58 loc/planet                               Planet
+   59 misc/relay-satellite                     Relay Satellite
+   60 zz2/etc/carrier                          Carrier
+   61 dev/launching-bay                        Launching Bay
+   62 sfx/jump/large                           Jump Effect Large
+   63 can/gunship                              Gunship
+   64 dev/antimatter-pulse-2                   Antimatter Pulse 
+   65 misc/antimatter-pulse                    Antimatter Pulse 
+   66 dev/anti2/pulse2                         Antimatter Pulse
+   67 misc/large-hit-explosi                   Large Hit Explosi
+   68 can/hvc                                  Heavy Cruiser
+   69 dev/anti1/rapid                          Rap A Pulse React
+   70 zz2/etc/heavy-cruiser                    Heavy Cruiser
+   71 dev/quad-chainguns                       Quad Chainguns
+   72 misc/empty-space                         Empty Space?
+   73 sfx/jump/small                           Jump Gate Effect
+   74 ish/etc/heavy-cruiser                    Heavy Cruiser
+   75 dev/fusion/rapid                         Rap F Pulse React
+   76 dev/fusion/pulse                         Fusion Pulse
+   77 dev/pk/ish/rapid                         Rapid P-K Cannon
+   78 dev/pk/can/bolt                          P-K Beam
+   79 dev/cm/five                              C Missiles(5)
+   80 misc/planet                              Planet
+   81 zz2/transport                            Transport
+   82 can/transport                            Transport
+   83 misc/chiuata-station-2                   Chi'uata Station
+   84 zz2/etc/carrier-2                        Carrier
+   85 ish/carrier                              Carrier
+   86 dev/pp/twin                              Twin Pulse Cannon
+   87 dev/pp/pulse                             Protopulse
+   88 dev/launching-bay-2                      Launching Bay
+   89 ish/fighter                              Fighter
+   90 dev/pk/can/gun                           P-K Beam Cannon
+   91 ish/hvd                                  Heavy Destroyer
+   92 dev/fullerene/gun                        Fullerene Gun
+   93 dev/fullerene/pulse                      Fullerene Pulse
+   94 dev/lepton-beam-canno                    Lepton Beam Canno
+   95 dev/lepton/bolt                          Lepton Beam
+   96 ish/hvc                                  Heavy Cruiser
+   97 ish/etc/research                         Research Vessel
+   98 zz2/etc/heavy-cruiser-2                  Heavy Cruiser
+   99 dev/chiuata-probes                       Chi'uata Probes
+  100 zz2/etc/chiuata-probe                    Chi'uata Probe
+  101 zz2/etc/chiuata-probe-2                  Chi'uata Probe
+  102 can/hvd                                  Heavy Destroyer
+  103 dev/quasi/gun                            Quasimatter Gun
+  104 dev/quasi/pulse                          Quasimatter Pulse
+  105 sfx/explosion/quasi                      Quasimatter Exp
+  106 zz2/class205                             Cruiser
+  107 dev/hyperpulse-cannon                    HyperPulse Cannon
+  108 misc/hyperbolt                           Hyperbolt
+  109 misc/hyperbolt-expire                    Hyperbolt Expire
+  110 misc/blue-explosion                      Blue Explosion
+  111 zz2/class305                             Gunship
+  112 dev/twin-hhp-cannons                     Twin HHP Cannons
+  113 misc/navigation-buoy                     Navigation Buoy
+  114 zz2/etc/heavy-destroyer                  Heavy Destroyer
+  115 zz2/etc/carrier-3                        Carrier
+  116 misc/chiuata-station-3                   Chi'uata Station
+  117 zz2/etc/cargo-ship                       Cargo Ship
+  118 zz2/etc/transport                        Transport
+  119 sal/carrier                              Carrier
+  120 dev/tspace/gun                           T-Space Bolt Rod
+  121 dev/tspace/ray                           Trans-Space Bolt
+  122 dev/magno/turret                         Magno Launcher
+  123 dev/magno/pulse                          Magno Pulse
+  124 dev/bay/sal                              Launching Bay
+  125 sal/fighter                              Fighter
+  126 dev/pk/sal/gun                           LRPK Beam Cannon
+  127 dev/pk/sal/bolt                          LR PK Beam
+  128 zz2/etc/disabled-carrier                 Disabled Carrier
+  129 misc/carrier-chunk-5                     Carrier Chunk
+  130 misc/carrier-chunk-6                     Carrier Chunk
+  131 misc/carrier-chunk-7                     Carrier Chunk
+  132 misc/carrier-chunk-8                     Carrier Chunk
+  133 loc/jump/gate                            Jump Gate
+  134 sal/cruiser                              Cruiser
+  135 misc/jump-vortex                         Jump Vortex
+  136 sal/gunship                              Gunship
+  137 dev/fireball/gun                         Plasma Ball
+  138 dev/fireball/pulse                       Fireball
+  139 dev/fireball/trail                       Fireball Trail
+  140 zz2/etc/battleship                       Battleship
+  141 dev/quark-cannon                         Quark Cannon
+  142 misc/quark-pulse                         Quark Pulse
+  143 misc/quark-explosion                     Quark Explosion
+  144 sal/hvd                                  Heavy Destroyer
+  145 dev/chronon/gun                          Chronon Prtcl Gun
+  146 dev/chronon/pulse                        Chronon Particle
+
+notes:
+    22 x non-reflexive create (destination semantics differ slightly)
+     1 x object 33 portrait 1301 missing
+     1 x object 34 portrait 1302 missing
+     1 x object 36 portrait 1300 missing
+     1 x object 51 portrait 1310 missing
+     1 x object 57 portrait 1300 missing
+     1 x object 59 portrait 1311 missing
+     1 x object 81 portrait 1307 missing
+     1 x object 83 portrait 1310 missing
+     1 x object 84 portrait 1304 missing
+     1 x object 114 portrait 1303 missing
+     1 x object 117 portrait 1309 missing
+     1 x object 118 portrait 1307 missing
+     1 x object 140 portrait 1308 missing

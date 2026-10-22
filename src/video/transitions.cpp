@@ -18,11 +18,15 @@
 
 #include "video/transitions.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 #include "config/keys.hpp"
 #include "data/resource.hpp"
 #include "drawing/color.hpp"
 #include "game/globals.hpp"
 #include "game/main.hpp"
+#include "game/sys.hpp"
 #include "game/time.hpp"
 #include "math/units.hpp"
 #include "sound/music.hpp"
@@ -179,8 +183,21 @@ void PictFade::fire_timer() {
 
 void PictFade::draw() const {
     Rect bounds = _texture->size().as_rect();
-    bounds.center_in(world());
-    _texture->draw(bounds.left, bounds.top);
+    Rect screen = sys.video->visible_rect(VideoDriver::Region::SCREEN);
+    if ((bounds.width() <= screen.width()) && (bounds.height() <= screen.height())) {
+        bounds.center_in(world());
+        _texture->draw(bounds.left, bounds.top);
+        return;
+    }
+    // Too big for the window (the splash is 1000x480, wider than 4:3 or 16:9): shrink it to fit,
+    // letterboxed, rather than cutting off its edges.
+    const double scale = std::min(
+            double(screen.width()) / bounds.width(), double(screen.height()) / bounds.height());
+    bounds = Rect(
+            0, 0, int(std::lround(bounds.width() * scale)),
+            int(std::lround(bounds.height() * scale)));
+    bounds.center_in(screen);
+    _texture->draw_smooth(bounds);
 }
 
 void PictFade::wax() {

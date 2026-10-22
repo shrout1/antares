@@ -60,6 +60,10 @@ class VideoDriver {
     virtual void set_game_layout(bool game) {}
     // The point in `to` that is drawn at the same place as `p` in `from`.
     virtual Point convert(Point p, Region from, Region to) const { return p; }
+    // The part of `region` that is on screen, in its points.
+    virtual Rect visible_rect(Region region) const { return screen_size().as_rect(); }
+    // False for a fixed resolution bigger than the display.
+    virtual bool resolution_supported(Size resolution) const { return true; }
 
     virtual bool start_editing(TextReceiver* text) = 0;
     virtual void stop_editing(TextReceiver* text)  = 0;
@@ -110,6 +114,9 @@ class Texture {
                 const RgbColor& fill_color) const = 0;
         virtual const Size& size() const          = 0;
 
+        // Like draw(), but smoothed rather than pixelated where `draw_rect` isn't size() points.
+        virtual void draw_smooth(const Rect& draw_rect) const { draw(draw_rect); }
+
         virtual void begin_quads() const {}
         virtual void end_quads() const {}
         virtual void draw_quad(const Rect& dest, const Rect& source, const RgbColor& tint) const {
@@ -124,6 +131,7 @@ class Texture {
 
     void draw(const Rect& draw_rect) const { _impl->draw(draw_rect); }
     void draw(int32_t x, int32_t y) const { _impl->draw(rect(x, y)); }
+    void draw_smooth(const Rect& draw_rect) const { _impl->draw_smooth(draw_rect); }
 
     void draw_cropped(const Rect& dest, const Rect& source) const {
         _impl->draw_cropped(dest, source, RgbColor::white());

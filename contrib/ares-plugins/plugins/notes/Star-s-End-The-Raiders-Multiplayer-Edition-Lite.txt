@@ -1,0 +1,207 @@
+objects:
+    0 misc/tachyon-shadow                      Tachyon Shadow
+    1 dev/tachyon-bolt                         Tachyon Bolt
+    2 baz/evat                                 Corvette
+    3 misc/antimatter-plasma                   Antimatter Plasma
+    4 misc/anti-matter-burn                    Anti-Matter Burn
+    5 zz1/etc/cruiser                          Cruiser
+    6 misc/bullet                              Bullet
+    7 dev/heavy-machinegun                     Heavy Machinegun
+    8 misc/phase-exp                           Phase Exp
+    9 obi/evat                                 Karashoun
+   10 misc/am-explosion                        AM Explosion
+   11 misc/mini-pulsar                         Mini-Pulsar
+   12 dev/pulsar-turret                        Pulsar Turret
+   13 misc/pulsar-explosion                    Pulsar Explosion
+   14 misc/pulsar                              Pulsar
+   15 dev/pulsar-launch                        Pulsar Launch
+   16 misc/graviton-reflex                     Graviton Reflex
+   17 misc/energy-drain                        Energy Drain
+   18 dev/energy-drainer                       Energy Drainer
+   19 gai/class30                              Defense Unit
+   20 misc/bullet-2                            Bullet
+   21 misc/cation-beam                         Cation Beam
+   22 dev/cation-turret                        Cation Turret
+   23 gai/class20                              Support Unit
+   24 ish/etc/transport                        Transport
+   25 misc/huge-explosion                      Huge Explosion
+   26 gai/fighter                              Trooper Unit
+   27 zz1/fighter                              Invader
+   28 misc/stargate                            Stargate
+   29 ish/etc/hyper-fixer                      Hyper Fixer
+   30 dev/hv-missile-launch                    Hv Missile Launch
+   31 ish/etc/interceptor                      Interceptor
+   32 misc/lr-neutron-missle                   LR Neutron Missle
+   33 misc/am-explosion-2                      AM Explosion
+   34 dev/energy-plasma                        Energy Plasma
+   35 misc/rendezvous                          Rendezvous
+   36 ish/etc/transport-2                      Transport
+   37 ish/etc/prisoner                         Prisoner
+   38 misc/cation-beam-2                       Cation Beam
+   39 dev/cation-cannon                        Cation Cannon
+   40 gai/class1                               Fighter Unit
+   41 dev/fighterbay-10                        Fighterbay (10)
+   42 misc/shipyard                            Shipyard
+   43 misc/shipyard-2                          Shipyard
+   44 misc/shipyard-3                          Shipyard
+   45 dev/nuclear-missiles                     Nuclear Missiles
+   46 dev/assault/can                          Assault Team
+   47 can/class50                              Assault Destroyer
+   48 ish/etc/railgun-platform                 Railgun Platform
+   49 misc/outpost                             Outpost
+   50 can/etc/corvette                         Corvette
+   51 misc/nuclear-explosion                   Nuclear Explosion
+   52 misc/nuclear-missile                     Nuclear Missile
+   53 dev/nuclear-missiles-2                   Nuclear Missiles
+   54 misc/holding-position                    Holding Position
+   55 misc/plasma                              Plasma
+   56 misc/plasma-2                            Plasma
+   57 misc/plasma-3                            Plasma
+   58 dev/plasma-shot-2                        Plasma Shot 2
+   59 misc/fleeing-system                      Fleeing system
+   60 ish/etc/assault-cruiser                  Assault Cruiser
+   61 dev/shooter                              Shooter
+   62 dev/change-owner                         Change owner
+   63 dev/assault-team                         Assault Team
+   64 can/etc/eva-trooper                      EVA Trooper
+   65 misc/sensor-buoy                         Sensor Buoy
+   66 misc/object-shooter                      Object Shooter
+   67 misc/planet                              Planet
+   68 misc/stargate-2                          Stargate
+   69 ish/etc/eva-trooper                      EVA Trooper
+   70 dev/assault-team-2                       Assault Team
+   71 ish/class50                              Assault Cruiser
+   72 misc/small-explosion                     Small Explosion
+   73 ish/fighter                              Transport
+   74 misc/nuclear-explosion-2                 Nuclear Explosion
+   75 misc/outpost-2                           Outpost
+   76 misc/med-explosion                       Med Explosion
+   77 misc/asteroid                            Asteroid
+   78 misc/freighter-shoot-u                   Freighter Shoot U
+   79 misc/plasma-4                            Plasma
+   80 dev/plasma-shot-1                        Plasma Shot 1
+   81 dev/hv-machine-turret                    Hv Machine Turret
+   82 can/evat                                 Corvette
+   83 misc/asteroid-2                          Asteroid
+   84 ast/shoot/narrow/up                      Asteroid Shoot Up
+   85 ast/shoot/narrow/down                    Ast Shoot Down
+   86 ish/class40                              Carrier
+   87 dev/neutron-missiles                     Neutron Missiles
+   88 misc/smoke                               Smoke
+   89 ish/class30                              Light Cruiser
+   90 misc/planet-2                            Planet
+   91 dev/neutron-missiles-2                   Neutron Missiles
+   92 misc/heat-explosion                      Heat Explosion
+   93 misc/neutron-missile                     Neutron Missile
+   94 dev/nuke-launcher                        Nuke Launcher
+   95 misc/bullet-3                            Bullet
+   96 dev/machinegun                           Machinegun
+   97 sfx/warp/out                             Warp Out Flare
+   98 sfx/warp/in                              Warp In Flare
+   99 sfx/explosion/missile-hit                Missile Hit
+  100 sfx/energy                               Energy
+  101 ish/class1                               Fighter
+  102 dev/railgun                              Railgun
+  103 misc/shell                               Shell
+  104 misc/ricochet                            Ricochet
+  105 misc/med-explosion-2                     Med Explosion
+  106 sfx/debris/a                             Debris
+  107 sfx/explosion/energy                     Energy Explosion
+  108 sfx/crew                                 Castaway Crew Mem
+  109 can/class1                               Heavy Fighter
+  110 sfx/gunsmoke                             Gunsmoke
+  111 ish/evat                                 Frigate
+  112 dev/machinegun-turret                    Machinegun Turret
+  113 misc/bullet-4                            Bullet
+  114 misc/smoke-2                             Smoke
+  115 misc/large-explosion                     Large Explosion
+  116 misc/small-explosion-2                   Small Explosion
+  117 sfx/debris/c                             Debris
+  118 ish/class20                              Destroyer
+  119 misc/nuclear-missile-2                   Nuclear Missile
+  120 dev/railgun-turret                       Railgun Turret
+  121 misc/shell-2                             Shell
+  122 dev/fighterbay-18                        Fighterbay (18)
+  123 ish/class5                               Merchant Cruiser
+  124 ish/etc/freighter                        Freighter
+  125 misc/ast-shoot-down                      Ast Shoot Down
+  126 misc/asteroid-3                          Asteroid
+  127 ast/regular/medium                       Asteroid Fragment
+  128 ast/regular/small                        Asteroid Debris
+  129 misc/asteroid-shoot-up                   Asteroid Shoot Up
+  130 misc/plasma-exhale                       Plasma Exhale
+  131 zz1/class1                               Corvette
+  132 zz1/class40                              Cruiser
+  133 misc/large-explosion-2                   Large Explosion
+  134 misc/sun                                 Sun
+  135 misc/ast-shoot-upperri                   Ast Shoot Upperri
+  136 misc/ast-shoot-downrig                   Ast Shoot downrig
+  137 misc/asteroid-4                          Asteroid
+  138 misc/asteroid-shoot-up-2                 Asteroid Shoot Up
+  139 misc/ast-shoot-down-2                    Ast Shoot Down
+  140 can/class30                              Escort Carrier
+  141 zz1/etc/cruiser-2                        Cruiser
+  142 misc/ast-shoot-down-3                    Ast Shoot Down
+  143 misc/asteroid-shoot-up-3                 Asteroid Shoot Up
+  144 misc/asteroid-5                          Asteroid
+  145 zz1/etc/disabled-cruiser                 Disabled Cruiser
+  146 misc/stargate-3                          Stargate
+  147 misc/warp-out-flare                      Warp Out Flare
+  148 dev/fighterbay-9                         Fighterbay (9)
+  149 can/class20                              Heavy Destroyer
+  150 can/class40                              Battlecruiser
+  151 dev/plasma-shot-3                        Plasma Shot 3
+  152 dev/fusion-rockets                       Fusion Rockets
+  153 misc/fusion-explosion                    Fusion Explosion
+  154 misc/fusion-rocket                       Fusion Rocket
+  155 dev/neutron-missiles-3                   Neutron Missiles
+  156 misc/planet-3                            Planet
+  157 dev/fighterbay-10-2                      Fighterbay (10)
+  158 misc/stargate-4                          Stargate
+  159 can/fighter                              Troopship
+  160 dev/energy-plasma-2                      Energy Plasma
+  161 misc/energy-plasma                       Energy Plasma
+  162 misc/plasma-exhale-2                     Plasma Exhale
+  163 misc/radar-station                       Radar Station
+  164 misc/prison                              Prison
+  165 gai/evat                                 Assault Unit
+  166 dev/antimatter-plasma                    Antimatter Plasma
+  167 misc/antimatter-plasma-2                 Antimatter Plasma
+  168 misc/anti-matter-burn-2                  Anti-Matter Burn
+  169 misc/anti-matter-boom                    Anti-Matter Boom
+  170 misc/am-explosion-smll                   AM Explosion Smll
+  171 ish/etc/transport-3                      Transport
+  172 misc/prison-2                            Prison
+  173 zz1/etc/neutron-platform                 Neutron Platform
+  174 dev/graviton-cannon                      Graviton Cannon
+  175 misc/graviton                            Graviton
+  176 dev/antimatter-plasma-2                  Antimatter Plasma
+  177 misc/pulsar-off-shoot                    Pulsar Off-Shoot
+  178 misc/pulsar-explosion-2                  Pulsar Explosion
+  179 gai/class40                              Carrier Unit
+  180 misc/lr-energy-drain                     LR Energy Drain
+  181 dev/lr-energy-drainer                    LR Energy Drainer
+  182 dev/rapid-graviton                       Rapid Graviton
+  183 dev/fighterbay-5                         Fighterbay (5)
+  184 misc/primal                              Primal
+  185 dev/primal-nexus                         Primal Nexus
+  186 can/etc/corvette-2                       Corvette
+  187 dev/hv-machine-turret-2                  Hv Machine Turret
+  188 misc/antimatter-plasma-3                 Antimatter Plasma
+  189 misc/antimatter-plasma-4                 Antimatter Plasma
+
+notes:
+     2 x sound 584 not found; dropped
+     2 x disable duration not integral
+     2 x sound 555 not found; dropped
+     2 x sound 574 not found; dropped
+     1 x object 9 portrait 8015 missing
+     1 x non-reflexive create (destination semantics differ slightly)
+     1 x object 19 portrait 8013 missing
+     1 x object 23 portrait 8012 missing
+     1 x object 31 portrait 8006 missing
+     1 x object 40 portrait 8010 missing
+     1 x sound 579 not found; dropped
+     1 x object 165 portrait 8011 missing
+     1 x object 179 portrait 8014 missing
+     1 x sound 1294 not found; dropped

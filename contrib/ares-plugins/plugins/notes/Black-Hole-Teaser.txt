@@ -1,0 +1,59 @@
+objects:
+    0 sfx/debris/a                             Debris
+    1 sfx/explosion/giant                      Giant Explosion
+    2 misc/small-destruction                   Small Destruction
+    3 can/fighter                              Fighter
+    4 dev/bay/can                              Launching Bay
+    5 dev/cluster/pulse                        Cluster Cell
+    6 dev/cluster/turret                       ClusterCell Array
+    7 dev/cm/missile                           C Missile
+    8 dev/cm/launcher                          C Missile Launch
+    9 can/carrier                              Carrier
+   10 sfx/debris/c                             Debris
+   11 misc/giant-explosion                     Giant Explosion
+   12 dev/stealth/item                         Stealth Field
+   13 sfx/explosion/quasi                      Quasimatter Exp
+   14 dev/quasi/pulse                          Quasimatter Pulse
+   15 dev/quasi/gun                            Quasimatter Gun
+   16 can/hvd                                  Heavy Destroyer
+   17 misc/debris                              Debris
+   18 misc/giant-explosion-2                   Giant Explosion
+   19 dev/pk/ish/bolt                          P-K Beam
+   20 dev/pk/ish/gun                           P-K Beam Cannon
+   21 misc/large-hit-explosi                   Large Hit Explosi
+   22 dev/anti1/pulse                          Antimatter Pulse
+   23 misc/antimatter-pulse                    Antimatter Pulse 
+   24 dev/antimatter-pulse                     Antimatter Pulse 
+   25 can/gunship                              Gunship
+   26 sfx/warp/out                             Warp Out Flare
+   27 sfx/warp/in                              Warp In Flare
+   28 sfx/explosion/missile-hit                Missile Hit
+   29 sfx/crew                                 Castaway Crew Mem
+   30 sfx/energy                               Energy
+   31 ele/etc/heavy-destroyer                  Heavy Destroyer
+   32 dev/rapid-onas-pulse                     Rapid Onas Pulse
+   33 dev/onas/pulse                           Onas Pulse
+   34 sfx/explosion/gas                        Gas Explosion
+   35 dev/guidednewo-cannon                    GuidedNewo Cannon
+   36 misc/guided-newo-beam                    Guided Newo Beam
+   37 dev/bay/ish                              Launching Bay
+   38 ele/etc/barrage-drone                    Barrage Drone
+   39 dev/muiltbeam-cannon                     Muiltbeam Cannon
+   40 misc/muiltbeam                           Muiltbeam
+   41 sfx/explosion/energy                     Energy Explosion
+   42 sfx/explosion/large                      Large Explosion
+   43 misc/debris-2                            Debris
+   44 misc/giant-explosion-3                   Giant Explosion
+   45 sfx/debris/b                             Debris
+   46 misc/debris-3                            Debris
+   47 can/cruiser                              Cruiser
+   48 dev/antimatter-pulse-2                   Antimatter Pulse 
+   49 dev/anti2/pulse2                         Antimatter Pulse
+   50 dev/pk/can/gun                           P-K Beam Cannon
+   51 dev/pk/can/bolt                          P-K Beam
+   52 dev/stealth-field                        Stealth Field
+   53 misc/large-explosion                     Large Explosion
+
+notes:
+     4 x initial reference 44 past 19 initials; set to none
+     1 x object 31 portrait 1278 missing

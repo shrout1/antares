@@ -1,0 +1,1193 @@
+objects:
+    0 sal/fighter                              Fighter
+    1 dev/bay/sal                              Launching Bay
+    2 sal/carrier                              Carrier
+    3 ish/hvc                                  Heavy Cruiser
+    4 dev/at-launch-bay                        AT Launch Bay
+    5 zz1/etc/assault-ship                     Assault Ship
+    6 ish/etc/hvc/mod                          Modified Cruiser
+    7 sal/cruiser                              Cruiser
+    8 loc/flak                                 Flak Drone
+    9 loc/bunker                               Bunker Station
+   10 ish/evat                                 EVA Trooper
+   11 dev/assault/ish                          Assault Team
+   12 ish/aslttran                             Assault Transport
+   13 aud/evat                                 EVA Trooper
+   14 dev/assault/gai                          Assault Team
+   15 dev/amissile/missile                     Missile
+   16 dev/amissile/launcher                    A Missile Launch
+   17 aud/aslttran                             Assault Transport
+   18 dev/egpb                                 EGPB
+   19 ish/etc/attack-transport                 Attack Transport
+   20 ish/etc/eva-trooper                      EVA Trooper
+   21 dev/assault/aud                          Assault Team
+   22 ish/etc/assault-transport                Assault Transport
+   23 aud/etc/eva-trooper                      EVA Trooper
+   24 dev/assault/sal                          Assault Team
+   25 misc/missile                             Missile
+   26 dev/a-missile-launch                     A Missile Launch
+   27 aud/etc/assault-transport                Assault Transport
+   28 aud/etc/eva-trooper-2                    EVA Trooper
+   29 dev/assault-team                         Assault Team
+   30 misc/missile-2                           Missile
+   31 dev/a-missile-launch-2                   A Missile Launch
+   32 aud/etc/assault-transport-2              Assault Transport
+   33 ish/etc/assault-transport-2              Assault Transport
+   34 ish/etc/eva-trooper-2                    EVA Trooper
+   35 dev/assault-team-2                       Assault Team
+   36 dev/egpb-2                               EGPB
+   37 ish/etc/attack-transport-2               Attack Transport
+   38 dev/egpb-3                               EGPB
+   39 ish/etc/attack-transport-3               Attack Transport
+   40 ish/etc/eva-trooper-3                    EVA Trooper
+   41 dev/assault-team-3                       Assault Team
+   42 ish/etc/assault-transport-3              Assault Transport
+   43 aud/etc/eva-trooper-3                    EVA Trooper
+   44 dev/assault-team-4                       Assault Team
+   45 misc/missile-3                           Missile
+   46 dev/a-missile-launch-3                   A Missile Launch
+   47 aud/etc/assault-transport-3              Assault Transport
+   48 aud/etc/eva-trooper-4                    EVA Trooper
+   49 dev/assault-team-5                       Assault Team
+   50 misc/missile-4                           Missile
+   51 dev/a-missile-launch-4                   A Missile Launch
+   52 aud/etc/assault-transport-4              Assault Transport
+   53 ish/etc/assault-transport-4              Assault Transport
+   54 ish/etc/eva-trooper-4                    EVA Trooper
+   55 dev/assault-team-6                       Assault Team
+   56 dev/egpb-4                               EGPB
+   57 ish/etc/attack-transport-4               Attack Transport
+   58 dev/egpb-5                               EGPB
+   59 ish/etc/attack-transport-5               Attack Transport
+   60 ish/etc/eva-trooper-5                    EVA Trooper
+   61 dev/assault-team-7                       Assault Team
+   62 ish/etc/assault-transport-5              Assault Transport
+   63 aud/etc/eva-trooper-5                    EVA Trooper
+   64 dev/assault-team-8                       Assault Team
+   65 misc/missile-5                           Missile
+   66 dev/a-missile-launch-5                   A Missile Launch
+   67 aud/etc/assault-transport-5              Assault Transport
+   68 aud/etc/eva-trooper-6                    EVA Trooper
+   69 dev/assault-team-9                       Assault Team
+   70 misc/missile-6                           Missile
+   71 dev/a-missile-launch-6                   A Missile Launch
+   72 aud/etc/assault-transport-6              Assault Transport
+   73 ish/etc/assault-transport-6              Assault Transport
+   74 ish/etc/eva-trooper-6                    EVA Trooper
+   75 dev/assault-team-10                      Assault Team
+   76 dev/egpb-6                               EGPB
+   77 ish/etc/attack-transport-6               Attack Transport
+   78 dev/egpb-7                               EGPB
+   79 ish/etc/attack-transport-7               Attack Transport
+   80 ish/etc/eva-trooper-7                    EVA Trooper
+   81 dev/assault-team-11                      Assault Team
+   82 ish/etc/assault-transport-7              Assault Transport
+   83 aud/etc/eva-trooper-7                    EVA Trooper
+   84 dev/assault-team-12                      Assault Team
+   85 misc/missile-7                           Missile
+   86 dev/a-missile-launch-7                   A Missile Launch
+   87 aud/etc/assault-transport-7              Assault Transport
+   88 aud/etc/eva-trooper-8                    EVA Trooper
+   89 dev/assault-team-13                      Assault Team
+   90 misc/missile-8                           Missile
+   91 dev/a-missile-launch-8                   A Missile Launch
+   92 aud/etc/assault-transport-8              Assault Transport
+   93 ish/etc/assault-transport-8              Assault Transport
+   94 ish/etc/eva-trooper-8                    EVA Trooper
+   95 dev/assault-team-14                      Assault Team
+   96 dev/egpb-8                               EGPB
+   97 ish/etc/attack-transport-8               Attack Transport
+   98 dev/egpb-9                               EGPB
+   99 ish/etc/attack-transport-9               Attack Transport
+  100 ish/etc/eva-trooper-9                    EVA Trooper
+  101 dev/assault-team-15                      Assault Team
+  102 ish/etc/assault-transport-9              Assault Transport
+  103 aud/etc/eva-trooper-9                    EVA Trooper
+  104 dev/assault-team-16                      Assault Team
+  105 misc/missile-9                           Missile
+  106 dev/a-missile-launch-9                   A Missile Launch
+  107 aud/etc/assault-transport-9              Assault Transport
+  108 ish/engineer                             Engineer Pod
+  109 ish/etc/engineer-pod                     Engineer Pod
+  110 ish/etc/engineer-pod-2                   Engineer Pod
+  111 ish/etc/engineer-pod-3                   Engineer Pod
+  112 ish/etc/engineer-pod-4                   Engineer Pod
+  113 ish/etc/engineer-pod-5                   Engineer Pod
+  114 ish/etc/engineer-pod-6                   Engineer Pod
+  115 ish/etc/engineer-pod-7                   Engineer Pod
+  116 ish/etc/engineer-pod-8                   Engineer Pod
+  117 aud/cruiser                              Cruiser
+  118 ish/cruiser                              Cruiser
+  119 ish/etc/cruiser                          Cruiser
+  120 aud/etc/cruiser                          Cruiser
+  121 aud/etc/cruiser-2                        Cruiser
+  122 ish/etc/cruiser-2                        Cruiser
+  123 ish/etc/cruiser-3                        Cruiser
+  124 aud/etc/cruiser-3                        Cruiser
+  125 aud/etc/cruiser-4                        Cruiser
+  126 ish/etc/cruiser-4                        Cruiser
+  127 ish/etc/cruiser-5                        Cruiser
+  128 aud/etc/cruiser-5                        Cruiser
+  129 aud/etc/cruiser-6                        Cruiser
+  130 ish/etc/cruiser-6                        Cruiser
+  131 ish/etc/cruiser-7                        Cruiser
+  132 aud/etc/cruiser-7                        Cruiser
+  133 aud/etc/cruiser-8                        Cruiser
+  134 ish/etc/cruiser-8                        Cruiser
+  135 ish/etc/cruiser-9                        Cruiser
+  136 aud/etc/cruiser-9                        Cruiser
+  137 aud/etc/cruiser-10                       Cruiser
+  138 ish/etc/cruiser-10                       Cruiser
+  139 ish/etc/cruiser-11                       Cruiser
+  140 aud/etc/cruiser-11                       Cruiser
+  141 aud/etc/cruiser-12                       Cruiser
+  142 ish/etc/cruiser-12                       Cruiser
+  143 ish/etc/cruiser-13                       Cruiser
+  144 aud/etc/cruiser-13                       Cruiser
+  145 aud/etc/cruiser-14                       Cruiser
+  146 ish/etc/cruiser-14                       Cruiser
+  147 ish/etc/cruiser-15                       Cruiser
+  148 aud/etc/cruiser-15                       Cruiser
+  149 aud/etc/cruiser-16                       Cruiser
+  150 ish/etc/cruiser-16                       Cruiser
+  151 ish/etc/cruiser-17                       Cruiser
+  152 aud/etc/cruiser-17                       Cruiser
+  153 aud/etc/cruiser-18                       Cruiser
+  154 ish/etc/cruiser-18                       Cruiser
+  155 ish/etc/cruiser-19                       Cruiser
+  156 aud/etc/cruiser-19                       Cruiser
+  157 aud/etc/cruiser-20                       Cruiser
+  158 ish/etc/cruiser-20                       Cruiser
+  159 ish/etc/cruiser-21                       Cruiser
+  160 aud/etc/cruiser-21                       Cruiser
+  161 aud/etc/cruiser-22                       Cruiser
+  162 ish/etc/cruiser-22                       Cruiser
+  163 ish/etc/cruiser-23                       Cruiser
+  164 aud/etc/cruiser-23                       Cruiser
+  165 aud/etc/cruiser-24                       Cruiser
+  166 ish/etc/cruiser-24                       Cruiser
+  167 ish/etc/cruiser-25                       Cruiser
+  168 aud/etc/cruiser-25                       Cruiser
+  169 aud/etc/cruiser-26                       Cruiser
+  170 ish/etc/cruiser-26                       Cruiser
+  171 ish/etc/cruiser-27                       Cruiser
+  172 aud/etc/cruiser-27                       Cruiser
+  173 aud/etc/cruiser-28                       Cruiser
+  174 ish/etc/cruiser-28                       Cruiser
+  175 ish/etc/cruiser-29                       Cruiser
+  176 aud/etc/cruiser-29                       Cruiser
+  177 aud/etc/cruiser-30                       Cruiser
+  178 ish/etc/cruiser-30                       Cruiser
+  179 aud/fighter                              Fighter
+  180 ish/fighter                              Fighter
+  181 aud/etc/fighter                          Fighter
+  182 ish/etc/fighter                          Fighter
+  183 ish/etc/fighter-2                        Fighter
+  184 aud/etc/fighter-2                        Fighter
+  185 ish/etc/fighter-3                        Fighter
+  186 aud/etc/fighter-3                        Fighter
+  187 aud/etc/fighter-4                        Fighter
+  188 ish/etc/fighter-4                        Fighter
+  189 ish/etc/fighter-5                        Fighter
+  190 aud/etc/fighter-5                        Fighter
+  191 aud/etc/fighter-6                        Fighter
+  192 ish/etc/fighter-6                        Fighter
+  193 ish/etc/fighter-7                        Fighter
+  194 aud/etc/fighter-7                        Fighter
+  195 aud/etc/fighter-8                        Fighter
+  196 ish/etc/fighter-8                        Fighter
+  197 ish/etc/cruiser-31                       Cruiser
+  198 aud/etc/cruiser-31                       Cruiser
+  199 aud/etc/cruiser-32                       Cruiser
+  200 ish/etc/cruiser-32                       Cruiser
+  201 ish/etc/cruiser-33                       Cruiser
+  202 aud/etc/cruiser-33                       Cruiser
+  203 aud/etc/cruiser-34                       Cruiser
+  204 ish/etc/cruiser-34                       Cruiser
+  205 ish/etc/cruiser-35                       Cruiser
+  206 aud/etc/cruiser-35                       Cruiser
+  207 aud/etc/cruiser-36                       Cruiser
+  208 ish/etc/cruiser-36                       Cruiser
+  209 ish/etc/cruiser-37                       Cruiser
+  210 aud/etc/cruiser-37                       Cruiser
+  211 aud/etc/cruiser-38                       Cruiser
+  212 ish/etc/cruiser-38                       Cruiser
+  213 ish/etc/cruiser-39                       Cruiser
+  214 aud/etc/cruiser-39                       Cruiser
+  215 aud/etc/cruiser-40                       Cruiser
+  216 ish/etc/cruiser-40                       Cruiser
+  217 ish/etc/cruiser-41                       Cruiser
+  218 aud/etc/cruiser-41                       Cruiser
+  219 aud/etc/cruiser-42                       Cruiser
+  220 ish/etc/cruiser-42                       Cruiser
+  221 ish/etc/cruiser-43                       Cruiser
+  222 aud/etc/cruiser-43                       Cruiser
+  223 aud/etc/cruiser-44                       Cruiser
+  224 ish/etc/cruiser-44                       Cruiser
+  225 ish/etc/cruiser-45                       Cruiser
+  226 aud/etc/cruiser-45                       Cruiser
+  227 aud/etc/cruiser-46                       Cruiser
+  228 ish/etc/cruiser-46                       Cruiser
+  229 ish/etc/cruiser-47                       Cruiser
+  230 aud/etc/cruiser-47                       Cruiser
+  231 aud/etc/cruiser-48                       Cruiser
+  232 ish/etc/cruiser-48                       Cruiser
+  233 ish/etc/cruiser-49                       Cruiser
+  234 aud/etc/cruiser-49                       Cruiser
+  235 aud/etc/cruiser-50                       Cruiser
+  236 ish/etc/cruiser-50                       Cruiser
+  237 ish/etc/cruiser-51                       Cruiser
+  238 aud/etc/cruiser-51                       Cruiser
+  239 aud/etc/cruiser-52                       Cruiser
+  240 ish/etc/cruiser-52                       Cruiser
+  241 ish/etc/cruiser-53                       Cruiser
+  242 aud/etc/cruiser-53                       Cruiser
+  243 aud/etc/cruiser-54                       Cruiser
+  244 ish/etc/cruiser-54                       Cruiser
+  245 ish/etc/cruiser-55                       Cruiser
+  246 aud/etc/cruiser-55                       Cruiser
+  247 aud/etc/cruiser-56                       Cruiser
+  248 ish/etc/cruiser-56                       Cruiser
+  249 ish/etc/cruiser-57                       Cruiser
+  250 aud/etc/cruiser-57                       Cruiser
+  251 aud/etc/cruiser-58                       Cruiser
+  252 ish/etc/cruiser-58                       Cruiser
+  253 ish/etc/cruiser-59                       Cruiser
+  254 aud/etc/cruiser-59                       Cruiser
+  255 aud/etc/cruiser-60                       Cruiser
+  256 ish/etc/cruiser-60                       Cruiser
+  257 ish/etc/cruiser-61                       Cruiser
+  258 aud/etc/cruiser-61                       Cruiser
+  259 ish/etc/fighter-9                        Fighter
+  260 dev/bay/can                              Launching Bay
+  261 ish/carrier                              Carrier
+  262 aud/etc/fighter-9                        Fighter
+  263 dev/bay/aud                              Launching Bay
+  264 aud/carrier                              Carrier
+  265 aud/etc/fighter-10                       Fighter
+  266 dev/bay/uns                              Launching Bay
+  267 misc/missile-10                          Missile
+  268 dev/a-missile-launch-10                  A Missile Launch
+  269 aud/etc/carrier                          Carrier
+  270 ish/etc/fighter-10                       Fighter
+  271 dev/bay/ish                              Launching Bay
+  272 ish/etc/carrier                          Carrier
+  273 ish/etc/fighter-11                       Fighter
+  274 dev/launching-bay                        Launching Bay
+  275 ish/etc/carrier-2                        Carrier
+  276 aud/etc/fighter-11                       Fighter
+  277 dev/launching-bay-2                      Launching Bay
+  278 misc/missile-11                          Missile
+  279 dev/a-missile-launch-11                  A Missile Launch
+  280 aud/etc/carrier-2                        Carrier
+  281 aud/etc/fighter-12                       Fighter
+  282 dev/launching-bay-3                      Launching Bay
+  283 misc/missile-12                          Missile
+  284 dev/a-missile-launch-12                  A Missile Launch
+  285 aud/etc/carrier-3                        Carrier
+  286 ish/etc/fighter-12                       Fighter
+  287 dev/launching-bay-4                      Launching Bay
+  288 ish/etc/carrier-3                        Carrier
+  289 ish/etc/fighter-13                       Fighter
+  290 dev/launching-bay-5                      Launching Bay
+  291 ish/etc/carrier-4                        Carrier
+  292 aud/etc/fighter-13                       Fighter
+  293 dev/launching-bay-6                      Launching Bay
+  294 misc/missile-13                          Missile
+  295 dev/a-missile-launch-13                  A Missile Launch
+  296 aud/etc/carrier-4                        Carrier
+  297 ish/hvd                                  Heavy Destroyer
+  298 aud/hvd                                  Heavy Destroyer
+  299 misc/missile-14                          Missile
+  300 dev/a-missile-launch-14                  A Missile Launch
+  301 aud/etc/heavy-destroyer                  Heavy Destroyer
+  302 ish/etc/heavy-destroyer                  Heavy Destroyer
+  303 ish/etc/heavy-destroyer-2                Heavy Destroyer
+  304 misc/missile-15                          Missile
+  305 dev/a-missile-launch-15                  A Missile Launch
+  306 aud/etc/heavy-destroyer-2                Heavy Destroyer
+  307 misc/missile-16                          Missile
+  308 dev/a-missile-launch-16                  A Missile Launch
+  309 aud/etc/heavy-destroyer-3                Heavy Destroyer
+  310 ish/etc/heavy-destroyer-3                Heavy Destroyer
+  311 ish/etc/heavy-destroyer-4                Heavy Destroyer
+  312 misc/missile-17                          Missile
+  313 dev/a-missile-launch-17                  A Missile Launch
+  314 aud/etc/heavy-destroyer-4                Heavy Destroyer
+  315 aud/gunship                              Gunship
+  316 ish/gunship                              Gunship
+  317 ish/etc/gunship                          Gunship
+  318 aud/etc/gunship                          Gunship
+  319 aud/etc/gunship-2                        Gunship
+  320 ish/etc/gunship-2                        Gunship
+  321 ish/etc/gunship-3                        Gunship
+  322 aud/etc/gunship-3                        Gunship
+  323 aud/etc/gunship-4                        Gunship
+  324 ish/etc/gunship-4                        Gunship
+  325 ish/etc/gunship-5                        Gunship
+  326 aud/etc/gunship-5                        Gunship
+  327 aud/etc/gunship-6                        Gunship
+  328 ish/etc/gunship-6                        Gunship
+  329 ish/etc/gunship-7                        Gunship
+  330 aud/etc/gunship-7                        Gunship
+  331 aud/etc/gunship-8                        Gunship
+  332 ish/etc/gunship-8                        Gunship
+  333 aud/etc/gunship-9                        Gunship
+  334 ish/etc/gunship-9                        Gunship
+  335 aud/etc/cruiser-62                       Cruiser
+  336 ish/etc/cruiser-62                       Cruiser
+  337 ish/etc/cruiser-63                       Cruiser
+  338 aud/etc/cruiser-63                       Cruiser
+  339 aud/etc/cruiser-64                       Cruiser
+  340 ish/etc/cruiser-64                       Cruiser
+  341 ish/etc/cruiser-65                       Cruiser
+  342 aud/etc/cruiser-65                       Cruiser
+  343 aud/etc/cruiser-66                       Cruiser
+  344 ish/etc/cruiser-66                       Cruiser
+  345 ish/etc/cruiser-67                       Cruiser
+  346 aud/etc/cruiser-67                       Cruiser
+  347 aud/etc/cruiser-68                       Cruiser
+  348 ish/etc/cruiser-68                       Cruiser
+  349 ish/etc/cruiser-69                       Cruiser
+  350 aud/etc/cruiser-69                       Cruiser
+  351 aud/etc/cruiser-70                       Cruiser
+  352 ish/etc/cruiser-70                       Cruiser
+  353 ish/etc/cruiser-71                       Cruiser
+  354 aud/etc/cruiser-71                       Cruiser
+  355 aud/etc/cruiser-72                       Cruiser
+  356 ish/etc/cruiser-72                       Cruiser
+  357 ish/etc/cruiser-73                       Cruiser
+  358 aud/etc/cruiser-73                       Cruiser
+  359 aud/etc/cruiser-74                       Cruiser
+  360 ish/etc/cruiser-74                       Cruiser
+  361 ish/etc/cruiser-75                       Cruiser
+  362 aud/etc/cruiser-75                       Cruiser
+  363 aud/etc/cruiser-76                       Cruiser
+  364 ish/etc/cruiser-76                       Cruiser
+  365 ish/etc/cruiser-77                       Cruiser
+  366 aud/etc/cruiser-77                       Cruiser
+  367 aud/etc/cruiser-78                       Cruiser
+  368 ish/etc/cruiser-78                       Cruiser
+  369 ish/etc/cruiser-79                       Cruiser
+  370 aud/etc/cruiser-79                       Cruiser
+  371 aud/etc/cruiser-80                       Cruiser
+  372 ish/etc/cruiser-80                       Cruiser
+  373 ish/etc/cruiser-81                       Cruiser
+  374 aud/etc/cruiser-81                       Cruiser
+  375 aud/etc/cruiser-82                       Cruiser
+  376 ish/etc/cruiser-82                       Cruiser
+  377 ish/etc/cruiser-83                       Cruiser
+  378 aud/etc/cruiser-83                       Cruiser
+  379 aud/etc/cruiser-84                       Cruiser
+  380 ish/etc/cruiser-84                       Cruiser
+  381 ish/etc/cruiser-85                       Cruiser
+  382 aud/etc/cruiser-85                       Cruiser
+  383 aud/etc/cruiser-86                       Cruiser
+  384 ish/etc/cruiser-86                       Cruiser
+  385 ish/etc/cruiser-87                       Cruiser
+  386 aud/etc/cruiser-87                       Cruiser
+  387 aud/etc/cruiser-88                       Cruiser
+  388 ish/etc/cruiser-88                       Cruiser
+  389 ish/etc/cruiser-89                       Cruiser
+  390 aud/etc/cruiser-89                       Cruiser
+  391 aud/etc/cruiser-90                       Cruiser
+  392 ish/etc/cruiser-90                       Cruiser
+  393 ish/etc/cruiser-91                       Cruiser
+  394 aud/etc/cruiser-91                       Cruiser
+  395 aud/etc/cruiser-92                       Cruiser
+  396 ish/etc/cruiser-92                       Cruiser
+  397 aud/etc/eva-trooper-10                   EVA Trooper
+  398 dev/assault-team-17                      Assault Team
+  399 misc/missile-18                          Missile
+  400 dev/a-missile-launch-18                  A Missile Launch
+  401 aud/etc/assault-transport-10             Assault Transport
+  402 ish/etc/assault-transport-10             Assault Transport
+  403 ish/etc/eva-trooper-10                   EVA Trooper
+  404 dev/assault-team-18                      Assault Team
+  405 ish/etc/engineer-pod-9                   Engineer Pod
+  406 dev/egpb-10                              EGPB
+  407 ish/etc/attack-transport-10              Attack Transport
+  408 ish/etc/engineer-pod-10                  Engineer Pod
+  409 dev/egpb-11                              EGPB
+  410 ish/etc/attack-transport-11              Attack Transport
+  411 ish/etc/eva-trooper-11                   EVA Trooper
+  412 dev/assault-team-19                      Assault Team
+  413 ish/etc/assault-transport-11             Assault Transport
+  414 aud/etc/eva-trooper-11                   EVA Trooper
+  415 dev/assault-team-20                      Assault Team
+  416 misc/missile-19                          Missile
+  417 dev/a-missile-launch-19                  A Missile Launch
+  418 aud/etc/assault-transport-11             Assault Transport
+  419 aud/etc/eva-trooper-12                   EVA Trooper
+  420 dev/assault-team-21                      Assault Team
+  421 misc/missile-20                          Missile
+  422 dev/a-missile-launch-20                  A Missile Launch
+  423 aud/etc/assault-transport-12             Assault Transport
+  424 ish/etc/assault-transport-12             Assault Transport
+  425 ish/etc/eva-trooper-12                   EVA Trooper
+  426 dev/assault-team-22                      Assault Team
+  427 ish/etc/engineer-pod-11                  Engineer Pod
+  428 dev/egpb-12                              EGPB
+  429 ish/etc/attack-transport-12              Attack Transport
+  430 ish/etc/engineer-pod-12                  Engineer Pod
+  431 dev/egpb-13                              EGPB
+  432 ish/etc/attack-transport-13              Attack Transport
+  433 ish/etc/eva-trooper-13                   EVA Trooper
+  434 dev/assault-team-23                      Assault Team
+  435 ish/etc/assault-transport-13             Assault Transport
+  436 aud/etc/eva-trooper-13                   EVA Trooper
+  437 dev/assault-team-24                      Assault Team
+  438 misc/missile-21                          Missile
+  439 dev/a-missile-launch-21                  A Missile Launch
+  440 aud/etc/assault-transport-13             Assault Transport
+  441 aud/etc/eva-trooper-14                   EVA Trooper
+  442 dev/assault-team-25                      Assault Team
+  443 misc/missile-22                          Missile
+  444 dev/a-missile-launch-22                  A Missile Launch
+  445 aud/etc/assault-transport-14             Assault Transport
+  446 ish/etc/assault-transport-14             Assault Transport
+  447 ish/etc/eva-trooper-14                   EVA Trooper
+  448 dev/assault-team-26                      Assault Team
+  449 ish/etc/engineer-pod-13                  Engineer Pod
+  450 dev/egpb-14                              EGPB
+  451 ish/etc/attack-transport-14              Attack Transport
+  452 ish/etc/engineer-pod-14                  Engineer Pod
+  453 dev/egpb-15                              EGPB
+  454 ish/etc/attack-transport-15              Attack Transport
+  455 ish/etc/eva-trooper-15                   EVA Trooper
+  456 dev/assault-team-27                      Assault Team
+  457 ish/etc/assault-transport-15             Assault Transport
+  458 aud/etc/eva-trooper-15                   EVA Trooper
+  459 dev/assault-team-28                      Assault Team
+  460 misc/missile-23                          Missile
+  461 dev/a-missile-launch-23                  A Missile Launch
+  462 aud/etc/assault-transport-15             Assault Transport
+  463 aud/etc/eva-trooper-16                   EVA Trooper
+  464 dev/assault-team-29                      Assault Team
+  465 misc/missile-24                          Missile
+  466 dev/a-missile-launch-24                  A Missile Launch
+  467 aud/etc/assault-transport-16             Assault Transport
+  468 ish/etc/assault-transport-16             Assault Transport
+  469 ish/etc/eva-trooper-16                   EVA Trooper
+  470 dev/assault-team-30                      Assault Team
+  471 ish/etc/engineer-pod-15                  Engineer Pod
+  472 dev/egpb-16                              EGPB
+  473 ish/etc/attack-transport-16              Attack Transport
+  474 ish/etc/engineer-pod-16                  Engineer Pod
+  475 dev/egpb-17                              EGPB
+  476 ish/etc/attack-transport-17              Attack Transport
+  477 ish/etc/eva-trooper-17                   EVA Trooper
+  478 dev/assault-team-31                      Assault Team
+  479 ish/etc/assault-transport-17             Assault Transport
+  480 aud/etc/eva-trooper-17                   EVA Trooper
+  481 dev/assault-team-32                      Assault Team
+  482 misc/missile-25                          Missile
+  483 dev/a-missile-launch-25                  A Missile Launch
+  484 aud/etc/assault-transport-17             Assault Transport
+  485 aud/etc/eva-trooper-18                   EVA Trooper
+  486 dev/assault-team-33                      Assault Team
+  487 misc/missile-26                          Missile
+  488 dev/a-missile-launch-26                  A Missile Launch
+  489 aud/etc/assault-transport-18             Assault Transport
+  490 ish/etc/assault-transport-18             Assault Transport
+  491 ish/etc/eva-trooper-18                   EVA Trooper
+  492 dev/assault-team-34                      Assault Team
+  493 ish/etc/engineer-pod-17                  Engineer Pod
+  494 dev/egpb-18                              EGPB
+  495 ish/etc/attack-transport-18              Attack Transport
+  496 aud/etc/eva-trooper-19                   EVA Trooper
+  497 dev/assault-team-35                      Assault Team
+  498 misc/missile-27                          Missile
+  499 dev/a-missile-launch-27                  A Missile Launch
+  500 aud/etc/assault-transport-19             Assault Transport
+  501 ish/etc/eva-trooper-19                   EVA Trooper
+  502 dev/assault-team-36                      Assault Team
+  503 ish/etc/assault-transport-19             Assault Transport
+  504 ish/etc/eva-trooper-20                   EVA Trooper
+  505 dev/assault-team-37                      Assault Team
+  506 ish/etc/assault-transport-20             Assault Transport
+  507 aud/etc/eva-trooper-20                   EVA Trooper
+  508 dev/assault-team-38                      Assault Team
+  509 misc/missile-28                          Missile
+  510 dev/a-missile-launch-28                  A Missile Launch
+  511 aud/etc/assault-transport-20             Assault Transport
+  512 ish/etc/engineer-pod-18                  Engineer Pod
+  513 dev/egpb-19                              EGPB
+  514 ish/etc/attack-transport-19              Attack Transport
+  515 ish/etc/eva-trooper-21                   EVA Trooper
+  516 dev/assault-team-39                      Assault Team
+  517 ish/etc/assault-transport-21             Assault Transport
+  518 aud/etc/eva-trooper-21                   EVA Trooper
+  519 dev/assault-team-40                      Assault Team
+  520 misc/missile-29                          Missile
+  521 dev/a-missile-launch-29                  A Missile Launch
+  522 aud/etc/assault-transport-21             Assault Transport
+  523 aud/etc/eva-trooper-22                   EVA Trooper
+  524 dev/assault-team-41                      Assault Team
+  525 misc/missile-30                          Missile
+  526 dev/a-missile-launch-30                  A Missile Launch
+  527 aud/etc/assault-transport-22             Assault Transport
+  528 ish/etc/assault-transport-22             Assault Transport
+  529 ish/etc/eva-trooper-22                   EVA Trooper
+  530 dev/assault-team-42                      Assault Team
+  531 ish/etc/engineer-pod-19                  Engineer Pod
+  532 dev/egpb-20                              EGPB
+  533 ish/etc/attack-transport-20              Attack Transport
+  534 ish/etc/engineer-pod-20                  Engineer Pod
+  535 dev/egpb-21                              EGPB
+  536 ish/etc/attack-transport-21              Attack Transport
+  537 ish/etc/eva-trooper-23                   EVA Trooper
+  538 dev/assault-team-43                      Assault Team
+  539 ish/etc/assault-transport-23             Assault Transport
+  540 aud/etc/eva-trooper-23                   EVA Trooper
+  541 dev/assault-team-44                      Assault Team
+  542 misc/missile-31                          Missile
+  543 dev/a-missile-launch-31                  A Missile Launch
+  544 aud/etc/assault-transport-23             Assault Transport
+  545 aud/etc/eva-trooper-24                   EVA Trooper
+  546 dev/assault-team-45                      Assault Team
+  547 misc/missile-32                          Missile
+  548 dev/a-missile-launch-32                  A Missile Launch
+  549 aud/etc/assault-transport-24             Assault Transport
+  550 ish/etc/assault-transport-24             Assault Transport
+  551 ish/etc/eva-trooper-24                   EVA Trooper
+  552 dev/assault-team-46                      Assault Team
+  553 ish/etc/engineer-pod-21                  Engineer Pod
+  554 dev/egpb-22                              EGPB
+  555 ish/etc/attack-transport-22              Attack Transport
+  556 ish/etc/engineer-pod-22                  Engineer Pod
+  557 dev/egpb-23                              EGPB
+  558 ish/etc/attack-transport-23              Attack Transport
+  559 ish/etc/eva-trooper-25                   EVA Trooper
+  560 dev/assault-team-47                      Assault Team
+  561 ish/etc/assault-transport-25             Assault Transport
+  562 aud/etc/eva-trooper-25                   EVA Trooper
+  563 dev/assault-team-48                      Assault Team
+  564 misc/missile-33                          Missile
+  565 dev/a-missile-launch-33                  A Missile Launch
+  566 aud/etc/assault-transport-25             Assault Transport
+  567 aud/etc/eva-trooper-26                   EVA Trooper
+  568 dev/assault-team-49                      Assault Team
+  569 misc/missile-34                          Missile
+  570 dev/a-missile-launch-34                  A Missile Launch
+  571 aud/etc/assault-transport-26             Assault Transport
+  572 ish/etc/assault-transport-26             Assault Transport
+  573 ish/etc/eva-trooper-26                   EVA Trooper
+  574 dev/assault-team-50                      Assault Team
+  575 ish/etc/engineer-pod-23                  Engineer Pod
+  576 dev/egpb-24                              EGPB
+  577 ish/etc/attack-transport-24              Attack Transport
+  578 ish/etc/engineer-pod-24                  Engineer Pod
+  579 dev/egpb-25                              EGPB
+  580 ish/etc/attack-transport-25              Attack Transport
+  581 ish/etc/eva-trooper-27                   EVA Trooper
+  582 dev/assault-team-51                      Assault Team
+  583 ish/etc/assault-transport-27             Assault Transport
+  584 aud/etc/eva-trooper-27                   EVA Trooper
+  585 dev/assault-team-52                      Assault Team
+  586 misc/missile-35                          Missile
+  587 dev/a-missile-launch-35                  A Missile Launch
+  588 aud/etc/assault-transport-27             Assault Transport
+  589 aud/etc/eva-trooper-28                   EVA Trooper
+  590 dev/assault-team-53                      Assault Team
+  591 misc/missile-36                          Missile
+  592 dev/a-missile-launch-36                  A Missile Launch
+  593 aud/etc/assault-transport-28             Assault Transport
+  594 ish/etc/assault-transport-28             Assault Transport
+  595 ish/etc/eva-trooper-28                   EVA Trooper
+  596 dev/assault-team-54                      Assault Team
+  597 ish/etc/engineer-pod-25                  Engineer Pod
+  598 dev/egpb-26                              EGPB
+  599 ish/etc/attack-transport-26              Attack Transport
+  600 ish/etc/engineer-pod-26                  Engineer Pod
+  601 dev/egpb-27                              EGPB
+  602 ish/etc/attack-transport-27              Attack Transport
+  603 ish/etc/eva-trooper-29                   EVA Trooper
+  604 dev/assault-team-55                      Assault Team
+  605 ish/etc/assault-transport-29             Assault Transport
+  606 aud/etc/eva-trooper-29                   EVA Trooper
+  607 dev/assault-team-56                      Assault Team
+  608 misc/missile-37                          Missile
+  609 dev/a-missile-launch-37                  A Missile Launch
+  610 aud/etc/assault-transport-29             Assault Transport
+  611 ish/etc/gunship-10                       Gunship
+  612 aud/etc/gunship-10                       Gunship
+  613 ish/etc/gunship-11                       Gunship
+  614 aud/etc/gunship-11                       Gunship
+  615 aud/etc/gunship-12                       Gunship
+  616 ish/etc/gunship-12                       Gunship
+  617 ish/etc/gunship-13                       Gunship
+  618 aud/etc/gunship-13                       Gunship
+  619 aud/etc/gunship-14                       Gunship
+  620 ish/etc/gunship-14                       Gunship
+  621 ish/etc/gunship-15                       Gunship
+  622 aud/etc/gunship-15                       Gunship
+  623 aud/etc/gunship-16                       Gunship
+  624 ish/etc/gunship-16                       Gunship
+  625 ish/etc/gunship-17                       Gunship
+  626 aud/etc/gunship-17                       Gunship
+  627 aud/etc/gunship-18                       Gunship
+  628 ish/etc/gunship-18                       Gunship
+  629 ish/etc/gunship-19                       Gunship
+  630 aud/etc/gunship-19                       Gunship
+  631 ish/etc/cruiser-93                       Cruiser
+  632 aud/etc/cruiser-93                       Cruiser
+  633 aud/etc/cruiser-94                       Cruiser
+  634 ish/etc/cruiser-94                       Cruiser
+  635 ish/etc/cruiser-95                       Cruiser
+  636 aud/etc/cruiser-95                       Cruiser
+  637 aud/etc/cruiser-96                       Cruiser
+  638 ish/etc/cruiser-96                       Cruiser
+  639 ish/etc/cruiser-97                       Cruiser
+  640 aud/etc/cruiser-97                       Cruiser
+  641 aud/etc/cruiser-98                       Cruiser
+  642 ish/etc/cruiser-98                       Cruiser
+  643 ish/etc/cruiser-99                       Cruiser
+  644 aud/etc/cruiser-99                       Cruiser
+  645 aud/etc/cruiser-100                      Cruiser
+  646 ish/etc/cruiser-100                      Cruiser
+  647 ish/etc/cruiser-101                      Cruiser
+  648 aud/etc/cruiser-101                      Cruiser
+  649 aud/etc/cruiser-102                      Cruiser
+  650 ish/etc/cruiser-102                      Cruiser
+  651 ish/etc/cruiser-103                      Cruiser
+  652 aud/etc/cruiser-103                      Cruiser
+  653 aud/etc/cruiser-104                      Cruiser
+  654 ish/etc/cruiser-104                      Cruiser
+  655 ish/etc/cruiser-105                      Cruiser
+  656 aud/etc/cruiser-105                      Cruiser
+  657 aud/etc/cruiser-106                      Cruiser
+  658 ish/etc/cruiser-106                      Cruiser
+  659 ish/etc/cruiser-107                      Cruiser
+  660 aud/etc/cruiser-107                      Cruiser
+  661 aud/etc/cruiser-108                      Cruiser
+  662 ish/etc/cruiser-108                      Cruiser
+  663 ish/etc/cruiser-109                      Cruiser
+  664 aud/etc/cruiser-109                      Cruiser
+  665 aud/etc/cruiser-110                      Cruiser
+  666 ish/etc/cruiser-110                      Cruiser
+  667 ish/etc/cruiser-111                      Cruiser
+  668 aud/etc/cruiser-111                      Cruiser
+  669 aud/etc/cruiser-112                      Cruiser
+  670 ish/etc/cruiser-112                      Cruiser
+  671 ish/etc/cruiser-113                      Cruiser
+  672 aud/etc/cruiser-113                      Cruiser
+  673 aud/etc/cruiser-114                      Cruiser
+  674 ish/etc/cruiser-114                      Cruiser
+  675 ish/etc/cruiser-115                      Cruiser
+  676 aud/etc/cruiser-115                      Cruiser
+  677 aud/etc/cruiser-116                      Cruiser
+  678 ish/etc/cruiser-116                      Cruiser
+  679 ish/etc/cruiser-117                      Cruiser
+  680 aud/etc/cruiser-117                      Cruiser
+  681 aud/etc/cruiser-118                      Cruiser
+  682 ish/etc/cruiser-118                      Cruiser
+  683 ish/etc/cruiser-119                      Cruiser
+  684 aud/etc/cruiser-119                      Cruiser
+  685 aud/etc/cruiser-120                      Cruiser
+  686 ish/etc/cruiser-120                      Cruiser
+  687 ish/etc/cruiser-121                      Cruiser
+  688 aud/etc/cruiser-121                      Cruiser
+  689 aud/etc/cruiser-122                      Cruiser
+  690 ish/etc/cruiser-122                      Cruiser
+  691 ish/etc/cruiser-123                      Cruiser
+  692 aud/etc/cruiser-123                      Cruiser
+  693 gai/transport                            Transport
+  694 dev/e-fullerene-gun                      E Fullerene Gun
+  695 zz1/hvd                                  Heavy Destroyer
+  696 uns/etc/bttlship                         Battleship
+  697 uns/transport                            Transport
+  698 dev/magneto/gun                          Magneto Pulse Gun
+  699 uns/cruiser                              Cruiser
+  700 dev/laser/gun-bolt                       Laser
+  701 dev/laser/gun                            Laser Cannon
+  702 uns/fighter                              Fighter
+  703 dev/launching-bay-7                      Launching Bay
+  704 uns/carrier                              Carrier
+  705 dev/laser/turret-bolt                    Laser
+  706 dev/laser/turret                         Laser Turret
+  707 dev/magneto/pulse                        Magneto Pulse
+  708 dev/magneto/rapid                        Rapid Magneto
+  709 uns/gunship                              Gunship
+  710 sfx/explosion/flak                       Flak Explosion
+  711 dev/flak/pulse                           Flak Shell
+  712 dev/flak/turret                          Flak Artillery
+  713 misc/flak-drone                          Flak Drone
+  714 ast/regular/small                        Asteroid Debris
+  715 ast/regular/medium                       Asteroid Fragment
+  716 ast/otr/big                              Asteroid
+  717 misc/asteroid-debris                     Asteroid Debris
+  718 misc/asteroid-fragment                   Asteroid Fragment
+  719 ast/rand-dir                             Asteroid
+  720 ast/nasty                                Nastiroid
+  721 zrb/spawn                                Zerbilite Spawn
+  722 zrb/base                                 Zerbilite
+  723 misc/asteroid-debris-2                   Asteroid Debris
+  724 misc/asteroid-fragment-2                 Asteroid Fragment
+  725 ast/regular/big                          Asteroid
+  726 ast/shoot/narrow/up                      Asteroid Shoot Up
+  727 aud/etc/eva-trooper-30                   EVA Trooper
+  728 dev/assault-team-57                      Assault Team
+  729 misc/missile-38                          Missile
+  730 dev/a-missile-launch-38                  A Missile Launch
+  731 aud/etc/assault-transport-30             Assault Transport
+  732 aud/transport                            Transport
+  733 aud/etc/fighter-14                       Fighter
+  734 dev/launching-bay-8                      Launching Bay
+  735 dev/trazer/ray                           Trazer Beam
+  736 dev/trazer/gun                           Trazer Cannon
+  737 misc/missile-39                          Missile
+  738 dev/a-missile-launch-39                  A Missile Launch
+  739 aud/etc/carrier-5                        Carrier
+  740 dev/newo/bolt                            Newo Beam
+  741 dev/newo/gun                             Newo Beam Cannon
+  742 misc/missile-40                          Missile
+  743 dev/a-missile-launch-40                  A Missile Launch
+  744 dev/cform/pulse                          Charged Form
+  745 dev/cform/gun                            C-Form Cannon
+  746 aud/etc/heavy-destroyer-5                Heavy Destroyer
+  747 dev/inasa/rapid                          Rapid Inasa Pulse
+  748 aud/etc/gunship-20                       Gunship
+  749 dev/holo/decoy                           Holographic Decoy
+  750 dev/holo/item                            Holo Generator
+  751 dev/asb/bolt                             ASB Beam
+  752 dev/asb/gun                              ASB Beam Cannon
+  753 dev/inasa/pulse                          Inasa Pulse
+  754 dev/inasa/gun                            Inasa Pulse Gun
+  755 aud/etc/cruiser-124                      Cruiser
+  756 sal/etc/fighter                          Fighter
+  757 dev/launching-bay-9                      Launching Bay
+  758 dev/magno/pulse                          Magno Pulse
+  759 dev/magno/turret                         Magno Launcher
+  760 dev/tspace/ray                           Trans-Space Bolt
+  761 dev/tspace/gun                           T-Space Bolt Rod
+  762 sal/etc/carrier                          Carrier
+  763 dev/chronon/pulse                        Chronon Particle
+  764 dev/chronon/gun                          Chronon Prtcl Gun
+  765 sal/hvd                                  Heavy Destroyer
+  766 dev/fireball/trail                       Fireball Trail
+  767 dev/fireball/pulse                       Fireball
+  768 dev/fireball/gun                         Plasma Ball
+  769 sal/gunship                              Gunship
+  770 sal/etc/cruiser                          Cruiser
+  771 dev/stealth/item                         Stealth Field
+  772 dev/pp2/pulse                            Protopulse 2
+  773 dev/pp2/gun                              Protopulse 2 Gun
+  774 obi/escort                               Escort
+  775 ish/etc/cruiser-124                      Cruiser
+  776 dev/fusion/rapid                         Rap F Pulse React
+  777 ish/etc/heavy-cruiser                    Heavy Cruiser
+  778 dev/pk/sal/bolt                          LR PK Beam
+  779 dev/pk/sal/gun                           LRPK Beam Cannon
+  780 dev/onas/pulse                           Onas Pulse
+  781 dev/onas/gun                             Onas Pulse Gun
+  782 ish/etc/modified-cruiser                 Modified Cruiser
+  783 dev/fusion/pulse                         Fusion Pulse
+  784 dev/fusion/gun                           F Pulse Reactor
+  785 ish/etc/gunship-20                       Gunship
+  786 dev/lepton/bolt                          Lepton Beam
+  787 dev/lepton-beam-canno                    Lepton Beam Canno
+  788 dev/fullerene/pulse                      Fullerene Pulse
+  789 dev/fullerene/gun                        Fullerene Gun
+  790 ish/etc/heavy-destroyer-5                Heavy Destroyer
+  791 sfx/debris/a                             Debris
+  792 sfx/explosion/giant                      Giant Explosion
+  793 dev/pk/ish/gun                           P-K Beam Cannon
+  794 ish/etc/fighter-14                       Fighter
+  795 dev/launching-bay-10                     Launching Bay
+  796 dev/cm/launcher                          C Missile Launch
+  797 dev/pp/twin                              Twin Pulse Cannon
+  798 ish/etc/carrier-5                        Carrier
+  799 ish/transport                            Transport
+  800 sfx/debris/b                             Debris
+  801 dev/repulser/turret                      Repulser
+  802 ish/etc/engineer-pod-27                  Engineer Pod
+  803 misc/small-destruction                   Small Destruction
+  804 dev/pk/ish/hand                          Hand PK Beam
+  805 ish/etc/eva-trooper-30                   EVA Trooper
+  806 dev/assault-team-58                      Assault Team
+  807 dev/pk/ish/bolt                          P-K Beam
+  808 dev/pk/ish/rapid                         Rapid P-K Cannon
+  809 dev/cm/five                              C Missiles(5)
+  810 ish/etc/assault-transport-30             Assault Transport
+  811 misc/flak-explosion                      Flak Explosion
+  812 dev/flak/flak                            Flak
+  813 misc/flak-shell                          Flak Shell
+  814 dev/flak-artillery                       Flak Artillery
+  815 dev/anti1/pulse                          Antimatter Pulse
+  816 dev/antimatter-pulse                     Antimatter Pulse 
+  817 misc/flak-drone-2                        Flak Drone
+  818 loc/power                                Power Station
+  819 loc/moon                                 Moon
+  820 sfx/debris/c                             Debris
+  821 sfx/explosion/large                      Large Explosion
+  822 aud/etc/device                           Massive Device
+  823 sfx/explosion/gas                        Gas Explosion
+  824 sfx/explosion/energy                     Energy Explosion
+  825 dev/cm/missile                           C Missile
+  826 dev/c-missile-launch                     C Missile Launch
+  827 dev/repulser/bolt                        Repulser Beam
+  828 dev/repulser                             Repulser
+  829 dev/pp/pulse                             Protopulse
+  830 dev/pp/turret                            ProtoPulse Cannon
+  831 misc/bunker-station                      Bunker Station
+  832 loc/planet                               Planet
+  833 sfx/warp/out                             Warp Out Flare
+  834 sfx/warp/in                              Warp In Flare
+  835 sfx/explosion/missile-hit                Missile Hit
+  836 sfx/crew                                 Castaway Crew Mem
+  837 sfx/energy                               Energy
+  838 misc/asteroid                            Asteroid
+  839 sfx/explosion/asteroid                   Large Explosion
+  840 ast/otr/medium                           Astroid Fragment
+  841 ast/otr/small                            Asteroid Debris
+  842 misc/nastiroid                           Nastiroid
+  843 can/carrier                              Carrier
+  844 dev/cluster/turret                       ClusterCell Array
+  845 dev/cluster/pulse                        Cluster Cell
+  846 dev/launching-bay-11                     Launching Bay
+  847 can/fighter                              Fighter
+  848 dev/pk/can/gun                           P-K Beam Cannon
+  849 dev/pk/can/bolt                          P-K Beam
+  850 can/schooner                             Schooner
+  851 zz1/etc/assault-ship-2                   Assault Ship
+  852 dev/at-launch-bay-2                      AT Launch Bay
+  853 ish/etc/attack-transport-28              Attack Transport
+  854 dev/egpb-28                              EGPB
+  855 dev/heavy-tp-cannon                      Heavy TP Cannon
+  856 misc/bunker-station-k                    Bunker Station K
+  857 misc/sensor-relay-stat                   Sensor Relay Stat
+  858 ish/etc/heavy-cruiser-2                  Heavy Cruiser
+  859 dev/c-missiles-5                         C Missiles(5)
+  860 zzz/dev/cm/dumb                          C Missile
+  861 gai/cruiser                              Cruiser
+  862 dev/conc/gun                             Concsv Pellet Gun
+  863 dev/conc/pellet                          Concussive Pellet
+  864 sfx/gunsmoke                             Gunsmoke
+  865 gai/gunship                              Gunship
+  866 dev/atomic/turret                        Atomic Pulse Gun
+  867 dev/atomic/pulse                         Atomic Pulse
+  868 misc/large-hit-explosi                   Large Hit Explosi
+  869 sfx/sparkle                              Sparkle
+  870 obi/etc/escort                           Escort
+  871 misc/bunker-station-2                    Bunker Station
+  872 dev/repulser-2                           Repulser
+  873 dev/c-missile-launch-2                   C Missile Launch
+  874 loc/sun                                  Sun
+  875 misc/heavy-station                       Heavy Station
+  876 can/hvc                                  Heavy Cruiser
+  877 dev/anti1/rapid                          Rap A Pulse React
+  878 dev/p-k-beam-cannon                      P-K Beam Cannon
+  879 misc/p-k-beam                            P-K Beam
+  880 can/cruiser                              Cruiser
+  881 can/etc/schooner                         Schooner
+  882 can/gunship                              Gunship
+  883 dev/antimatter-pulse-2                   Antimatter Pulse 
+  884 misc/antimatter-pulse                    Antimatter Pulse 
+  885 dev/anti2/pulse2                         Antimatter Pulse
+  886 can/hvd                                  Heavy Destroyer
+  887 dev/quasi/gun                            Quasimatter Gun
+  888 dev/quasi/pulse                          Quasimatter Pulse
+  889 sfx/explosion/quasi                      Quasimatter Exp
+  890 ish/etc/cruiser-125                      Cruiser
+  891 aud/etc/cruiser-125                      Cruiser
+  892 ish/etc/gunship-21                       Gunship
+  893 aud/etc/gunship-21                       Gunship
+  894 ish/etc/attack-transport-29              Attack Transport
+  895 dev/egpb-29                              EGPB
+  896 ish/etc/engineer-pod-28                  Engineer Pod
+  897 dev/assault-team-59                      Assault Team
+  898 ish/etc/eva-trooper-31                   EVA Trooper
+  899 ish/etc/assault-transport-31             Assault Transport
+  900 aud/etc/assault-transport-31             Assault Transport
+  901 dev/a-missile-launch-41                  A Missile Launch
+  902 misc/missile-41                          Missile
+  903 dev/assault-team-60                      Assault Team
+  904 aud/etc/eva-trooper-31                   EVA Trooper
+  905 aud/etc/cruiser-126                      Cruiser
+  906 ish/etc/cruiser-126                      Cruiser
+  907 ish/etc/cruiser-127                      Cruiser
+  908 aud/etc/cruiser-127                      Cruiser
+  909 aud/etc/gunship-22                       Gunship
+  910 ish/etc/gunship-22                       Gunship
+  911 ish/etc/heavy-destroyer-6                Heavy Destroyer
+  912 aud/etc/heavy-destroyer-6                Heavy Destroyer
+  913 dev/a-missile-launch-42                  A Missile Launch
+  914 misc/missile-42                          Missile
+  915 ish/etc/carrier-6                        Carrier
+  916 dev/launching-bay-12                     Launching Bay
+  917 ish/etc/fighter-15                       Fighter
+  918 aud/etc/carrier-6                        Carrier
+  919 dev/a-missile-launch-43                  A Missile Launch
+  920 misc/missile-43                          Missile
+  921 dev/launching-bay-13                     Launching Bay
+  922 aud/etc/fighter-15                       Fighter
+  923 aud/etc/cruiser-128                      Cruiser
+  924 ish/etc/cruiser-128                      Cruiser
+  925 aud/etc/fighter-16                       Fighter
+  926 ish/etc/fighter-16                       Fighter
+  927 ish/etc/cruiser-129                      Cruiser
+  928 aud/etc/cruiser-129                      Cruiser
+  929 ish/etc/engineer-pod-29                  Engineer Pod
+  930 aud/etc/assault-transport-32             Assault Transport
+  931 dev/a-missile-launch-44                  A Missile Launch
+  932 misc/missile-44                          Missile
+  933 dev/assault-team-61                      Assault Team
+  934 aud/etc/eva-trooper-32                   EVA Trooper
+  935 ish/etc/assault-transport-32             Assault Transport
+  936 dev/assault-team-62                      Assault Team
+  937 ish/etc/eva-trooper-32                   EVA Trooper
+  938 ish/etc/attack-transport-30              Attack Transport
+  939 dev/egpb-30                              EGPB
+  940 misc/bunker-station-3                    Bunker Station
+  941 misc/flak-drone-3                        Flak Drone
+  942 sal/etc/carrier-2                        Carrier
+  943 dev/launching-bay-14                     Launching Bay
+  944 sal/etc/fighter-2                        Fighter
+  945 sal/etc/cruiser-2                        Cruiser
+  946 ish/etc/modified-cruiser-2               Modified Cruiser
+  947 zz1/etc/heavy-destroyer                  Heavy Destroyer
+  948 zz1/etc/assault-ship-3                   Assault Ship
+  949 dev/at-launch-bay-3                      AT Launch Bay
+  950 ish/etc/heavy-cruiser-3                  Heavy Cruiser
+  951 gai/hvd                                  Heavy Destroyer
+  952 dev/neutron/gun                          Neutron Pulse Gun
+  953 dev/neutron/pulse                        Neutron Pulse
+  954 gai/carrier                              Carrier
+  955 dev/bay/gai                              Launching Bay
+  956 gai/fighter                              Fighter
+  957 dev/kl/gun                               KL Beam Cannon
+  958 dev/kl/bolt                              Kinetic Laser
+  959 gai/etc/fighter                          Fighter
+  960 dev/kl-beam-cannon                       KL Beam Cannon
+  961 misc/kinetic-laser                       Kinetic Laser
+  962 uns/etc/fighter                          Fighter
+  963 gai/etc/cruiser                          Cruiser
+  964 uns/etc/cruiser                          Cruiser
+  965 gai/etc/gunship                          Gunship
+  966 uns/etc/gunship                          Gunship
+  967 misc/flak-drone-4                        Flak Drone
+  968 zz1/etc/heavy-destroyer-2                Heavy Destroyer
+  969 ish/etc/heavy-cruiser-4                  Heavy Cruiser
+  970 gai/etc/heavy-destroyer                  Heavy Destroyer
+  971 gai/etc/carrier                          Carrier
+  972 dev/launching-bay-15                     Launching Bay
+  973 sal/etc/carrier-3                        Carrier
+  974 dev/launching-bay-16                     Launching Bay
+  975 sal/etc/fighter-3                        Fighter
+  976 ish/etc/modified-cruiser-3               Modified Cruiser
+  977 ish/etc/heavy-cruiser-5                  Heavy Cruiser
+  978 gai/etc/gunship-2                        Gunship
+  979 gai/etc/cruiser-2                        Cruiser
+  980 gai/etc/heavy-destroyer-2                Heavy Destroyer
+  981 gai/etc/carrier-2                        Carrier
+  982 dev/launching-bay-17                     Launching Bay
+  983 gai/etc/fighter-2                        Fighter
+  984 aud/etc/cruiser-130                      Cruiser
+  985 ish/etc/cruiser-130                      Cruiser
+  986 ish/etc/cruiser-131                      Cruiser
+  987 aud/etc/cruiser-131                      Cruiser
+  988 aud/etc/cruiser-132                      Cruiser
+  989 ish/etc/cruiser-132                      Cruiser
+  990 ish/etc/cruiser-133                      Cruiser
+  991 aud/etc/cruiser-133                      Cruiser
+  992 aud/etc/cruiser-134                      Cruiser
+  993 ish/etc/cruiser-134                      Cruiser
+  994 ish/etc/cruiser-135                      Cruiser
+  995 aud/etc/cruiser-135                      Cruiser
+  996 ish/etc/gunship-23                       Gunship
+  997 aud/etc/gunship-23                       Gunship
+  998 aud/etc/gunship-24                       Gunship
+  999 ish/etc/gunship-24                       Gunship
+  1000 ish/etc/gunship-25                       Gunship
+  1001 aud/etc/gunship-25                       Gunship
+  1002 ish/etc/attack-transport-31              Attack Transport
+  1003 dev/egpb-31                              EGPB
+  1004 ish/etc/engineer-pod-30                  Engineer Pod
+  1005 dev/assault-team-63                      Assault Team
+  1006 ish/etc/eva-trooper-33                   EVA Trooper
+  1007 ish/etc/assault-transport-33             Assault Transport
+  1008 aud/etc/assault-transport-33             Assault Transport
+  1009 dev/a-missile-launch-45                  A Missile Launch
+  1010 misc/missile-45                          Missile
+  1011 dev/assault-team-64                      Assault Team
+  1012 aud/etc/eva-trooper-33                   EVA Trooper
+  1013 aud/etc/assault-transport-34             Assault Transport
+  1014 dev/a-missile-launch-46                  A Missile Launch
+  1015 misc/missile-46                          Missile
+  1016 dev/assault-team-65                      Assault Team
+  1017 aud/etc/eva-trooper-34                   EVA Trooper
+  1018 ish/etc/assault-transport-34             Assault Transport
+  1019 dev/assault-team-66                      Assault Team
+  1020 ish/etc/eva-trooper-34                   EVA Trooper
+  1021 ish/etc/attack-transport-32              Attack Transport
+  1022 dev/egpb-32                              EGPB
+  1023 ish/etc/engineer-pod-31                  Engineer Pod
+  1024 ish/etc/attack-transport-33              Attack Transport
+  1025 dev/egpb-33                              EGPB
+  1026 ish/etc/engineer-pod-32                  Engineer Pod
+  1027 dev/assault-team-67                      Assault Team
+  1028 ish/etc/eva-trooper-35                   EVA Trooper
+  1029 ish/etc/assault-transport-35             Assault Transport
+  1030 aud/etc/assault-transport-35             Assault Transport
+  1031 dev/a-missile-launch-47                  A Missile Launch
+  1032 misc/missile-47                          Missile
+  1033 dev/assault-team-68                      Assault Team
+  1034 aud/etc/eva-trooper-35                   EVA Trooper
+  1035 aud/etc/cruiser-136                      Cruiser
+  1036 ish/etc/cruiser-136                      Cruiser
+  1037 ish/etc/cruiser-137                      Cruiser
+  1038 aud/etc/cruiser-137                      Cruiser
+  1039 aud/etc/cruiser-138                      Cruiser
+  1040 ish/etc/cruiser-138                      Cruiser
+  1041 ish/etc/cruiser-139                      Cruiser
+  1042 aud/etc/cruiser-139                      Cruiser
+  1043 aud/etc/cruiser-140                      Cruiser
+  1044 ish/etc/cruiser-140                      Cruiser
+  1045 ish/etc/cruiser-141                      Cruiser
+  1046 aud/etc/cruiser-141                      Cruiser
+  1047 aud/etc/gunship-26                       Gunship
+  1048 ish/etc/gunship-26                       Gunship
+  1049 ish/etc/gunship-27                       Gunship
+  1050 aud/etc/gunship-27                       Gunship
+  1051 aud/etc/gunship-28                       Gunship
+  1052 ish/etc/gunship-28                       Gunship
+  1053 aud/etc/heavy-destroyer-7                Heavy Destroyer
+  1054 dev/a-missile-launch-48                  A Missile Launch
+  1055 misc/missile-48                          Missile
+  1056 ish/etc/heavy-destroyer-7                Heavy Destroyer
+  1057 ish/etc/heavy-destroyer-8                Heavy Destroyer
+  1058 aud/etc/heavy-destroyer-8                Heavy Destroyer
+  1059 dev/a-missile-launch-49                  A Missile Launch
+  1060 misc/missile-49                          Missile
+  1061 aud/etc/carrier-7                        Carrier
+  1062 dev/a-missile-launch-50                  A Missile Launch
+  1063 misc/missile-50                          Missile
+  1064 dev/launching-bay-18                     Launching Bay
+  1065 aud/etc/fighter-17                       Fighter
+  1066 ish/etc/carrier-7                        Carrier
+  1067 dev/launching-bay-19                     Launching Bay
+  1068 ish/etc/fighter-17                       Fighter
+  1069 ish/etc/carrier-8                        Carrier
+  1070 dev/launching-bay-20                     Launching Bay
+  1071 ish/etc/fighter-18                       Fighter
+  1072 aud/etc/carrier-8                        Carrier
+  1073 dev/a-missile-launch-51                  A Missile Launch
+  1074 misc/missile-51                          Missile
+  1075 dev/launching-bay-21                     Launching Bay
+  1076 aud/etc/fighter-18                       Fighter
+  1077 aud/etc/cruiser-142                      Cruiser
+  1078 ish/etc/cruiser-142                      Cruiser
+  1079 ish/etc/cruiser-143                      Cruiser
+  1080 aud/etc/cruiser-143                      Cruiser
+  1081 aud/etc/cruiser-144                      Cruiser
+  1082 ish/etc/cruiser-144                      Cruiser
+  1083 ish/etc/cruiser-145                      Cruiser
+  1084 aud/etc/cruiser-145                      Cruiser
+  1085 aud/etc/cruiser-146                      Cruiser
+  1086 ish/etc/cruiser-146                      Cruiser
+  1087 ish/etc/cruiser-147                      Cruiser
+  1088 aud/etc/cruiser-147                      Cruiser
+  1089 aud/etc/fighter-19                       Fighter
+  1090 ish/etc/fighter-19                       Fighter
+  1091 ish/etc/fighter-20                       Fighter
+  1092 aud/etc/fighter-20                       Fighter
+  1093 ish/etc/fighter-21                       Fighter
+  1094 aud/etc/fighter-21                       Fighter
+  1095 aud/etc/cruiser-148                      Cruiser
+  1096 ish/etc/cruiser-148                      Cruiser
+  1097 ish/etc/cruiser-149                      Cruiser
+  1098 aud/etc/cruiser-149                      Cruiser
+  1099 aud/etc/cruiser-150                      Cruiser
+  1100 ish/etc/cruiser-150                      Cruiser
+  1101 ish/etc/cruiser-151                      Cruiser
+  1102 aud/etc/cruiser-151                      Cruiser
+  1103 aud/etc/cruiser-152                      Cruiser
+  1104 ish/etc/cruiser-152                      Cruiser
+  1105 ish/etc/cruiser-153                      Cruiser
+  1106 aud/etc/cruiser-153                      Cruiser
+  1107 ish/etc/engineer-pod-33                  Engineer Pod
+  1108 ish/etc/engineer-pod-34                  Engineer Pod
+  1109 ish/etc/engineer-pod-35                  Engineer Pod
+  1110 aud/etc/assault-transport-36             Assault Transport
+  1111 dev/a-missile-launch-52                  A Missile Launch
+  1112 misc/missile-52                          Missile
+  1113 dev/assault-team-69                      Assault Team
+  1114 aud/etc/eva-trooper-36                   EVA Trooper
+  1115 ish/etc/assault-transport-36             Assault Transport
+  1116 dev/assault-team-70                      Assault Team
+  1117 ish/etc/eva-trooper-36                   EVA Trooper
+  1118 ish/etc/attack-transport-34              Attack Transport
+  1119 dev/egpb-34                              EGPB
+  1120 ish/etc/attack-transport-35              Attack Transport
+  1121 dev/egpb-35                              EGPB
+  1122 dev/assault-team-71                      Assault Team
+  1123 ish/etc/eva-trooper-37                   EVA Trooper
+  1124 ish/etc/assault-transport-37             Assault Transport
+  1125 aud/etc/assault-transport-37             Assault Transport
+  1126 dev/a-missile-launch-53                  A Missile Launch
+  1127 misc/missile-53                          Missile
+  1128 dev/assault-team-72                      Assault Team
+  1129 aud/etc/eva-trooper-37                   EVA Trooper
+  1130 aud/etc/assault-transport-38             Assault Transport
+  1131 dev/a-missile-launch-54                  A Missile Launch
+  1132 misc/missile-54                          Missile
+  1133 dev/assault-team-73                      Assault Team
+  1134 aud/etc/eva-trooper-38                   EVA Trooper
+  1135 ish/etc/assault-transport-38             Assault Transport
+  1136 dev/assault-team-74                      Assault Team
+  1137 ish/etc/eva-trooper-38                   EVA Trooper
+  1138 ish/etc/attack-transport-36              Attack Transport
+  1139 dev/egpb-36                              EGPB
+  1140 misc/bunker-station-4                    Bunker Station
+  1141 misc/flak-drone-5                        Flak Drone
+  1142 sal/etc/cruiser-3                        Cruiser
+  1143 ish/etc/modified-cruiser-4               Modified Cruiser
+  1144 zz1/etc/assault-ship-4                   Assault Ship
+  1145 dev/at-launch-bay-4                      AT Launch Bay
+  1146 ish/etc/heavy-cruiser-6                  Heavy Cruiser
+  1147 sal/etc/carrier-4                        Carrier
+  1148 dev/launching-bay-22                     Launching Bay
+  1149 sal/etc/fighter-4                        Fighter
+  1150 ast/shoot/wide/up                        Asteroid Shoot Up
+  1151 misc/asteroid-2                          Asteroid
+  1152 misc/asteroid-fragment-3                 Asteroid Fragment
+  1153 misc/asteroid-debris-3                   Asteroid Debris
+  1154 misc/nastiroid-2                         Nastiroid
+  1155 ast/shoot/wide/down                      AsteroidShootDown
+  1156 aud/etc/cruiser-154                      Cruiser
+  1157 dev/asb-beam-cannon                      ASB Beam Cannon
+  1158 ish/etc/cruiser-154                      Cruiser
+  1159 aud/etc/gunship-29                       Gunship
+  1160 ish/etc/gunship-29                       Gunship
+  1161 aud/etc/assault-transport-39             Assault Transport
+  1162 dev/a-missile-launch-55                  A Missile Launch
+  1163 misc/missile-55                          Missile
+  1164 dev/assault-team-75                      Assault Team
+  1165 aud/etc/eva-trooper-39                   EVA Trooper
+  1166 ish/etc/assault-transport-39             Assault Transport
+  1167 dev/assault-team-76                      Assault Team
+  1168 ish/etc/eva-trooper-39                   EVA Trooper
+  1169 aud/etc/carrier-9                        Carrier
+  1170 dev/trazer-cannon                        Trazer Cannon
+  1171 dev/launching-bay-23                     Launching Bay
+  1172 aud/etc/fighter-22                       Fighter
+  1173 ish/etc/carrier-9                        Carrier
+  1174 dev/twin-pulse-cannon                    Twin Pulse Cannon
+  1175 dev/launching-bay-24                     Launching Bay
+  1176 ish/etc/fighter-22                       Fighter
+  1177 aud/etc/heavy-destroyer-9                Heavy Destroyer
+  1178 ish/etc/heavy-destroyer-9                Heavy Destroyer
+  1179 dev/fullerene-gun                        Fullerene Gun
+  1180 misc/bunker-station-5                    Bunker Station
+  1181 ele/cruiser                              Cruiser
+  1182 uns/etc/cruiser-2                        Cruiser
+  1183 dev/magneto-pulse-gun                    Magneto Pulse Gun
+  1184 dev/laser-cannon                         Laser Cannon
+  1185 misc/laser                               Laser
+  1186 loc/outpost                              Outpost Station
+  1187 ish/etc/modified-cruiser2                Modified Cruiser2
+
+notes:
+     2 x initial reference 4131 past 74 initials; set to none
+     2 x message 5 has no text; dropped

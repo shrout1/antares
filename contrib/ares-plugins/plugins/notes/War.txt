@@ -1,0 +1,139 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 loc/planet                               Planet
+    6 ish/fighter                              Fighter
+    7 dev/pk/ish/gun                           P-K Beam Cannon
+    8 dev/pk/ish/bolt                          P-K Beam
+    9 sfx/explosion/energy                     Energy Explosion
+   10 misc/small-destruction                   Small Destruction
+   11 ish/cruiser                              Cruiser
+   12 dev/fusion/gun                           F Pulse Reactor
+   13 dev/fusion/pulse                         Fusion Pulse
+   14 sfx/explosion/large                      Large Explosion
+   15 sfx/debris/a                             Debris
+   16 misc/wreckage-small                      Wreckage (Small)
+   17 sfx/sparkle                              Sparkle
+   18 ish/gunship                              Gunship
+   19 dev/lepton-beam-canno                    Lepton Beam Canno
+   20 dev/lepton/bolt                          Lepton Beam
+   21 sfx/explosion/giant                      Giant Explosion
+   22 sfx/debris/b                             Debris
+   23 sfx/debris/c                             Debris
+   24 misc/wreckage-medium                     Wreckage (Medium)
+   25 ish/transport                            Transport
+   26 ish/engineer                             Engineer Pod
+   27 dev/repulser/turret                      Repulser
+   28 dev/repulser/bolt                        Repulser Beam
+   29 ish/aslttran                             Assault Transport
+   30 dev/cm/five                              C Missiles(5)
+   31 dev/cm/missile                           C Missile
+   32 sfx/explosion/gas                        Gas Explosion
+   33 dev/pk/ish/rapid                         Rapid P-K Cannon
+   34 dev/assault/ish                          Assault Team
+   35 ish/evat                                 EVA Trooper
+   36 dev/pk/ish/hand                          Hand PK Beam
+   37 loc/bunker                               Bunker Station
+   38 dev/pp/turret                            ProtoPulse Cannon
+   39 dev/pp/pulse                             Protopulse
+   40 dev/cm/launcher                          C Missile Launch
+   41 ish/hvd                                  Heavy Destroyer
+   42 dev/fullerene/gun                        Fullerene Gun
+   43 dev/fullerene/pulse                      Fullerene Pulse
+   44 misc/wreckage-large                      Wreckage (Large)
+   45 ish/carrier                              Carrier
+   46 dev/pp/twin                              Twin Pulse Cannon
+   47 dev/bay/can                              Launching Bay
+   48 misc/wreckage-huge                       Wreckage (Huge)
+   49 ish/class620                             Guard Drone
+   50 dev/r-f-fc                               R-F FC
+   51 misc/shell                               Shell
+   52 misc/shrapnel                            Shrapnel
+   53 misc/trail                               Trail
+   54 misc/shrapnel-2                          Shrapnel
+   55 misc/shrapnel-3                          Shrapnel
+   56 sfx/explosion/flak                       Flak Explosion
+   57 dev/point-defense                        Point Defense
+   58 misc/beam                                Beam
+   59 ish/class650                             Minelayer
+   60 dev/mine-launcher                        Mine Launcher
+   61 misc/proximity-mine                      Proximity Mine
+   62 dev/proximity-sensor                     Proximity Sensor
+   63 misc/mine-explosion                      Mine Explosion
+   64 ish/class888                             Wreckage Recycler
+   65 loc/power                                Power Station
+   66 misc/planet                              Planet
+   67 ish/class777                             Military Base
+   68 dev/deploy-ion-base                      Deploy Ion Base
+   69 ish/etc/ion-military-base                Ion Military Base
+   70 dev/ion-bolt-cannon                      Ion Bolt Cannon
+   71 misc/recharge-blast                      Recharge Blast
+   72 misc/ion-bolt                            Ion Bolt
+   73 dev/ion-cannon                           Ion Cannon
+   74 misc/ion-pulse                           Ion Pulse
+   75 dev/deploy-mssl-base                     Deploy Mssl base
+   76 ish/etc/missile-platform                 Missile Platform
+   77 dev/chemical-missile                     Chemical Missile
+   78 misc/chemical-missile                    Chemical missile
+   79 misc/green-explosion                     Green Explosion
+   80 dev/concsn-msl-launch                    Concsn Msl Launch
+   81 misc/concussion-missle                   Concussion Missle
+   82 misc/small-exp                           Small exp
+   83 misc/smoke                               Smoke
+   84 dev/eliminatr-torpedo                    Eliminatr Torpedo
+   85 misc/torpedo                             Torpedo
+   86 misc/big-explosion                       Big Explosion
+   87 dev/deploy-art-base                      Deploy Art. base
+   88 ish/etc/artllry-platform                 Artllry. Platform
+   89 dev/r-f-fc-2                             R-F FC
+   90 misc/shell-2                             Shell
+   91 misc/shrapnel-4                          Shrapnel
+   92 misc/shrapnel-5                          Shrapnel
+   93 misc/shrapnel-6                          Shrapnel
+   94 dev/jammer/turret                        Electronic Jam
+   95 dev/bomb-rack                            Bomb Rack
+   96 misc/proximity-bomb                      Proximity Bomb
+   97 dev/proximity-sensor-2                   Proximity Sensor
+   98 misc/gas-explosion-2                     Gas Explosion 2
+   99 ish/class666                             Dreadnought
+  100 dev/beam-array                           Beam Array
+  101 misc/beam-2                              Beam
+  102 dev/spread-cannon                        Spread Cannon
+  103 misc/pulse-0                             Pulse 0º
+  104 misc/pulse-5                             Pulse -5º
+  105 misc/pulse-5-2                           Pulse 5º
+  106 misc/pulse-20                            Pulse 20º
+  107 misc/pulse-20-2                          Pulse -20º
+  108 dev/omega-cannon                         Omega Cannon
+  109 misc/omega-pulse                         Omega Pulse
+  110 loc/flak                                 Flak Drone
+  111 dev/antimatter-pulse                     Antimatter Pulse 
+  112 dev/anti1/pulse                          Antimatter Pulse
+  113 dev/flak/turret                          Flak Artillery
+  114 dev/flak/pulse                           Flak Shell
+  115 dev/flak/flak                            Flak
+  116 misc/flak-explosion                      Flak Explosion
+  117 misc/sun                                 Sun
+  118 misc/supernova-large                     Supernova (Large)
+  119 misc/supernova-debris                    Supernova Debris
+  120 misc/giant-explosion                     Giant Explosion
+  121 misc/debris                              Debris
+  122 misc/gas-explosion                       Gas Explosion
+  123 misc/debris-2                            Debris
+  124 misc/debris-3                            Debris
+  125 misc/fire-trail-large                    Fire Trail Large
+  126 misc/shock-wave                          Shock Wave
+  127 misc/invis-explosion                     Invis explosion
+  128 misc/supernova-debris-2                  Supernova Debris
+  129 misc/large-explosion                     Large Explosion
+  130 misc/fire-trail                          Fire Trail
+  131 loc/outpost                              Outpost Station
+  132 ish/class150                             Kamikaze Fighter
+  133 misc/gas-explosion-3                     Gas Explosion
+
+notes:
+     6 x non-reflexive create (destination semantics differ slightly)
+     6 x disable duration not integral

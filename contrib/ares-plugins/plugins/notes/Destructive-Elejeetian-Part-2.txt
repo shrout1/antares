@@ -1,0 +1,378 @@
+objects:
+    0 sfx/crew                                 Castaway Crew Mem
+    1 sfx/explosion/missile-hit                Missile Hit
+    2 sfx/energy                               Energy
+    3 sfx/warp/in                              Warp In Flare
+    4 sfx/warp/out                             Warp Out Flare
+    5 loc/planet                               Planet
+    6 ish/fighter                              Fighter
+    7 dev/pk/ish/gun                           P-K Beam Cannon
+    8 dev/pk/ish/bolt                          P-K Beam
+    9 sfx/explosion/energy                     Energy Explosion
+   10 misc/small-destruction                   Small Destruction
+   11 ele/fighter                              Fighter
+   12 dev/newo/gun                             Newo Beam Cannon
+   13 dev/newo/bolt                            Newo Beam
+   14 ele/etc/fighter                          Fighter
+   15 ele/etc/fighter-2                        Fighter
+   16 ele/etc/fighter-3                        Fighter
+   17 ele/etc/fighter-4                        Fighter
+   18 ele/etc/fighter-5                        Fighter
+   19 ele/etc/fighter-6                        Fighter
+   20 ele/etc/fighter-7                        Fighter
+   21 ele/etc/fighter-8                        Fighter
+   22 ele/etc/fighter-9                        Fighter
+   23 ele/etc/fighter-10                       Fighter
+   24 ele/etc/fighter-11                       Fighter
+   25 ele/etc/fighter-12                       Fighter
+   26 ele/etc/fighter-13                       Fighter
+   27 ele/etc/fighter-14                       Fighter
+   28 ele/etc/fighter-15                       Fighter
+   29 ele/etc/fighter-16                       Fighter
+   30 ele/etc/fighter-17                       Fighter
+   31 ele/etc/fighter-18                       Fighter
+   32 ele/etc/fighter-19                       Fighter
+   33 ele/etc/fighter-20                       Fighter
+   34 ele/etc/fighter-21                       Fighter
+   35 ele/etc/fighter-22                       Fighter
+   36 ele/etc/fighter-23                       Fighter
+   37 ele/etc/fighter-24                       Fighter
+   38 ele/etc/fighter-25                       Fighter
+   39 ele/etc/fighter-26                       Fighter
+   40 ele/etc/fighter-27                       Fighter
+   41 ele/etc/fighter-28                       Fighter
+   42 ele/etc/fighter-29                       Fighter
+   43 ele/etc/fighter-30                       Fighter
+   44 ele/etc/fighter-31                       Fighter
+   45 ele/etc/fighter-32                       Fighter
+   46 ele/etc/fighter-33                       Fighter
+   47 ele/etc/fighter-34                       Fighter
+   48 ele/etc/fighter-35                       Fighter
+   49 ele/etc/fighter-36                       Fighter
+   50 ele/etc/fighter-37                       Fighter
+   51 ele/etc/fighter-38                       Fighter
+   52 ele/etc/fighter-39                       Fighter
+   53 ele/etc/fighter-40                       Fighter
+   54 ele/etc/fighter-41                       Fighter
+   55 ele/etc/fighter-42                       Fighter
+   56 ele/etc/fighter-43                       Fighter
+   57 ele/etc/fighter-44                       Fighter
+   58 ele/etc/fighter-45                       Fighter
+   59 ele/etc/fighter-46                       Fighter
+   60 ele/etc/fighter-47                       Fighter
+   61 ele/etc/fighter-48                       Fighter
+   62 ele/etc/fighter-49                       Fighter
+   63 ele/etc/fighter-50                       Fighter
+   64 ele/etc/fighter-51                       Fighter
+   65 ele/etc/fighter-52                       Fighter
+   66 ele/etc/fighter-53                       Fighter
+   67 ele/etc/fighter-54                       Fighter
+   68 ele/etc/fighter-55                       Fighter
+   69 ele/etc/fighter-56                       Fighter
+   70 ele/etc/fighter-57                       Fighter
+   71 ele/etc/fighter-58                       Fighter
+   72 ele/etc/fighter-59                       Fighter
+   73 ele/etc/fighter-60                       Fighter
+   74 ele/etc/fighter-61                       Fighter
+   75 ele/etc/fighter-62                       Fighter
+   76 ele/etc/fighter-63                       Fighter
+   77 ele/etc/fighter-64                       Fighter
+   78 ele/etc/fighter-65                       Fighter
+   79 ele/etc/fighter-66                       Fighter
+   80 ele/etc/fighter-67                       Fighter
+   81 ele/etc/fighter-68                       Fighter
+   82 ele/etc/fighter-69                       Fighter
+   83 ele/etc/fighter-70                       Fighter
+   84 ele/etc/fighter-71                       Fighter
+   85 ele/etc/fighter-72                       Fighter
+   86 ele/etc/fighter-73                       Fighter
+   87 ele/etc/fighter-74                       Fighter
+   88 ele/etc/fighter-75                       Fighter
+   89 ele/etc/fighter-76                       Fighter
+   90 ele/etc/fighter-77                       Fighter
+   91 ele/etc/fighter-78                       Fighter
+   92 ele/etc/fighter-79                       Fighter
+   93 ele/etc/fighter-80                       Fighter
+   94 ele/etc/fighter-81                       Fighter
+   95 ele/etc/fighter-82                       Fighter
+   96 ele/etc/fighter-83                       Fighter
+   97 ele/etc/fighter-84                       Fighter
+   98 ele/etc/fighter-85                       Fighter
+   99 ele/etc/fighter-86                       Fighter
+  100 ele/etc/fighter-87                       Fighter
+  101 ele/etc/fighter-88                       Fighter
+  102 ele/etc/fighter-89                       Fighter
+  103 ele/etc/fighter-90                       Fighter
+  104 ele/etc/fighter-91                       Fighter
+  105 ele/etc/fighter-92                       Fighter
+  106 ele/etc/fighter-93                       Fighter
+  107 ele/etc/fighter-94                       Fighter
+  108 ele/etc/fighter-95                       Fighter
+  109 ele/etc/fighter-96                       Fighter
+  110 ele/etc/fighter-97                       Fighter
+  111 ele/etc/fighter-98                       Fighter
+  112 ele/etc/fighter-99                       Fighter
+  113 ele/etc/fighter-100                      Fighter
+  114 ele/etc/fighter-101                      Fighter
+  115 ele/etc/fighter-102                      Fighter
+  116 ele/etc/fighter-103                      Fighter
+  117 ele/etc/fighter-104                      Fighter
+  118 ele/etc/fighter-105                      Fighter
+  119 ele/etc/fighter-106                      Fighter
+  120 ele/etc/fighter-107                      Fighter
+  121 ele/etc/fighter-108                      Fighter
+  122 ele/etc/fighter-109                      Fighter
+  123 ele/etc/fighter-110                      Fighter
+  124 ele/etc/fighter-111                      Fighter
+  125 ele/etc/fighter-112                      Fighter
+  126 ele/etc/fighter-113                      Fighter
+  127 ele/etc/fighter-114                      Fighter
+  128 ele/etc/fighter-115                      Fighter
+  129 ele/etc/fighter-116                      Fighter
+  130 ele/etc/fighter-117                      Fighter
+  131 ele/etc/fighter-118                      Fighter
+  132 ele/etc/fighter-119                      Fighter
+  133 ele/etc/fighter-120                      Fighter
+  134 ele/etc/fighter-121                      Fighter
+  135 ele/etc/fighter-122                      Fighter
+  136 ele/etc/fighter-123                      Fighter
+  137 ele/etc/fighter-124                      Fighter
+  138 ele/etc/fighter-125                      Fighter
+  139 ele/etc/fighter-126                      Fighter
+  140 ele/etc/fighter-127                      Fighter
+  141 ele/etc/fighter-128                      Fighter
+  142 ele/etc/fighter-129                      Fighter
+  143 ele/etc/fighter-130                      Fighter
+  144 ele/etc/fighter-131                      Fighter
+  145 ele/etc/fighter-132                      Fighter
+  146 ele/etc/fighter-133                      Fighter
+  147 ele/etc/fighter-134                      Fighter
+  148 ele/etc/fighter-135                      Fighter
+  149 ele/etc/fighter-136                      Fighter
+  150 ele/etc/fighter-137                      Fighter
+  151 ele/etc/fighter-138                      Fighter
+  152 ele/etc/fighter-139                      Fighter
+  153 ele/etc/fighter-140                      Fighter
+  154 ele/etc/fighter-141                      Fighter
+  155 ele/etc/fighter-142                      Fighter
+  156 ele/etc/fighter-143                      Fighter
+  157 ele/etc/fighter-144                      Fighter
+  158 ele/etc/fighter-145                      Fighter
+  159 ele/etc/fighter-146                      Fighter
+  160 ele/etc/fighter-147                      Fighter
+  161 ele/etc/fighter-148                      Fighter
+  162 ele/etc/fighter-149                      Fighter
+  163 ele/etc/fighter-150                      Fighter
+  164 ele/etc/fighter-151                      Fighter
+  165 ele/etc/fighter-152                      Fighter
+  166 ele/etc/fighter-153                      Fighter
+  167 ele/etc/fighter-154                      Fighter
+  168 ele/etc/fighter-155                      Fighter
+  169 ele/etc/fighter-156                      Fighter
+  170 ele/etc/fighter-157                      Fighter
+  171 ele/etc/fighter-158                      Fighter
+  172 ele/etc/fighter-159                      Fighter
+  173 ele/etc/fighter-160                      Fighter
+  174 ele/etc/fighter-161                      Fighter
+  175 ish/transport                            Transport
+  176 sfx/explosion/large                      Large Explosion
+  177 sfx/debris/a                             Debris
+  178 ele/transport                            Transport
+  179 dev/stealth/item                         Stealth Field
+  180 dev/holo/item                            Holo Generator
+  181 dev/holo/decoy                           Holographic Decoy
+  182 ele/cruiser                              Elejeetian-Cruise
+  183 dev/onas-x-pulse-gun                     Onas X Pulse Gun
+  184 misc/onas-x-pulse                        Onas X Pulse
+  185 sfx/explosion/gas                        Gas Explosion
+  186 dev/flak/turret                          Flak Artillery
+  187 dev/flak/pulse                           Flak Shell
+  188 dev/flak/flak                            Flak
+  189 sfx/explosion/flak                       Flak Explosion
+  190 dev/atomic-puls-gun3                     Atomic Puls Gun3
+  191 dev/atomic/pulse                         Atomic Pulse
+  192 misc/large-hit-explosi                   Large Hit Explosi
+  193 sfx/sparkle                              Sparkle
+  194 ish/carrier                              Carrier
+  195 dev/pp/twin                              Twin Pulse Cannon
+  196 dev/pp/pulse                             Protopulse
+  197 dev/cm/launcher                          C Missile Launch
+  198 dev/cm/missile                           C Missile
+  199 dev/bay/can                              Launching Bay
+  200 sfx/explosion/giant                      Giant Explosion
+  201 sfx/debris/b                             Debris
+  202 sfx/debris/c                             Debris
+  203 ish/cruiser                              Cruiser
+  204 dev/fusion/gun                           F Pulse Reactor
+  205 dev/fusion/pulse                         Fusion Pulse
+  206 ele/etc/cruiser                          Cruiser
+  207 dev/onas/gun                             Onas Pulse Gun
+  208 dev/onas/pulse                           Onas Pulse
+  209 ele/etc/cruiser-2                        Cruiser
+  210 ele/etc/cruiser-3                        Cruiser
+  211 ele/etc/cruiser-4                        Cruiser
+  212 ele/etc/cruiser-5                        Cruiser
+  213 ele/etc/cruiser-6                        Cruiser
+  214 ele/etc/cruiser-7                        Cruiser
+  215 ele/etc/cruiser-8                        Cruiser
+  216 ele/etc/cruiser-9                        Cruiser
+  217 ele/etc/cruiser-10                       Cruiser
+  218 ele/etc/cruiser-11                       Cruiser
+  219 ele/etc/cruiser-12                       Cruiser
+  220 ele/etc/cruiser-13                       Cruiser
+  221 ele/etc/cruiser-14                       Cruiser
+  222 ele/etc/cruiser-15                       Cruiser
+  223 ele/etc/cruiser-16                       Cruiser
+  224 ele/etc/cruiser-17                       Cruiser
+  225 ele/etc/cruiser-18                       Cruiser
+  226 ele/etc/cruiser-19                       Cruiser
+  227 ele/etc/cruiser-20                       Cruiser
+  228 ele/etc/cruiser-21                       Cruiser
+  229 ele/etc/cruiser-22                       Cruiser
+  230 ele/etc/cruiser-23                       Cruiser
+  231 ele/etc/cruiser-24                       Cruiser
+  232 ele/etc/cruiser-25                       Cruiser
+  233 ele/etc/cruiser-26                       Cruiser
+  234 ele/etc/cruiser-27                       Cruiser
+  235 ele/etc/cruiser-28                       Cruiser
+  236 ele/etc/cruiser-29                       Cruiser
+  237 ele/etc/cruiser-30                       Cruiser
+  238 ele/etc/cruiser-31                       Cruiser
+  239 ele/etc/cruiser-32                       Cruiser
+  240 ele/etc/cruiser-33                       Cruiser
+  241 ele/etc/cruiser-34                       Cruiser
+  242 ele/etc/cruiser-35                       Cruiser
+  243 ele/etc/cruiser-36                       Cruiser
+  244 ele/etc/cruiser-37                       Cruiser
+  245 ele/etc/cruiser-38                       Cruiser
+  246 ele/etc/cruiser-39                       Cruiser
+  247 ele/etc/cruiser-40                       Cruiser
+  248 ele/etc/cruiser-41                       Cruiser
+  249 ele/etc/cruiser-42                       Cruiser
+  250 ele/etc/cruiser-43                       Cruiser
+  251 ele/etc/cruiser-44                       Cruiser
+  252 ele/etc/cruiser-45                       Cruiser
+  253 ele/etc/cruiser-46                       Cruiser
+  254 ele/etc/cruiser-47                       Cruiser
+  255 ele/etc/cruiser-48                       Cruiser
+  256 ele/etc/cruiser-49                       Cruiser
+  257 ele/etc/cruiser-50                       Cruiser
+  258 ele/etc/cruiser-51                       Cruiser
+  259 ele/etc/cruiser-52                       Cruiser
+  260 ele/etc/cruiser-53                       Cruiser
+  261 ele/etc/cruiser-54                       Cruiser
+  262 ele/etc/cruiser-55                       Cruiser
+  263 ele/etc/cruiser-56                       Cruiser
+  264 ele/etc/cruiser-57                       Cruiser
+  265 ele/etc/cruiser-58                       Cruiser
+  266 ele/etc/cruiser-59                       Cruiser
+  267 ele/etc/cruiser-60                       Cruiser
+  268 ele/etc/cruiser-61                       Cruiser
+  269 ele/etc/cruiser-62                       Cruiser
+  270 ele/etc/cruiser-63                       Cruiser
+  271 ele/etc/cruiser-64                       Cruiser
+  272 ele/etc/cruiser-65                       Cruiser
+  273 ele/etc/cruiser-66                       Cruiser
+  274 ele/etc/cruiser-67                       Cruiser
+  275 ele/etc/cruiser-68                       Cruiser
+  276 ele/etc/cruiser-69                       Cruiser
+  277 ele/etc/cruiser-70                       Cruiser
+  278 ele/etc/cruiser-71                       Cruiser
+  279 ele/etc/cruiser-72                       Cruiser
+  280 ele/etc/cruiser-73                       Cruiser
+  281 ele/etc/cruiser-74                       Cruiser
+  282 ele/etc/cruiser-75                       Cruiser
+  283 ele/etc/cruiser-76                       Cruiser
+  284 ele/etc/cruiser-77                       Cruiser
+  285 ele/etc/cruiser-78                       Cruiser
+  286 ele/etc/cruiser-79                       Cruiser
+  287 ele/etc/cruiser-80                       Cruiser
+  288 ele/etc/cruiser-81                       Cruiser
+  289 ish/gunship                              Gunship
+  290 dev/lepton-beam-canno                    Lepton Beam Canno
+  291 dev/lepton/bolt                          Lepton Beam
+  292 ele/gunship                              Gunship
+  293 dev/onas-pulse-gun                       Onas Pulse Gun+
+  294 misc/onas-pulse                          Onas Pulse
+  295 ele/etc/gunship                          Gunship
+  296 ele/etc/gunship-2                        Gunship
+  297 ele/etc/gunship-3                        Gunship
+  298 ele/etc/gunship-4                        Gunship
+  299 ele/etc/gunship-5                        Gunship
+  300 ele/etc/gunship-6                        Gunship
+  301 ele/etc/gunship-7                        Gunship
+  302 ele/etc/gunship-8                        Gunship
+  303 ele/etc/gunship-9                        Gunship
+  304 ele/etc/gunship-10                       Gunship
+  305 ele/etc/gunship-11                       Gunship
+  306 ele/etc/gunship-12                       Gunship
+  307 ele/etc/gunship-13                       Gunship
+  308 ele/etc/gunship-14                       Gunship
+  309 ele/etc/gunship-15                       Gunship
+  310 ele/carrier                              Carrier
+  311 dev/onas-pulse-turret                    Onas Pulse Turret
+  312 misc/onas-pulse-turret                   Onas Pulse turret
+  313 dev/bay/sal                              Launching Bay
+  314 obi/fighter                              Fighter
+  315 dev/pprotopulse-gun                      PProtopulse Gun
+  316 misc/pprotopulse                         PProtopulse 
+  317 uns/bttlship                             Battleship
+  318 dev/bay/gai                              Launching Bay
+  319 obi/cruiser                              Escort
+  320 dev/pp2/gun                              Protopulse 2 Gun
+  321 dev/pp2/pulse                            Protopulse 2
+  322 can/fighter                              Fighter
+  323 dev/pk/can/gun                           P-K Beam Cannon
+  324 dev/pk/can/bolt                          P-K Beam
+  325 can/transport                            Transport
+  326 can/bttlship                             Gate Ship
+  327 dev/magno/turret                         Magno Launcher
+  328 dev/magno/pulse                          Magno Pulse
+  329 can/gateship/damaged                     Gate Ship
+  330 sfx/explosion/supernova                  Super Nova
+  331 can/carrier                              Carrier
+  332 dev/cluster/turret                       ClusterCell Array
+  333 dev/cluster/pulse                        Cluster Cell
+  334 dev/bay/ish                              Launching Bay
+  335 can/cruiser                              Cruiser
+  336 dev/antimatter-pulse                     Antimatter Pulse 
+  337 dev/anti1/pulse                          Antimatter Pulse
+  338 can/gunship                              Gunship
+  339 dev/antimatter-pulse-2                   Antimatter Pulse 
+  340 misc/antimatter-pulse                    Antimatter Pulse 
+  341 dev/anti2/pulse2                         Antimatter Pulse
+  342 aud/fighter                              Fighter
+  343 dev/asb/gun                              ASB Beam Cannon
+  344 dev/asb/bolt                             ASB Beam
+  345 sal/fighter                              Fighter
+  346 dev/pk/sal/gun                           LRPK Beam Cannon
+  347 dev/pk/sal/bolt                          LR PK Beam
+  348 ele/class222                             E.-C. Light
+  349 sal/transport                            Transport
+  350 aud/transport                            Transport
+  351 sal/carrier                              Carrier
+  352 dev/tspace/gun                           T-Space Bolt Rod
+  353 dev/tspace/ray                           Trans-Space Bolt
+  354 dev/bay/aud                              Launching Bay
+  355 sal/etc/battle-ship-speci                Battle Ship Speci
+  356 dev/trazer/gun                           Trazer Cannon
+  357 dev/trazer/ray                           Trazer Beam
+  358 aud/carrier                              Carrier
+  359 dev/amissile/launcher                    A Missile Launch
+  360 dev/amissile/missile                     Missile
+  361 dev/bay/uns                              Launching Bay
+  362 aud/cruiser                              Cruiser
+  363 dev/inasa/gun                            Inasa Pulse Gun
+  364 dev/inasa/pulse                          Inasa Pulse
+  365 sal/cruiser                              Cruiser
+  366 sal/gunship                              Gunship
+  367 dev/fireball/gun                         Plasma Ball
+  368 dev/fireball/pulse                       Fireball
+  369 dev/fireball/trail                       Fireball Trail
+  370 aud/gunship                              Gunship
+  371 dev/inasa/rapid                          Rapid Inasa Pulse
+
+rotations matched to sprite frame counts:
+  uns/bttlship: 24 -> 60 directions
+
+notes:

@@ -16,6 +16,12 @@ config("add_flags") {
   ldflags = add_ldflags
 }
 
+# The msvc toolchain reads header dependencies from cl.exe's /showIncludes output; without it,
+# ninja doesn't rebuild objects when a header they include changes.
+config("msvc-deps") {
+  cflags = [ "/showIncludes" ]
+}
+
 config("mac-universal") {
   cflags = [
     "-arch",

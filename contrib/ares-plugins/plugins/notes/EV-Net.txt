@@ -1,0 +1,125 @@
+objects:
+    0 ele/cruiser                              Hawk
+    1 baz/cruiser                              Defender
+    2 gro/cruiser                              Gunboat
+    3 r1000/cruiser                            Rapier
+    4 uns/cruiser                              Lightning
+    5 aud/cruiser                              Patrol Fighter
+    6 sal/cruiser                              Manta
+    7 obi/cruiser                              Shuttle
+    8 ish/etc/corvette-special                 Corvette Special
+    9 gai/class50                              Manta Group
+   10 can/class50                              Fighter Patrol
+   11 ish/cruiser                              Defender
+   12 dev/cm/launcher                          C Missile Launch
+   13 misc/outpost-station                     Outpost Station
+   14 can/transport                            Shuttle
+   15 gai/transport                            Shuttle
+   16 can/hvd                                  Frigate
+   17 dev/15x-torpedo-bay                      15x Torpedo Bay
+   18 gai/hvd                                  Destroyer
+   19 dev/manta-bay                            Manta Bay
+   20 dev/25x-missile                          25x Missile
+   21 dev/4x-pdtl                              4x PDTL
+   22 gai/carrier                              Cruiser
+   23 misc/cc-debris-b                         - CC Debris B
+   24 misc/cc-debris-a                         - CC Debris A
+   25 misc/cc-explosion                        - CC Explosion
+   26 dev/conf-patrol-bay                      Conf Patrol Bay
+   27 dev/20x-torpedo-bay                      20x Torpedo Bay
+   28 misc/nutron-hit                          - Nutron Hit
+   29 misc/1-nutron-bolt                       1 Nutron Bolt
+   30 dev/4x-pdtl-nutrongun                    4x PDTL NutronGun
+   31 can/carrier                              Cruiser
+   32 dev/assault/can                          Assault Team
+   33 can/aslttran                             Assault Transport
+   34 dev/pk/ish/hand                          Hand PK Beam
+   35 ish/evat                                 EVA Trooper
+   36 dev/assault/ish                          Assault Team
+   37 dev/pk/ish/bolt                          P-K Beam
+   38 dev/pk/ish/rapid                         Rapid P-K Cannon
+   39 ish/aslttran                             Assault Transport
+   40 dev/2x-rocket                            2x ROCKET
+   41 dev/4x-missile                           4x Missile
+   42 dev/2x-laser-cannon                      2x Laser Cannon
+   43 can/gunship                              Gunboat
+   44 can/cruiser                              Patrol Fighter
+   45 gai/cruiser                              Manta
+   46 ast/shoot/wide/down                      AsteroidShootDown
+   47 misc/asteroid                            Asteroid
+   48 ast/shoot/wide/up                        Asteroid Shoot Up
+   49 zz1/transport                            Shuttle
+   50 gai/gunship                              Hawk
+   51 dev/hawk-bay                             Hawk Bay
+   52 zz1/etc/bulk-freighter                   Bulk Freighter
+   53 dev/1x-laser-turret                      1x Laser Turret
+   54 zz1/etc/light-freighter                  Light Freighter
+   55 zz1/etc/jump-point                       Jump Point
+   56 dev/repulser/bolt                        Repulser Beam
+   57 dev/repulser/turret                      Repulser
+   58 misc/bunker-station                      Bunker Station
+   59 misc/stelar-object                       Stelar Object
+   60 ish/transport                            Shuttle
+   61 misc/captl-explosion                     - Captl Explosion
+   62 dev/2x-missile                           2x Missile
+   63 dev/4x-laser-cannon                      4x Laser Cannon
+   64 ish/etc/lightning                        Lightning
+   65 dev/lightning-bay                        Lightning Bay
+   66 dev/10x-torpedo-bay                      10x Torpedo Bay
+   67 misc/1b-proton-bolt                      1b Proton Bolt
+   68 dev/2x-proton-turret                     2x Proton Turret
+   69 misc/2x-ptdt                             2x PTDT
+   70 dev/2x-pdtl                              2x PDTL
+   71 ish/carrier                              Kestrel
+   72 misc/1-missile                           1 Missile
+   73 dev/10x-missile                          10x Missile
+   74 misc/1b-laser-beam                       1b Laser Beam
+   75 dev/2x-laser-turret                      2x Laser Turret
+   76 ish/hvd                                  Corvette
+   77 misc/1-heavy-rocket                      1 Heavy Rocket
+   78 dev/6x-rocket                            6x ROCKET
+   79 sfx/sparkle                              Sparkle
+   80 misc/large-hit-explosi                   Large Hit Explosi
+   81 misc/1-torpedo                           1 Torpedo
+   82 dev/6x-torpedo-rack                      6x Torpedo Rack
+   83 ish/gunship                              Rapier
+   84 misc/laser-hit                           - Laser Hit
+   85 misc/1-laser-beam                        1 Laser Beam
+   86 dev/3x-laser-cannon                      3x Laser Cannon
+   87 ish/class50                              Defender Group
+   88 loc/planet                               Planet
+   89 ast/shoot/lite/down                      Ast Shoot Down Lt
+   90 sfx/debris/a                             Debris
+   91 sfx/debris/b                             Debris
+   92 sfx/explosion/giant                      Giant Explosion
+   93 misc/nastiroid                           Nastiroid
+   94 sfx/explosion/missile-hit                Missile Hit
+   95 misc/castaway-crew-mem                   Castaway Crew Mem
+   96 sfx/debris/c                             Debris
+   97 sfx/explosion/large                      Large Explosion
+   98 sfx/explosion/gas                        Gas Explosion
+   99 misc/1-javiln                            1 Javiln
+  100 dev/1x-javiln-pod                        1x Javiln Pod
+  101 misc/proton-hit                          - Proton Hit
+  102 misc/1-proton-bolt                       1 Proton Bolt
+  103 dev/4x-proton-bolt                       4x Proton Bolt
+  104 zz1/cruiser                              Clipper
+  105 misc/small-destruction                   Small Destruction
+  106 misc/asteroid-debris                     Asteroid Debris
+  107 misc/asteroid-fragment                   Asteroid Fragment
+  108 sfx/explosion/asteroid                   Large Explosion
+  109 misc/asteroid-2                          Asteroid
+  110 ast/shoot/lite/up                        Ast Shoot Up Lite
+  111 sfx/warp/out                             Warp Out Flare
+  112 sfx/warp/in                              Warp In Flare
+  113 sfx/energy                               Energy
+  114 misc/missile-hit                         Missile Hit
+  115 sfx/crew                                 Castaway Crew Mem
+  116 loc/moon                                 Moon
+
+notes:
+     1 x object 23 animation direction range 1 approximated
+     1 x object 24 animation direction range 1 approximated
+     1 x object 106 animation direction range 1 approximated
+     1 x object 107 animation direction range 1 approximated
+     1 x missing text 10056
