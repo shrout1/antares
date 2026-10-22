@@ -2,10 +2,11 @@
 """Antares Launcher: pick an Ares scenario / Antares plugin and start the game with it.
 
 Shows each plugin's solo chapters and how many you've unlocked (Antares keeps that in
-~/.local/share/games/antares/registry/<identifier>.pn), and saves, imports or resets that
-progress the same way as the game's Plugins screen (saved copies go in saved-progress/).
-Settings are kept in ~/.config/antares-launcher.json. Lists the plugins in ../plugins unless
-another folder is chosen.
+registry/<identifier>.pn under its data folder: ~/.local/share/games/antares on Linux,
+Documents\\Antares on Windows), and saves, imports or resets that progress the same way as the
+game's Plugins screen (saved copies go in saved-progress/). Settings are kept in
+~/.config/antares-launcher.json (%APPDATA%\\Antares Launcher on Windows). Lists the plugins in
+../plugins unless another folder is chosen.
 """
 import ast
 import hashlib
@@ -19,24 +20,58 @@ import tkinter as tk
 import zipfile
 from tkinter import filedialog, messagebox, ttk
 
+WINDOWS = os.name == 'nt'
 HOME = os.path.expanduser('~')
-CONFIG = os.path.join(HOME, '.config', 'antares-launcher.json')
-LOG = os.path.join(HOME, '.cache', 'antares-launcher.log')
-INPUT_LOGS = os.path.join(HOME, '.cache', 'antares-input')  # one per game; builds with input-debug
+# contrib/ares-plugins, followed through a symlink so an installed link still finds it.
+CONTRIB = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+REPO = os.path.dirname(os.path.dirname(CONTRIB))
+
+
+def documents():
+    """The Documents folder, where Antares keeps its data on Windows (it may be moved)."""
+    import ctypes
+    buf = ctypes.create_unicode_buffer(260)
+    if ctypes.windll.shell32.SHGetFolderPathW(None, 5, None, 0, buf) == 0:  # CSIDL_PERSONAL
+        return buf.value
+    return os.path.join(HOME, 'Documents')
+
+
+if WINDOWS:
+    CONFIG_DIR = os.path.join(os.environ.get('APPDATA', HOME), 'Antares Launcher')
+    CACHE_DIR = os.path.join(os.environ.get('LOCALAPPDATA', HOME), 'Antares Launcher')
+    CONFIG = os.path.join(CONFIG_DIR, 'antares-launcher.json')
+    GAME_DATA = os.path.join(documents(), 'Antares')  # dirs().root in src/config/win-dirs.cpp
+    REGISTRY = os.path.join(GAME_DATA, 'Registry')
+else:
+    CONFIG_DIR = os.path.join(HOME, '.config', 'antares-launcher')
+    CACHE_DIR = os.path.join(HOME, '.cache')
+    CONFIG = os.path.join(HOME, '.config', 'antares-launcher.json')
+    GAME_DATA = os.path.join(HOME, '.local', 'share', 'games', 'antares')  # linux-dirs.cpp
+    REGISTRY = os.path.join(GAME_DATA, 'registry')
+LOG = os.path.join(CACHE_DIR, 'antares-launcher.log')
+INPUT_LOGS = os.path.join(CACHE_DIR, 'antares-input')  # one per game; builds with input-debug
 KEEP_INPUT_LOGS = 20
-ALSOFT_CONF = os.path.join(HOME, '.config', 'antares-launcher', 'alsoft.conf')
-REGISTRY = os.path.join(HOME, '.local', 'share', 'games', 'antares', 'registry')
-SAVED = os.path.join(HOME, '.local', 'share', 'games', 'antares', 'saved-progress')
-APP_DATA = '/usr/local/share/games/antares/app'
-# The converted plugins beside this launcher (contrib/ares-plugins/plugins), followed through a
-# symlink so an installed link still finds them.
-DEFAULT_FOLDER = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'plugins')
+ALSOFT_CONF = os.path.join(CONFIG_DIR, 'alsoft.conf')  # OpenAL; the Windows build uses XAudio2
+SAVED = os.path.join(GAME_DATA, 'saved-progress')
+# The converted plugins beside this launcher (contrib/ares-plugins/plugins).
+DEFAULT_FOLDER = os.path.join(CONTRIB, 'plugins')
 FACTORY = ''  # sentinel path: run Antares with no plugin argument
 
 
 def find_antares():
+    if WINDOWS:
+        # A build in this checkout (out/win/opt, made by configure and ninja) if not on PATH.
+        return shutil.which('antares') or os.path.join(REPO, 'out', 'win', 'opt', 'antares.exe')
     return shutil.which('antares') or '/usr/local/games/antares'
+
+
+def app_data():
+    """The folder holding the original game's info.pn and levels."""
+    if not WINDOWS:
+        return '/usr/local/share/games/antares/app'
+    # Antares.exe looks for data beside itself; a build in this checkout uses the data submodule.
+    beside = os.path.join(os.path.dirname(find_antares()), 'data')
+    return beside if os.path.isdir(beside) else os.path.join(REPO, 'data')
 
 
 # GNOME schemas whose shortcuts can take Windows-key and Alt combinations away from the game.
@@ -116,9 +151,9 @@ def read_plugin(path):
     plugin."""
     description = ''
     if path == FACTORY:
-        info = open(os.path.join(APP_DATA, 'info.pn'), encoding='utf-8').read()
+        info = open(os.path.join(app_data(), 'info.pn'), encoding='utf-8').read()
         levels = []
-        ldir = os.path.join(APP_DATA, 'levels')
+        ldir = os.path.join(app_data(), 'levels')
         for f in sorted(os.listdir(ldir)):
             levels.append(open(os.path.join(ldir, f), encoding='utf-8').read())
     else:
@@ -258,13 +293,15 @@ class Launcher(tk.Tk):
 
         bottom = ttk.Frame(self, padding=10)
         bottom.pack(fill='x', side='bottom', before=body)
-        self.software = tk.BooleanVar(value=self.cfg.get('software', True))
-        ttk.Checkbutton(bottom, text='Software rendering',
-                        variable=self.software, command=self.save_config).pack(side='left')
-        self.free_super = tk.BooleanVar(value=self.cfg.get('free_super', True))
-        ttk.Checkbutton(bottom, text='Let the game use the Windows and Alt keys',
-                        variable=self.free_super, command=self.save_config).pack(side='left',
-                                                                                 padx=(12, 0))
+        # Both options are for Linux: Mesa's software renderer and GNOME's shortcuts.
+        self.software = tk.BooleanVar(value=self.cfg.get('software', True) and not WINDOWS)
+        self.free_super = tk.BooleanVar(value=self.cfg.get('free_super', True) and not WINDOWS)
+        if not WINDOWS:
+            ttk.Checkbutton(bottom, text='Software rendering',
+                            variable=self.software, command=self.save_config).pack(side='left')
+            ttk.Checkbutton(bottom, text='Let the game use the Windows and Alt keys',
+                            variable=self.free_super, command=self.save_config).pack(
+                                side='left', padx=(12, 0))
         self.status = ttk.Label(bottom, foreground='#666')
         self.status.pack(side='left', padx=12)
         self.launch_btn = ttk.Button(bottom, text='Launch', command=self.launch)
@@ -513,6 +550,8 @@ class Launcher(tk.Tk):
         else:
             env.pop('LIBGL_ALWAYS_SOFTWARE', None)
         cmd = [exe]
+        if WINDOWS and app_data() != os.path.join(os.path.dirname(exe), 'data'):
+            cmd += ['-a', app_data()]
         if supports_plugins_option(exe):
             cmd += ['-p', self.folder()]
         cmd += [p['path']] if p['path'] else []

@@ -45,7 +45,7 @@ if (host_os == "mac") {
 } else if (host_os == "win") {
   assert(target_os == host_os, "cross-compilation not supported on win")
   set_default_toolchain("//build/lib/win:msvc")
-  _default_configs += [ "//build/lib:c++20", "//build/lib/win:console", "//build/lib/win:cpp_exceptions", "//build/lib:debug_symbols" ]
+  _default_configs += [ "//build/lib:c++20", "//build/lib/win:console", "//build/lib/win:cpp_exceptions", "//build/lib:debug_symbols", "//build:msvc-deps" ]
 } else {
   assert(false, "unsupported host_os $host_os")
 }
