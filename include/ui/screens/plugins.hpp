@@ -36,6 +36,7 @@ class PluginsScreen : public InterfaceScreen {
     ~PluginsScreen();
 
     virtual void mouse_down(const MouseDownEvent& event);
+    virtual void mouse_scroll(const MouseScrollEvent& event);
     virtual void key_down(const KeyDownEvent& event);
     virtual void gamepad_button_down(const GamepadButtonDownEvent& event);
 
@@ -60,6 +61,7 @@ class PluginsScreen : public InterfaceScreen {
     const Entry& selected() const { return _entries[_index]; }
     bool         playable(const Entry& e) const;
     void         select(int index);
+    void         scroll(int rows);
     void         refresh_progress(Entry* e);
     void         play();
     void         confirm(Confirm action, pn::string message);
@@ -73,6 +75,7 @@ class PluginsScreen : public InterfaceScreen {
     std::vector<Entry> _entries;
     int                _index   = 0;
     int                _top     = 0;
+    double             _scroll  = 0;  // wheel movement not yet a whole row.
     Confirm            _confirm = NONE;
     pn::string         _status;
 };

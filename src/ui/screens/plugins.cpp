@@ -45,6 +45,7 @@ static constexpr char kListRect[]     = "list";
 static constexpr char kDetailsRect[]  = "details";
 
 static const int kRowPadding = 2;
+static const int kScrollRows = 3;  // per notch of the scroll wheel.
 
 static const Font& list_font() { return sys.fonts.small_button; }
 static int         row_height() { return list_font().height + kRowPadding; }
@@ -273,6 +274,12 @@ void PluginsScreen::select(int index) {
     }
 }
 
+// Moves the list without changing the selection.
+void PluginsScreen::scroll(int rows) {
+    const int max_top = std::max<int>(0, _entries.size() - visible_rows());
+    _top              = std::max(0, std::min(_top + rows, max_top));
+}
+
 void PluginsScreen::play() {
     const Entry& e = selected();
     if (!e.current) {
@@ -313,6 +320,13 @@ void PluginsScreen::mouse_down(const MouseDownEvent& event) {
         return;
     }
     InterfaceScreen::mouse_down(event);
+}
+
+void PluginsScreen::mouse_scroll(const MouseScrollEvent& event) {
+    _scroll -= event.dy() * kScrollRows;
+    int rows = static_cast<int>(_scroll);  // toward zero, keeping the remainder's sign.
+    _scroll -= rows;
+    scroll(rows);
 }
 
 void PluginsScreen::key_down(const KeyDownEvent& event) {
