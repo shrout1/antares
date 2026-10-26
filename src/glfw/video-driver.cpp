@@ -553,6 +553,10 @@ void GLFWVideoDriver::mouse_move(double x, double y) {
     MouseMoveEvent(now(), to_screen(x, y)).send(_loop->top());
 }
 
+void GLFWVideoDriver::mouse_scroll(double x, double y) {
+    MouseScrollEvent(now(), get_mouse(), x, y).send(_loop->top());
+}
+
 void GLFWVideoDriver::window_size(int width, int height) {
     update_size();
     if (!_fullscreen) {
@@ -612,6 +616,11 @@ void GLFWVideoDriver::mouse_button_callback(GLFWwindow* w, int button, int actio
 void GLFWVideoDriver::mouse_move_callback(GLFWwindow* w, double x, double y) {
     GLFWVideoDriver* driver = reinterpret_cast<GLFWVideoDriver*>(glfwGetWindowUserPointer(w));
     driver->mouse_move(x, y);
+}
+
+void GLFWVideoDriver::mouse_scroll_callback(GLFWwindow* w, double x, double y) {
+    GLFWVideoDriver* driver = reinterpret_cast<GLFWVideoDriver*>(glfwGetWindowUserPointer(w));
+    driver->mouse_scroll(x, y);
 }
 
 void GLFWVideoDriver::window_size_callback(GLFWwindow* w, int width, int height) {
@@ -679,6 +688,7 @@ void GLFWVideoDriver::loop(Card* initial) {
     glfwSetCharCallback(_window, char_callback);
     glfwSetMouseButtonCallback(_window, mouse_button_callback);
     glfwSetCursorPosCallback(_window, mouse_move_callback);
+    glfwSetScrollCallback(_window, mouse_scroll_callback);
     glfwSetWindowSizeCallback(_window, window_size_callback);
     glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
     fit_window();
