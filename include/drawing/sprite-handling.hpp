@@ -56,7 +56,10 @@ class Sprite {
 
     Sprite();
 
-    Point             where;
+    Point where;
+    struct {
+        float h, v;
+    } offset;  // fraction of a point to shift drawing from `where`
     NatePixTable*     table;
     int               whichShape;
     Scale             scale;

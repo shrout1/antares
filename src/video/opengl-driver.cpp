@@ -402,8 +402,8 @@ vec4 OpenGlVideoDriver::region_transform(Region region) const {
 
 void OpenGlVideoDriver::set_region(Region region, float h, float v) {
     vec4 t = region_transform(region);
-    t.z += std::trunc(h * t.x);
-    t.w += std::trunc(v * t.y);
+    t.z += std::floor(h * t.x);
+    t.w += std::floor(v * t.y);
     _uniforms.transform.set(t);
     _pixels_per_point = t.x;
 }

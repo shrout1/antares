@@ -26,8 +26,9 @@
 namespace antares {
 
 struct ScaledScreen {
-    Scale scale;
-    Rect  bounds;
+    Scale          scale;
+    Rect           bounds;
+    fixedPointType motion;  // the camera's motionFraction, not yet part of `bounds`
 };
 extern ScaledScreen scaled_screen;
 Point               scale_to_viewport(Point p);
