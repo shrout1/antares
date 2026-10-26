@@ -88,7 +88,8 @@ Sprite* Sprite::get(int number) {
 }
 
 Sprite::Sprite()
-        : table(NULL),
+        : offset{0, 0},
+          table(NULL),
           style(spriteNormal),
           styleColor(RgbColor::white()),
           styleData(0),
@@ -177,6 +178,9 @@ void draw_sprites() {
                     const NatePixTable::Frame& frame = aSprite->table->at(aSprite->whichShape);
 
                     Rect draw_rect = scale_sprite_rect(frame, aSprite->where, trueScale);
+                    sys.video->set_region(
+                            VideoDriver::Region::BATTLEFIELD, aSprite->offset.h,
+                            aSprite->offset.v);
 
                     switch (aSprite->style) {
                         case spriteNormal: frame.texture().draw(draw_rect); break;
@@ -205,15 +209,17 @@ void draw_sprites() {
                     Rect        tiny_rect(-tinySize, -tinySize, tinySize, tinySize);
                     tiny_rect.offset(std::floor(h), std::floor(v));
                     sys.video->set_region(
-                            VideoDriver::Region::OVERLAY, h - std::floor(h), v - std::floor(v));
+                            VideoDriver::Region::OVERLAY,
+                            h - std::floor(h) + (aSprite->offset.h / scale),
+                            v - std::floor(v) + (aSprite->offset.v / scale));
                     aSprite->draw_tiny(
                             tiny_rect, GetRGBTranslateColorShade(
                                                aSprite->tinyColor.hue, aSprite->tinyColor.shade));
                 }
             }
         }
-        sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
     }
+    sys.video->set_region(VideoDriver::Region::BATTLEFIELD);
 }
 
 // CullSprites: if you're keeping track of sprites, but not showing them, use this to remove

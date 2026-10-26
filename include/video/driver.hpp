@@ -51,7 +51,7 @@ class VideoDriver {
     // Parts of the screen that a driver may scale separately. OVERLAY is for text and icons over
     // the battlefield; it draws overlay_scale() times larger than BATTLEFIELD.
     enum class Region { SCREEN, BATTLEFIELD, OVERLAY, LEFT_PANEL, RIGHT_PANEL };
-    // `h` and `v` shift drawing by fractions of a point, rounded toward zero to whole pixels.
+    // `h` and `v` shift drawing by fractions of a point, rounded down to whole pixels.
     virtual void  set_region(Region region, float h = 0, float v = 0) {}
     virtual float overlay_scale() const { return 1; }
     // Pixels per point on the battlefield that `scale` gives at the current size.
