@@ -176,7 +176,7 @@ void Session::submit(uint32_t at, Lockstep::Turn turn) {
 
 bool Session::ready_turn(uint32_t at) const {
     std::lock_guard<std::mutex> lock(_mutex);
-    return _lockstep && _lockstep->ready(at);
+    return (_state == PLAYING) && _lockstep->ready(at);
 }
 
 std::vector<Lockstep::Turn> Session::take(uint32_t at) {

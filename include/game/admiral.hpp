@@ -111,6 +111,9 @@ class Admiral {
     static Admiral*            get(int i);
     static Handle<Admiral>     make(int index, const DemoLevel::Player& player);
     static Handle<Admiral>     make(int index, const SoloLevel::Player& player);
+    static Handle<Admiral>     make(
+                int index, const NetLevel::Player& player, pn::string_view name,
+                const NamedHandle<const Race>& race, Hue hue, bool remote);
     static Handle<Admiral>     none() { return Handle<Admiral>(-1); }
     static HandleList<Admiral> all() { return HandleList<Admiral>(0, kMaxPlayerNum); }
 

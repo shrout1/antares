@@ -83,6 +83,12 @@ enum class PlayerEventType {
     HOTKEY_SET    = 0x051,
     HOTKEY_SELECT = 0x052,
     HOTKEY_TARGET = 0x053,
+
+    SELECT_OBJECT = 0x060,
+    TARGET_OBJECT = 0x061,
+    GAMEPAD_KEYS  = 0x062,
+    STEER         = 0x063,
+    CLEAR         = 0x064,
 };
 
 struct PlayerEvent {
@@ -115,7 +121,13 @@ class PlayerShip : public EventReceiver {
     virtual void gamepad_button_up(const GamepadButtonUpEvent& event);
     virtual void gamepad_stick(const GamepadStickEvent& event);
 
-    void update();
+    // Translates the input received since the last call into the local admiral's commands.
+    std::vector<PlayerEvent> commands();
+    // Executes one turn of an admiral's commands.
+    void execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& commands);
+
+    // Messages entered in a net game since the last call.
+    std::vector<pn::string> take_messages();
 
     bool    show_select() const;
     bool    show_target() const;
@@ -128,10 +140,14 @@ class PlayerShip : public EventReceiver {
 
   private:
     bool active() const;
-    void set_gamepad_state(int state);
-    void update_steer();
+    void click(Point where, int button);
+    void pick(PlayerEventType type, int32_t direction);
 
-    std::vector<PlayerEvent> _player_events;
+    uint32_t                              _gamepad_keys;
+    uint32_t                              _sent_gamepad_keys;
+    int32_t                               _sent_steer;
+    std::vector<PlayerEvent>              _player_events;
+    std::vector<std::vector<PlayerEvent>> _events;  // Each admiral's commands not yet executed.
 
     enum GamepadState {
         NO_BUMPER              = 0,
@@ -160,6 +176,8 @@ class PlayerShip : public EventReceiver {
         virtual void accept();
         virtual void escape();
 
+        std::vector<pn::string> sent;
+
       protected:
         virtual void        update(pn::string_view text, range<int> selection, range<int> mark);
         virtual StyledText& styled_text();
@@ -172,7 +190,6 @@ class PlayerShip : public EventReceiver {
 };
 
 void ResetPlayerShip();
-void PlayerShipHandleClick(Point where, int button);
 void ChangePlayerShipNumber(Handle<Admiral> whichAdmiral, Handle<SpaceObject> newShip);
 void TogglePlayerAutoPilot(Handle<SpaceObject> theShip);
 void PlayerShipGiveCommand(Handle<Admiral> whichAdmiral);

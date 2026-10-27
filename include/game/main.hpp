@@ -28,6 +28,10 @@ namespace antares {
 class InputSource;
 union Level;
 
+namespace net {
+class Session;
+}  // namespace net
+
 // For testing rollback. Writes a line to `log` after each major tick, identifying the state of
 // the world. With `lookahead`, the game also simulates that many major ticks ahead before each
 // major tick, with other controls held and no other input, then copies the world back, so that
@@ -49,7 +53,7 @@ class MainPlay : public Card {
   public:
     MainPlay(
             const Level& level, bool replay, InputSource* input, bool show_loading_screen,
-            GameResult* game_result);
+            GameResult* game_result, net::Session* session = nullptr);
 
     virtual void become_front();
 
@@ -62,12 +66,13 @@ class MainPlay : public Card {
     };
     State _state;
 
-    const Level&      _level;
-    const bool        _replay;
-    const bool        _show_loading_screen;
-    bool              _cancelled;
-    GameResult* const _game_result;
-    InputSource*      _input_source;
+    const Level&        _level;
+    const bool          _replay;
+    const bool          _show_loading_screen;
+    bool                _cancelled;
+    GameResult* const   _game_result;
+    InputSource*        _input_source;
+    net::Session* const _session;
 };
 
 }  // namespace antares

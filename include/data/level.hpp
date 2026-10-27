@@ -115,9 +115,14 @@ struct SoloLevel : LevelBase {
 
 struct NetLevel : LevelBase {
     struct Player {
-        PlayerType           type  = PlayerType::CPU;
-        int16_t              races = 0;
-        sfz::optional<Fixed> earning_power;
+        PlayerType                           type = PlayerType::CPU;
+        std::vector<NamedHandle<const Race>> races;
+        sfz::optional<Fixed>                 earning_power;
+
+        Player()              = default;
+        Player(const Player&) = delete;
+        Player(Player&&)      = default;
+        Player& operator=(Player&&) = default;
     };
 
     std::vector<Player>       players;
