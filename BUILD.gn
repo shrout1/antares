@@ -384,6 +384,7 @@ source_set("libantares-ui") {
     "include/ui/event-scheduler.hpp",
     "include/ui/event.hpp",
     "include/ui/flows/master.hpp",
+    "include/ui/flows/net-game.hpp",
     "include/ui/flows/replay-game.hpp",
     "include/ui/flows/solo-game.hpp",
     "include/ui/interface-handling.hpp",
@@ -393,6 +394,7 @@ source_set("libantares-ui") {
     "include/ui/screens/help.hpp",
     "include/ui/screens/loading.hpp",
     "include/ui/screens/main.hpp",
+    "include/ui/screens/net-setup.hpp",
     "include/ui/screens/object-data.hpp",
     "include/ui/screens/options.hpp",
     "include/ui/screens/play-again.hpp",
@@ -404,6 +406,7 @@ source_set("libantares-ui") {
     "src/ui/event-scheduler.cpp",
     "src/ui/event.cpp",
     "src/ui/flows/master.cpp",
+    "src/ui/flows/net-game.cpp",
     "src/ui/flows/replay-game.cpp",
     "src/ui/flows/solo-game.cpp",
     "src/ui/interface-handling.cpp",
@@ -413,6 +416,7 @@ source_set("libantares-ui") {
     "src/ui/screens/help.cpp",
     "src/ui/screens/loading.cpp",
     "src/ui/screens/main.cpp",
+    "src/ui/screens/net-setup.cpp",
     "src/ui/screens/object-data.cpp",
     "src/ui/screens/options.cpp",
     "src/ui/screens/play-again.cpp",
@@ -422,6 +426,7 @@ source_set("libantares-ui") {
   ]
   public_deps = [
     ":libantares-data",
+    ":libantares-net",
     "//ext/libsfz",
   ]
   configs += [ ":antares_private" ]
