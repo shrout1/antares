@@ -35,11 +35,11 @@ jobs:
           name: antares-git.zip
           path: dist/antares-git.zip
 
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCLOUD_CREDENTIALS_JSON }}'
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           path: dist/antares-git.zip
@@ -57,17 +57,20 @@ jobs:
       - run: make
       - run: make smoke-test
 
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         run: scripts/load-cert.sh
         env:
           DEVELOPER_P12_BASE64: ${{ secrets.DEVELOPER_P12_BASE64 }}
           DEVELOPER_P12_PASS_BASE64: ${{ secrets.DEVELOPER_P12_PASS_BASE64 }}
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         run: make sign notarize
         env:
           APPLE_USER: ${{ secrets.APPLE_USER }}
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
           APPLE_TEAM: ${{ secrets.APPLE_TEAM }}
+      # Without arescentral's certificate, sign it ad hoc so Apple Silicon Macs will open it.
+      - if: ${{ github.event_name == 'pull_request' || github.repository_owner != 'arescentral' }}
+        run: codesign --force --deep --sign - out/mac/opt/Antares.app
 
       - run: ./scripts/dist.py mac zip
       - uses: actions/upload-artifact@v4
@@ -75,11 +78,11 @@ jobs:
           name: antares-mac-git.zip
           path: dist/antares-mac-git.zip
 
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCLOUD_CREDENTIALS_JSON }}'
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           path: dist/antares-mac-git.zip
@@ -106,11 +109,11 @@ jobs:
           name: antares-win-git.zip
           path: dist/antares-win-git.zip
 
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GCLOUD_CREDENTIALS_JSON }}'
-      - if: ${{ github.event_name != 'pull_request' }}
+      - if: ${{ github.event_name != 'pull_request' && github.repository_owner == 'arescentral' }}
         uses: 'google-github-actions/upload-cloud-storage@v2'
         with:
           path: dist/antares-win-git.zip
