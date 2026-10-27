@@ -30,8 +30,10 @@ group("default") {
     ":fixed-test",
     ":gen-install",
     ":hash-data",
+    ":host-test",
     ":object-data",
     ":offscreen",
+    ":packet-test",
     ":replay",
     ":shapes",
     ":tint",
@@ -80,6 +82,7 @@ source_set("libantares") {
     ":libantares-game",
     ":libantares-lang",
     ":libantares-math",
+    ":libantares-net",
     ":libantares-sound",
     ":libantares-ui",
     ":libantares-video",
@@ -317,6 +320,21 @@ source_set("libantares-math") {
     ":libantares-lang",
     "//ext/libsfz",
   ]
+  configs += [ ":antares_private" ]
+}
+
+source_set("libantares-net") {
+  sources = [
+    "include/net/host.hpp",
+    "include/net/packet.hpp",
+    "src/net/host.cpp",
+    "src/net/packet.cpp",
+  ]
+  public_deps = [
+    ":libantares-math",
+    "//ext/procyon:procyon-cpp",
+  ]
+  deps = [ "//ext/enet" ]
   configs += [ ":antares_private" ]
 }
 
@@ -570,6 +588,28 @@ executable("fixed-test") {
   testonly = true
   output_extension = exe
   sources = [ "src/math/fixed.test.cpp" ]
+  deps = [
+    ":libantares-test",
+    "//ext/gmock:gmock_main",
+  ]
+  configs += [ ":antares_private" ]
+}
+
+executable("host-test") {
+  testonly = true
+  output_extension = exe
+  sources = [ "src/net/host.test.cpp" ]
+  deps = [
+    ":libantares-test",
+    "//ext/gmock:gmock_main",
+  ]
+  configs += [ ":antares_private" ]
+}
+
+executable("packet-test") {
+  testonly = true
+  output_extension = exe
+  sources = [ "src/net/packet.test.cpp" ]
   deps = [
     ":libantares-test",
     "//ext/gmock:gmock_main",
