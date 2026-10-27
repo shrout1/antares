@@ -110,14 +110,17 @@ class NetLobbyScreen : public InterfaceScreen {
     virtual bool next_timer(wall_time& time);
     virtual void fire_timer();
 
+    virtual void mouse_down(const MouseDownEvent& event);
+
   protected:
     virtual void overlay() const;
 
   private:
     void change_level(int by);
+    void choose_level(int index);
     void change_delay(int by);
     void change_race(int by);
-    void change_hue(int by);
+    void choose_hue(int hue);
     void choose(pn::string_view race, int hue);
     void choose_defaults();
     void send();
