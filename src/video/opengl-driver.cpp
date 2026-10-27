@@ -382,7 +382,10 @@ class OpenGlTextureImpl : public Texture::Impl {
 
 OpenGlVideoDriver::OpenGlVideoDriver() : _static_seed{0} {}
 
-int OpenGlVideoDriver::scale() const { return viewport_size().width / screen_size().width; }
+int OpenGlVideoDriver::scale() const {
+    const int width = screen_size().width;
+    return (width > 0) ? (viewport_size().width / width) : 1;
+}
 
 Texture OpenGlVideoDriver::texture(pn::string_view name, const PixMap& content, int scale) {
     return unique_ptr<Texture::Impl>(
