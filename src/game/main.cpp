@@ -586,8 +586,11 @@ void GamePlay::fire_timer() {
             end_net_game("The game is out of sync.");
             return;
         } else if (_session->state() == net::Session::CLOSED) {
-            end_net_game(_session->error());
-            return;
+            if (!g.game_over) {
+                end_net_game(_session->error());
+                return;
+            }
+            g.game_over_at = g.time;
         }
     }
 

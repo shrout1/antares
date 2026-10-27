@@ -73,9 +73,12 @@ void usage(pn::output_view out, pn::string_view progname, int retcode) {
             "        --console       allocate console\n"
             "    -f, --factory       set path to factory scenario\n"
             "                        (default: {3})\n"
-            "    -h, --help          display this help screen\n",
+            "    -h, --help          display this help screen\n"
+            "        --host          host a net game\n"
+            "        --join HOST     join a net game\n"
+            "        --port PORT     set the net game port (default: {4})\n",
             progname, default_application_path(), default_config_path(),
-            default_factory_scenario_path());
+            default_factory_scenario_path(), net::kDefaultPort);
     exit(retcode);
 }
 
@@ -110,6 +113,9 @@ void main(int argc, char* const* argv) {
         return true;
     };
 
+    sfz::optional<NetStart> net;
+    sfz::optional<int64_t>  port;
+
     pn::string_view config_path = default_config_path();
     callbacks.short_option      = [&progname, &config_path](
                                      pn::rune opt, const args::callbacks::get_value_f& get_value) {
@@ -123,7 +129,7 @@ void main(int argc, char* const* argv) {
     };
 
     callbacks.long_option =
-            [&callbacks](pn::string_view opt, const args::callbacks::get_value_f& get_value) {
+            [&](pn::string_view opt, const args::callbacks::get_value_f& get_value) {
                 if (opt == "app-data") {
                     return callbacks.short_option(pn::rune{'a'}, get_value);
                 } else if (opt == "config") {
@@ -141,12 +147,31 @@ void main(int argc, char* const* argv) {
                     freopen_s(&f, "CONOUT$", "w", stdout);
                     freopen_s(&f, "CONOUT$", "w", stderr);
                     return true;
+                } else if (opt == "host") {
+                    net.emplace();
+                    net->mode = NetSetupScreen::HOST;
+                    return true;
+                } else if (opt == "join") {
+                    net.emplace();
+                    net->mode    = NetSetupScreen::JOIN;
+                    net->address = get_value().copy();
+                    return true;
+                } else if (opt == "port") {
+                    int64_t p;
+                    if (!pn::strtoll(get_value(), &p, nullptr) || (p <= 0) || (p > 65535)) {
+                        return false;
+                    }
+                    port.emplace(p);
+                    return true;
                 } else {
                     return false;
                 }
             };
 
     args::parse(argc - 1, argv + 1, callbacks);
+    if (net.has_value() && port.has_value()) {
+        net->port = *port;
+    }
 
     if (!sfz::path::isdir(application_path())) {
         throw std::runtime_error(
@@ -165,7 +190,7 @@ void main(int argc, char* const* argv) {
     NullSoundDriver sound;
 #endif
     GLFWVideoDriver video;
-    video.loop(new Master(scenario, time(NULL)));
+    video.loop(new Master(scenario, time(NULL), std::move(net)));
 }
 
 }  // namespace antares

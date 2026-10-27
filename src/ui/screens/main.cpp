@@ -28,6 +28,7 @@
 #include "math/random.hpp"
 #include "sound/music.hpp"
 #include "ui/card.hpp"
+#include "ui/flows/net-game.hpp"
 #include "ui/flows/replay-game.hpp"
 #include "ui/flows/solo-game.hpp"
 #include "ui/interface-handling.hpp"
@@ -60,8 +61,9 @@ MainScreen::MainScreen()
 
     button(kNetButton)
             ->bind({
-                    [] { throw std::runtime_error("Networked games not yet implemented."); },
-                    [] { return false; },
+                    [this] {
+                        stack()->push(new NetGame(NetSetupScreen::ASK, "", net::kDefaultPort));
+                    },
             });
 
     button(kIntroButton)
