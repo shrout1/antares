@@ -28,6 +28,8 @@ message Packet {
         Turns    turns    = 6;
         Chat     chat     = 7;
         Quit     quit     = 8;
+        Choose   choose   = 9;
+        Ready    ready    = 10;
     }
 }
 
@@ -57,7 +59,7 @@ message Reject {
 
 // Host to clients; sent again whenever it changes.
 message Setup {
-    optional int32   chapter      = 1;
+    optional string  level        = 1;
     optional int32   global_seed  = 2;
     optional uint32  delay        = 3;  // in turns
     repeated Player  player       = 4;
@@ -97,3 +99,12 @@ message Chat {
 message Quit {
     optional int32  player  = 1;
 }
+
+// Client to host: the client's own race and color.
+message Choose {
+    optional string  race  = 1;
+    optional int32   hue   = 2;
+}
+
+// Sent after the briefing; play starts once every player is ready.
+message Ready {}

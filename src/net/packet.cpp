@@ -275,7 +275,7 @@ bool read(pn::data_view d, Setup::Player* p) {
 
 pn::data write(const Setup& s) {
     pn::data out;
-    put_int(&out, 1, s.chapter);
+    put_string(&out, 1, s.level);
     put_int(&out, 2, s.global_seed);
     put_uint(&out, 3, s.delay);
     for (const Setup::Player& p : s.players) {
@@ -288,7 +288,7 @@ bool read(pn::data_view d, Setup* s) {
     return read_fields(d, [s](int field, int wire, Reader* r) {
         pn::data_view sub;
         switch (field) {
-            case 1: return get(r, wire, &s->chapter);
+            case 1: return get(r, wire, &s->level);
             case 2: return get(r, wire, &s->global_seed);
             case 3: return get(r, wire, &s->delay);
             case 4:
@@ -399,11 +399,52 @@ bool read(pn::data_view d, Quit* q) {
     });
 }
 
+pn::data write(const Choose& c) {
+    pn::data out;
+    put_string(&out, 1, c.race);
+    put_int(&out, 2, c.hue);
+    return out;
+}
+
+bool read(pn::data_view d, Choose* c) {
+    return read_fields(d, [c](int field, int wire, Reader* r) {
+        switch (field) {
+            case 1: return get(r, wire, &c->race);
+            case 2: return get(r, wire, &c->hue);
+            default: return r->skip(wire);
+        }
+    });
+}
+
 bool read_empty(pn::data_view d) {
     return read_fields(d, [](int field, int wire, Reader* r) { return r->skip(wire); });
 }
 
 }  // namespace
+
+Hello Hello::copy() const {
+    Hello h;
+    h.protocol          = protocol;
+    h.antares_version   = antares_version.copy();
+    h.plugin_identifier = plugin_identifier.copy();
+    h.plugin_version    = plugin_version.copy();
+    h.name              = name.copy();
+    return h;
+}
+
+Setup Setup::copy() const {
+    Setup s;
+    s.level       = level.copy();
+    s.global_seed = global_seed;
+    s.delay       = delay;
+    for (const Player& p : players) {
+        s.players.emplace_back();
+        s.players.back().name = p.name.copy();
+        s.players.back().race = p.race.copy();
+        s.players.back().hue  = p.hue;
+    }
+    return s;
+}
 
 pn::data encode(const Packet& packet) {
     pn::data out;
@@ -416,6 +457,8 @@ pn::data encode(const Packet& packet) {
         case Packet::TURNS: put_bytes(&out, packet.type, write(packet.turns)); break;
         case Packet::CHAT: put_bytes(&out, packet.type, write(packet.chat)); break;
         case Packet::QUIT: put_bytes(&out, packet.type, write(packet.quit)); break;
+        case Packet::CHOOSE: put_bytes(&out, packet.type, write(packet.choose)); break;
+        case Packet::READY: put_bytes(&out, packet.type, pn::data{}); break;
         case Packet::NONE: throw std::runtime_error("can't encode a packet with no type");
     }
     return out;
@@ -424,7 +467,7 @@ pn::data encode(const Packet& packet) {
 bool decode(pn::data_view bytes, Packet* packet) {
     *packet = Packet{};
     bool ok = read_fields(bytes, [packet](int field, int wire, Reader* r) {
-        if ((field < Packet::HELLO) || (Packet::QUIT < field)) {
+        if ((field < Packet::HELLO) || (Packet::READY < field)) {
             return r->skip(wire);
         }
         pn::data_view body;
@@ -441,6 +484,8 @@ bool decode(pn::data_view bytes, Packet* packet) {
             case Packet::TURNS: return read(body, &packet->turns);
             case Packet::CHAT: return read(body, &packet->chat);
             case Packet::QUIT: return read(body, &packet->quit);
+            case Packet::CHOOSE: return read(body, &packet->choose);
+            case Packet::READY: return read_empty(body);
             case Packet::NONE: return false;
         }
         return false;

@@ -31,9 +31,11 @@ group("default") {
     ":gen-install",
     ":hash-data",
     ":host-test",
+    ":lockstep-test",
     ":object-data",
     ":offscreen",
     ":packet-test",
+    ":session-test",
     ":replay",
     ":shapes",
     ":tint",
@@ -323,9 +325,13 @@ source_set("libantares-math") {
 source_set("libantares-net") {
   sources = [
     "include/net/host.hpp",
+    "include/net/lockstep.hpp",
     "include/net/packet.hpp",
+    "include/net/session.hpp",
     "src/net/host.cpp",
+    "src/net/lockstep.cpp",
     "src/net/packet.cpp",
+    "src/net/session.cpp",
   ]
   public_deps = [
     ":libantares-math",
@@ -594,6 +600,28 @@ executable("host-test") {
   testonly = true
   output_extension = exe
   sources = [ "src/net/host.test.cpp" ]
+  deps = [
+    ":libantares-test",
+    "//ext/gmock:gmock_main",
+  ]
+  configs += [ ":antares_private" ]
+}
+
+executable("lockstep-test") {
+  testonly = true
+  output_extension = exe
+  sources = [ "src/net/lockstep.test.cpp" ]
+  deps = [
+    ":libantares-test",
+    "//ext/gmock:gmock_main",
+  ]
+  configs += [ ":antares_private" ]
+}
+
+executable("session-test") {
+  testonly = true
+  output_extension = exe
+  sources = [ "src/net/session.test.cpp" ]
   deps = [
     ":libantares-test",
     "//ext/gmock:gmock_main",
