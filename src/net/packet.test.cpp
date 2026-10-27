@@ -84,12 +84,24 @@ TEST_F(PacketTest, Lobby) {
     quit.type        = Packet::QUIT;
     quit.quit.player = 1;
     EXPECT_EQ(1, round_trip(quit).quit.player);
+
+    Packet choose;
+    choose.type        = Packet::CHOOSE;
+    choose.choose.race = "can";
+    choose.choose.hue  = 5;
+    Packet out         = round_trip(choose);
+    EXPECT_EQ("can", out.choose.race);
+    EXPECT_EQ(5, out.choose.hue);
+
+    Packet ready;
+    ready.type = Packet::READY;
+    round_trip(ready);
 }
 
 TEST_F(PacketTest, Setup) {
     Packet in;
     in.type              = Packet::SETUP;
-    in.setup.chapter     = 2;
+    in.setup.level       = "net2";
     in.setup.global_seed = -12345;
     in.setup.delay       = 8;
     in.setup.players.emplace_back();
@@ -102,7 +114,7 @@ TEST_F(PacketTest, Setup) {
     in.setup.players.back().hue  = 7;
 
     Packet out = round_trip(in);
-    EXPECT_EQ(2, out.setup.chapter);
+    EXPECT_EQ("net2", out.setup.level);
     EXPECT_EQ(-12345, out.setup.global_seed);
     EXPECT_EQ(8u, out.setup.delay);
     ASSERT_EQ(2u, out.setup.players.size());

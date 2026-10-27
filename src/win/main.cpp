@@ -78,9 +78,12 @@ void usage(pn::output_view out, pn::string_view progname, int retcode) {
             "                        (default: {3})\n"
             "    -p, --plugins       also list plugins found in this directory\n"
             "                        (may be repeated; {4} is always searched)\n"
-            "    -h, --help          display this help screen\n",
+            "    -h, --help          display this help screen\n"
+            "        --host          host a net game\n"
+            "        --join HOST     join a net game\n"
+            "        --port PORT     set the net game port (default: {5})\n",
             progname, default_application_path(), default_config_path(),
-            default_factory_scenario_path(), dirs().scenarios);
+            default_factory_scenario_path(), dirs().scenarios, net::kDefaultPort);
     exit(retcode);
 }
 
@@ -271,6 +274,9 @@ void main(int argc, char* const* argv) {
         return true;
     };
 
+    sfz::optional<NetStart> net;
+    sfz::optional<int64_t>  port;
+
     pn::string_view config_path = default_config_path();
     // Options to pass on when restarting with another plugin.
     std::vector<pn::string> restart_options;
@@ -291,7 +297,7 @@ void main(int argc, char* const* argv) {
     };
 
     callbacks.long_option =
-            [&callbacks](pn::string_view opt, const args::callbacks::get_value_f& get_value) {
+            [&](pn::string_view opt, const args::callbacks::get_value_f& get_value) {
                 if (opt == "app-data") {
                     return callbacks.short_option(pn::rune{'a'}, get_value);
                 } else if (opt == "config") {
@@ -311,12 +317,31 @@ void main(int argc, char* const* argv) {
                     freopen_s(&f, "CONOUT$", "w", stdout);
                     freopen_s(&f, "CONOUT$", "w", stderr);
                     return true;
+                } else if (opt == "host") {
+                    net.emplace();
+                    net->mode = NetSetupScreen::HOST;
+                    return true;
+                } else if (opt == "join") {
+                    net.emplace();
+                    net->mode    = NetSetupScreen::JOIN;
+                    net->address = get_value().copy();
+                    return true;
+                } else if (opt == "port") {
+                    int64_t p;
+                    if (!pn::strtoll(get_value(), &p, nullptr) || (p <= 0) || (p > 65535)) {
+                        return false;
+                    }
+                    port.emplace(p);
+                    return true;
                 } else {
                     return false;
                 }
             };
 
     args::parse(argc - 1, argv + 1, callbacks);
+    if (net.has_value() && port.has_value()) {
+        net->port = *port;
+    }
 
     if (!sfz::path::isdir(application_path())) {
         throw std::runtime_error(
@@ -338,7 +363,7 @@ void main(int argc, char* const* argv) {
         GLFWVideoDriver video;
         enable_plugin_switching();
         WindowsKeyHook  windows_keys;
-        video.loop(new Master(scenario, time(nullptr)));
+        video.loop(new Master(scenario, time(nullptr), std::move(net)));
     }
 
     if (plugin_requested()) {

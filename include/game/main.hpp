@@ -28,6 +28,10 @@ namespace antares {
 class InputSource;
 union Level;
 
+namespace net {
+class Session;
+}  // namespace net
+
 enum GameResult {
     NO_GAME      = -1,
     LOSE_GAME    = 0,
@@ -40,7 +44,7 @@ class MainPlay : public Card {
   public:
     MainPlay(
             const Level& level, bool replay, InputSource* input, bool show_loading_screen,
-            GameResult* game_result);
+            GameResult* game_result, net::Session* session = nullptr);
 
     virtual void become_front();
 
@@ -53,12 +57,13 @@ class MainPlay : public Card {
     };
     State _state;
 
-    const Level&      _level;
-    const bool        _replay;
-    const bool        _show_loading_screen;
-    bool              _cancelled;
-    GameResult* const _game_result;
-    InputSource*      _input_source;
+    const Level&        _level;
+    const bool          _replay;
+    const bool          _show_loading_screen;
+    bool                _cancelled;
+    GameResult* const   _game_result;
+    InputSource*        _input_source;
+    net::Session* const _session;
 };
 
 }  // namespace antares

@@ -23,13 +23,16 @@
 
 #include "game/main.hpp"
 #include "ui/card.hpp"
+#include "ui/flows/net-game.hpp"
 #include "ui/screens/play-again.hpp"
 
 namespace antares {
 
 class Master : public Card {
   public:
-    Master(sfz::optional<pn::string_view> plugin_path, int32_t seed);
+    // With `net`, skips the intro and starts by hosting or joining a net game.
+    Master(sfz::optional<pn::string_view> plugin_path, int32_t seed,
+           sfz::optional<NetStart> net = sfz::nullopt);
     ~Master();
 
     virtual void become_front();
@@ -44,12 +47,14 @@ class Master : public Card {
         EGO_PICT,
         TITLE_SCREEN_PICT,
         INTRO_SCROLL,
+        NET_GAME,
         MAIN_SCREEN,
     };
 
     State                     _state;
     sfz::optional<pn::string> _plugin_path;
     const int32_t             _seed;
+    sfz::optional<NetStart>   _net;
     bool                      _skipped;
     Texture                   _publisher_screen;
     Texture                   _ego_screen;

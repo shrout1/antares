@@ -135,8 +135,10 @@ void ResetPlayerShip() {
 }
 
 PlayerShip::PlayerShip()
-        : gTheseKeys(0),
-          _gamepad_keys(0),
+        : _gamepad_keys(0),
+          _sent_gamepad_keys(0),
+          _sent_steer(-1),
+          _pilots(kMaxPlayerNum),
           _gamepad_state(NO_BUMPER),
           _control_active(false),
           _control_direction(0) {}
@@ -189,12 +191,11 @@ static void zoom_out() {
     }
 }
 
-static void engage_autopilot() {
-    auto player = g.ship;
-    if (!(player->attributes & kOnAutoPilot)) {
-        player->keysDown |= kAutoPilotKey;
+static void engage_autopilot(Handle<SpaceObject> flagship) {
+    if (!(flagship->attributes & kOnAutoPilot)) {
+        flagship->keysDown |= kAutoPilotKey;
     }
-    player->keysDown |= kAdoptTargetKey;
+    flagship->keysDown |= kAdoptTargetKey;
 }
 
 static void select_object(Handle<SpaceObject> ship, bool target, Handle<Admiral> adm) {
@@ -232,9 +233,43 @@ static void select_object(Handle<SpaceObject> ship, bool target, Handle<Admiral>
     }
 }
 
-static void pick_object(
-        Handle<SpaceObject> origin_ship, int32_t direction, bool target, int32_t attributes,
-        int32_t nonattributes, Handle<SpaceObject> select_ship, Allegiance allegiance) {
+static bool targets(PlayerEventType type) {
+    return (type != PlayerEventType::SELECT_FRIEND) && (type != PlayerEventType::SELECT_BASE);
+}
+
+// The object that a SELECT_FRIEND, TARGET_FRIEND, TARGET_FOE, SELECT_BASE, or TARGET_BASE key
+// picks for `adm`, looking from `origin_ship` towards `direction`.
+static Handle<SpaceObject> pick_object(
+        Handle<Admiral> adm, Handle<SpaceObject> origin_ship, int32_t direction,
+        PlayerEventType type) {
+    int32_t    attributes, nonattributes;
+    Allegiance allegiance;
+    switch (type) {
+        case PlayerEventType::SELECT_FRIEND:
+        case PlayerEventType::TARGET_FRIEND:
+            attributes    = kCanBeDestination;
+            nonattributes = kIsDestination;
+            allegiance    = FRIENDLY;
+            break;
+        case PlayerEventType::TARGET_FOE:
+            attributes    = kCanBeDestination;
+            nonattributes = kIsDestination;
+            allegiance    = HOSTILE;
+            break;
+        case PlayerEventType::SELECT_BASE:
+            attributes    = kIsDestination;
+            nonattributes = 0;
+            allegiance    = FRIENDLY;
+            break;
+        case PlayerEventType::TARGET_BASE:
+            attributes    = kIsDestination;
+            nonattributes = 0;
+            allegiance    = FRIENDLY_OR_HOSTILE;
+            break;
+        default: return SpaceObject::none();
+    }
+    Handle<SpaceObject> select_ship = targets(type) ? adm->target() : adm->control();
+
     uint64_t huge_distance;
     if (select_ship.get()) {
         uint32_t difference = ABS<int>(origin_ship->location.h - select_ship->location.h);
@@ -258,44 +293,10 @@ static void pick_object(
         huge_distance = 0;
     }
 
-    select_ship = GetManualSelectObject(
+    return GetManualSelectObject(
             origin_ship, direction, attributes, nonattributes, &huge_distance, select_ship,
             allegiance);
-
-    if (select_ship.get()) {
-        select_object(select_ship, target, g.admiral);
-    }
 }
-
-static void select_friendly(Handle<SpaceObject> origin_ship, int32_t direction) {
-    pick_object(
-            origin_ship, direction, false, kCanBeDestination, kIsDestination, g.admiral->control(),
-            FRIENDLY);
-}
-
-static void target_friendly(Handle<SpaceObject> origin_ship, int32_t direction) {
-    pick_object(
-            origin_ship, direction, true, kCanBeDestination, kIsDestination, g.admiral->target(),
-            FRIENDLY);
-}
-
-static void target_hostile(Handle<SpaceObject> origin_ship, int32_t direction) {
-    pick_object(
-            origin_ship, direction, true, kCanBeDestination, kIsDestination, g.admiral->target(),
-            HOSTILE);
-}
-
-static void select_base(Handle<SpaceObject> origin_ship, int32_t direction) {
-    pick_object(origin_ship, direction, false, kIsDestination, 0, g.admiral->control(), FRIENDLY);
-}
-
-static void target_base(Handle<SpaceObject> origin_ship, int32_t direction) {
-    pick_object(
-            origin_ship, direction, true, kIsDestination, 0, g.admiral->target(),
-            FRIENDLY_OR_HOSTILE);
-}
-
-static void target_self() { select_object(g.ship, true, g.admiral); }
 
 static bool use_target_key() {
     if (gDestKeyState == DEST_KEY_DOWN) {
@@ -501,7 +502,7 @@ void PlayerShip::mouse_down(const MouseDownEvent& event) {
         case 1: break;
         default: return;
     }
-    PlayerShipHandleClick(where, event.button());
+    click(where, event.button());
 }
 
 void PlayerShip::mouse_up(const MouseUpEvent& event) {
@@ -544,27 +545,23 @@ void PlayerShip::gamepad_button_down(const GamepadButtonDownEvent& event) {
         switch (event.button) {
             case Gamepad::Button::A:
                 if (_control_active) {
-                    if (_gamepad_state & SELECT_BUMPER) {
-                        select_friendly(player, _control_direction);
-                    } else {
-                        target_friendly(player, _control_direction);
-                    }
+                    pick((_gamepad_state & SELECT_BUMPER) ? PlayerEventType::SELECT_FRIEND
+                                                          : PlayerEventType::TARGET_FRIEND,
+                         _control_direction);
                 }
                 return;
             case Gamepad::Button::B:
                 if (_control_active) {
                     if (_gamepad_state & TARGET_BUMPER) {
-                        target_hostile(player, _control_direction);
+                        pick(PlayerEventType::TARGET_FOE, _control_direction);
                     }
                 }
                 return;
             case Gamepad::Button::X:
                 if (_control_active) {
-                    if (_gamepad_state & SELECT_BUMPER) {
-                        select_base(player, _control_direction);
-                    } else {
-                        target_base(player, _control_direction);
-                    }
+                    pick((_gamepad_state & SELECT_BUMPER) ? PlayerEventType::SELECT_BASE
+                                                          : PlayerEventType::TARGET_BASE,
+                         _control_direction);
                 }
                 return;
             case Gamepad::Button::Y:
@@ -576,9 +573,10 @@ void PlayerShip::gamepad_button_down(const GamepadButtonDownEvent& event) {
                 return;
             case Gamepad::Button::LSB:
                 if (_gamepad_state & TARGET_BUMPER) {
-                    target_self();
+                    _player_events.push_back(
+                            PlayerEvent{PlayerEventType::TARGET_OBJECT, player.number()});
                 } else {
-                    transfer_control(g.admiral);
+                    _player_events.push_back(PlayerEvent{PlayerEventType::TRANSFER});
                 }
                 return;
             default: break;
@@ -696,73 +694,86 @@ bool PlayerShip::active() const {
     return player.get() && player->active && (player->attributes & kIsPlayerShip);
 }
 
-static void handle_destination_key(const std::vector<PlayerEvent>& player_events) {
+void PlayerShip::pick(PlayerEventType type, int32_t direction) {
+    Handle<SpaceObject> o = pick_object(g.admiral, g.ship, direction, type);
+    if (o.get()) {
+        _player_events.push_back(PlayerEvent{
+                targets(type) ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
+                o.number()});
+    }
+}
+
+static void handle_destination_key(
+        Handle<Admiral> adm, const std::vector<PlayerEvent>& player_events) {
     for (const auto& e : player_events) {
-        if (e.type == PlayerEventType::TARGET_SELF && (g.ship->attributes & kCanBeDestination)) {
-            target_self();
+        if (e.type == PlayerEventType::TARGET_SELF &&
+            (adm->flagship()->attributes & kCanBeDestination)) {
+            select_object(adm->flagship(), true, adm);
         }
     }
 }
 
-static void handle_hotkeys(const std::vector<PlayerEvent>& player_events) {
-    for (const auto& e : player_events) {
-        switch (e.type) {
-            case PlayerEventType::HOTKEY_SET:
-                if (globals()->lastSelectedObject.get()) {
-                    auto o = globals()->lastSelectedObject;
-                    if (o->active && (o->id == globals()->lastSelectedObjectID)) {
-                        globals()->hotKey[e.data].object   = globals()->lastSelectedObject;
-                        globals()->hotKey[e.data].objectID = globals()->lastSelectedObjectID;
-                        Update_LabelStrings_ForHotKeyChange();
-                        sys.sound.select();
-                    }
-                }
-                break;
-
-            case PlayerEventType::HOTKEY_SELECT:
-            case PlayerEventType::HOTKEY_TARGET:
-                if (globals()->hotKey[e.data].object.get()) {
-                    auto o = globals()->hotKey[e.data].object;
-                    if (o->active && (o->id == globals()->hotKey[e.data].objectID)) {
-                        bool target = (e.type == PlayerEventType::HOTKEY_TARGET) ||
-                                      (o->owner != g.admiral);
-                        select_object(o, target, g.admiral);
-                    } else {
-                        globals()->hotKey[e.data].object = SpaceObject::none();
-                    }
-                }
-                break;
-
-            default: break;
+static void set_hotkey(int i) {
+    if (globals()->lastSelectedObject.get()) {
+        auto o = globals()->lastSelectedObject;
+        if (o->active && (o->id == globals()->lastSelectedObjectID)) {
+            globals()->hotKey[i].object   = globals()->lastSelectedObject;
+            globals()->hotKey[i].objectID = globals()->lastSelectedObjectID;
+            Update_LabelStrings_ForHotKeyChange();
+            sys.sound.select();
         }
     }
 }
 
-static void handle_target_keys(const std::vector<PlayerEvent>& player_events) {
-    // for this we check lastKeys against theseKeys & relevent keys now being pressed
+static sfz::optional<PlayerEvent> use_hotkey(int i, bool target) {
+    if (globals()->hotKey[i].object.get()) {
+        auto o = globals()->hotKey[i].object;
+        if (o->active && (o->id == globals()->hotKey[i].objectID)) {
+            target = target || (o->owner != g.admiral);
+            return sfz::make_optional(PlayerEvent{
+                    target ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
+                    o.number()});
+        } else {
+            globals()->hotKey[i].object = SpaceObject::none();
+        }
+    }
+    return sfz::nullopt;
+}
+
+static void handle_selections(Handle<Admiral> adm, const std::vector<PlayerEvent>& player_events) {
     for (const auto& e : player_events) {
-        switch (e.type) {
-            case PlayerEventType::SELECT_FRIEND: select_friendly(g.ship, g.ship->direction); break;
-            case PlayerEventType::TARGET_FRIEND: target_friendly(g.ship, g.ship->direction); break;
-            case PlayerEventType::TARGET_FOE: target_hostile(g.ship, g.ship->direction); break;
-            case PlayerEventType::SELECT_BASE: select_base(g.ship, g.ship->direction); break;
-            case PlayerEventType::TARGET_BASE: target_base(g.ship, g.ship->direction); break;
-            default: continue;
+        if (((e.type == PlayerEventType::SELECT_OBJECT) ||
+             (e.type == PlayerEventType::TARGET_OBJECT)) &&
+            (0 <= e.data) && (e.data < kMaxSpaceObject)) {
+            Handle<SpaceObject> o(e.data);
+            if (o->active) {
+                select_object(o, e.type == PlayerEventType::TARGET_OBJECT, adm);
+            }
+        }
+    }
+}
+
+static void handle_target_keys(
+        Handle<Admiral> adm, const std::vector<PlayerEvent>& player_events) {
+    for (const auto& e : player_events) {
+        auto flagship = adm->flagship();
+        auto o        = pick_object(adm, flagship, flagship->direction, e.type);
+        if (o.get()) {
+            select_object(o, targets(e.type), adm);
         }
     }
 }
 
 static void handle_pilot_keys(
-        Handle<SpaceObject> flagship, int32_t these_keys, int32_t gamepad_keys,
-        bool gamepad_control, int32_t gamepad_control_direction) {
+        Handle<SpaceObject> flagship, int32_t these_keys, int32_t gamepad_keys, int32_t steer) {
     if (flagship->attributes & kOnAutoPilot) {
         if ((these_keys | gamepad_keys) & (kUpKey | kDownKey | kLeftKey | kRightKey)) {
             flagship->keysDown = these_keys | kAutoPilotKey;
         }
     } else {
         flagship->keysDown = these_keys | gamepad_keys;
-        if (gamepad_control) {
-            int difference = mAngleDifference(gamepad_control_direction, flagship->direction);
+        if (steer >= 0) {
+            int difference = mAngleDifference(steer, flagship->direction);
             if (abs(difference) < 15) {
                 // pass
             } else if (difference < 0) {
@@ -774,156 +785,24 @@ static void handle_pilot_keys(
     }
 }
 
-static void handle_order_key(const std::vector<PlayerEvent>& player_events) {
+static void handle_order_key(Handle<Admiral> adm, const std::vector<PlayerEvent>& player_events) {
     for (const auto& e : player_events) {
         if (e.type == PlayerEventType::ORDER) {
-            g.ship->keysDown |= kGiveCommandKey;
+            adm->flagship()->keysDown |= kGiveCommandKey;
         }
     }
 }
 
-static void handle_autopilot_keys(const std::vector<PlayerEvent>& player_events) {
+static void handle_autopilot_keys(
+        Handle<Admiral> adm, const std::vector<PlayerEvent>& player_events) {
     for (const auto& e : player_events) {
         if (e.type == PlayerEventType::AUTOPILOT) {
-            engage_autopilot();
+            engage_autopilot(adm->flagship());
         }
     }
 }
 
-void PlayerShip::update() {
-    if (!g.ship.get()) {
-        return;
-    }
-
-    if (_message.editing()) {
-        _player_events.clear();
-        gTheseKeys = 0;
-    }
-
-    for (auto e : _player_events) {
-        switch (e.type) {
-            case PlayerEventType::ACCEL_ON: gTheseKeys |= (kUpKey & ~g.key_mask); break;
-            case PlayerEventType::DECEL_ON: gTheseKeys |= (kDownKey & ~g.key_mask); break;
-            case PlayerEventType::CCW_ON: gTheseKeys |= (kLeftKey & ~g.key_mask); break;
-            case PlayerEventType::CW_ON: gTheseKeys |= (kRightKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_1_ON: gTheseKeys |= (kPulseKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_2_ON: gTheseKeys |= (kBeamKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_S_ON: gTheseKeys |= (kSpecialKey & ~g.key_mask); break;
-            case PlayerEventType::WARP_ON: gTheseKeys |= (kWarpKey & ~g.key_mask); break;
-
-            case PlayerEventType::ACCEL_OFF: gTheseKeys &= ~(kUpKey & ~g.key_mask); break;
-            case PlayerEventType::DECEL_OFF: gTheseKeys &= ~(kDownKey & ~g.key_mask); break;
-            case PlayerEventType::CCW_OFF: gTheseKeys &= ~(kLeftKey & ~g.key_mask); break;
-            case PlayerEventType::CW_OFF: gTheseKeys &= ~(kRightKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_1_OFF: gTheseKeys &= ~(kPulseKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_2_OFF: gTheseKeys &= ~(kBeamKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_S_OFF: gTheseKeys &= ~(kSpecialKey & ~g.key_mask); break;
-            case PlayerEventType::WARP_OFF: gTheseKeys &= ~(kWarpKey & ~g.key_mask); break;
-
-            case PlayerEventType::ZOOM_OUT: zoom_out(); break;
-            case PlayerEventType::ZOOM_IN: zoom_in(); break;
-            case PlayerEventType::ZOOM_1X: zoom_shortcut(Zoom::ACTUAL); break;
-            case PlayerEventType::ZOOM_2X: zoom_shortcut(Zoom::HALF); break;
-            case PlayerEventType::ZOOM_4X: zoom_shortcut(Zoom::QUARTER); break;
-            case PlayerEventType::ZOOM_16X: zoom_shortcut(Zoom::SIXTEENTH); break;
-            case PlayerEventType::ZOOM_FOE: zoom_shortcut(Zoom::FOE); break;
-            case PlayerEventType::ZOOM_OBJ: zoom_shortcut(Zoom::OBJECT); break;
-            case PlayerEventType::ZOOM_ALL: zoom_shortcut(Zoom::ALL); break;
-            case PlayerEventType::TRANSFER: transfer_control(g.admiral); break;
-
-            case PlayerEventType::MINI_BUILD: build_ship(g.admiral, e.data); break;
-
-            case PlayerEventType::MINI_HOLD: hold_position(g.admiral); break;
-            case PlayerEventType::MINI_COME: come_to_me(g.admiral); break;
-            case PlayerEventType::MINI_FIRE_1: fire_weapon(g.admiral, kPulseKey); break;
-            case PlayerEventType::MINI_FIRE_2: fire_weapon(g.admiral, kBeamKey); break;
-            case PlayerEventType::MINI_FIRE_S: fire_weapon(g.admiral, kSpecialKey); break;
-
-            case PlayerEventType::NEXT_PAGE: next_message(g.admiral); break;
-            case PlayerEventType::MINI_NEXT_PAGE: next_message(g.admiral); break;
-            case PlayerEventType::MINI_PREV_PAGE: prev_message(g.admiral); break;
-            case PlayerEventType::MINI_LAST_MESSAGE: last_message(g.admiral); break;
-
-            default: break;
-        }
-    }
-
-    /*
-    while ((globals()->gKeyMapBufferBottom != globals()->gKeyMapBufferTop)) {
-        bufMap = globals()->gKeyMapBuffer + globals()->gKeyMapBufferBottom;
-        globals()->gKeyMapBufferBottom++;
-        if (globals()->gKeyMapBufferBottom >= kKeyMapBufferNum) {
-            globals()->gKeyMapBufferBottom = 0;
-        }
-        if (*enterMessage) {
-            String* message = Label::get_string(g.send_label);
-            if (message->empty()) {
-                message->assign("<>");
-            }
-            if ((mReturnKey(*bufMap)) && (!AnyKeyButThisOne(*bufMap, Keys::RETURN))) {
-                *enterMessage = false;
-                StringSlice sliced = message->slice(1, message->size() - 2);
-                int cheat = GetCheatNumFromString(sliced);
-                if (cheat > 0) {
-                    ExecuteCheat(cheat, g.admiral);
-                } else if (!sliced.empty()) {
-                    if (globals()->gActiveCheats[g.admiral] & kNameObjectBit)
-                    {
-                        SetAdmiralBuildAtName(g.admiral, sliced);
-                        globals()->gActiveCheats[g.admiral] &= ~kNameObjectBit;
-                    }
-                }
-                Label::set_position(
-                        g.send_label,
-                        viewport.left + ((viewport.width() / 2)),
-                        viewport.top + ((play_screen.height() / 2)) +
-                        kSendMessageVOffset);
-                Label::recalc_size(g.send_label);
-            } else {
-                if ((mDeleteKey(*bufMap)) || (mLeftArrowKey(*bufMap))) {
-                    if (message->size() > 2) {
-                        if (mCommandKey(*bufMap)) {
-                            // delete whole message
-                            message->assign("<>");
-                        } else {
-                            message->resize(message->size() - 2);
-                            message->append(1, '>');
-                        }
-                    }
-                } else {
-                    if (message->size() < 120) {
-                        uint8_t ch = GetAsciiFromKeyMap(*bufMap, globals()->gLastMessageKeyMap);
-                        if (ch) {
-                            message->resize(message->size() - 1);
-                            String s(macroman::decode(sfz::BytesSlice(&ch, 1)));
-                            message->append(s);
-                            message->append(1, '>');
-                        }
-                    }
-                }
-                width = sys.fonts.tactical->string_width(*message);
-                strlen = viewport.left + ((viewport.width() / 2) - (width / 2));
-                if ((strlen + width) > (viewport.right))
-                {
-                    strlen -= (strlen + width) - (viewport.right);
-                }
-                Label::recalc_size(g.send_label);
-                Label::set_position(g.send_label, strlen, viewport.top +
-                    ((play_screen.height() / 2) + kSendMessageVOffset));
-            }
-        } else {
-            if ((mReturnKey(*bufMap)) && (!(g.key_mask & kReturnKeyMask))) {
-                *enterMessage = true;
-            }
-        }
-        globals()->gLastMessageKeyMap.copy(*bufMap);
-    }
-    */
-
-    if (!g.ship->active) {
-        return;
-    }
-
+static void sound_klaxon() {
     if (g.ship->health() < (g.ship->base->health >> 2L)) {
         if (g.time > globals()->next_klaxon) {
             if (globals()->next_klaxon == game_ticks()) {
@@ -937,30 +816,152 @@ void PlayerShip::update() {
     } else {
         globals()->next_klaxon = game_ticks();
     }
+}
 
-    if (!(g.ship->attributes & kIsPlayerShip)) {
+std::vector<PlayerEvent> PlayerShip::commands() {
+    std::vector<PlayerEvent> commands;
+    if (_message.editing()) {
+        _player_events.clear();
+        commands.push_back(PlayerEvent{PlayerEventType::CLEAR});
+    }
+
+    for (auto e : _player_events) {
+        switch (e.type) {
+            case PlayerEventType::ZOOM_OUT: zoom_out(); break;
+            case PlayerEventType::ZOOM_IN: zoom_in(); break;
+            case PlayerEventType::ZOOM_1X: zoom_shortcut(Zoom::ACTUAL); break;
+            case PlayerEventType::ZOOM_2X: zoom_shortcut(Zoom::HALF); break;
+            case PlayerEventType::ZOOM_4X: zoom_shortcut(Zoom::QUARTER); break;
+            case PlayerEventType::ZOOM_16X: zoom_shortcut(Zoom::SIXTEENTH); break;
+            case PlayerEventType::ZOOM_FOE: zoom_shortcut(Zoom::FOE); break;
+            case PlayerEventType::ZOOM_OBJ: zoom_shortcut(Zoom::OBJECT); break;
+            case PlayerEventType::ZOOM_ALL: zoom_shortcut(Zoom::ALL); break;
+
+            case PlayerEventType::NEXT_PAGE: next_message(g.admiral); break;
+            case PlayerEventType::MINI_NEXT_PAGE: next_message(g.admiral); break;
+            case PlayerEventType::MINI_PREV_PAGE: prev_message(g.admiral); break;
+            case PlayerEventType::MINI_LAST_MESSAGE: last_message(g.admiral); break;
+
+            case PlayerEventType::HOTKEY_SET: set_hotkey(e.data); break;
+            case PlayerEventType::HOTKEY_SELECT:
+            case PlayerEventType::HOTKEY_TARGET: {
+                auto select = use_hotkey(e.data, e.type == PlayerEventType::HOTKEY_TARGET);
+                if (select.has_value()) {
+                    commands.push_back(*select);
+                }
+            } break;
+
+            case PlayerEventType::SELECT_FRIEND:
+            case PlayerEventType::TARGET_FRIEND:
+            case PlayerEventType::TARGET_FOE:
+            case PlayerEventType::SELECT_BASE:
+            case PlayerEventType::TARGET_BASE:
+                if (!_cursor.active()) {
+                    commands.push_back(e);
+                }
+                break;
+
+            default: commands.push_back(e); break;
+        }
+    }
+    _player_events.clear();
+
+    if (_gamepad_keys != _sent_gamepad_keys) {
+        _sent_gamepad_keys = _gamepad_keys;
+        commands.push_back(PlayerEvent{PlayerEventType::GAMEPAD_KEYS, int(_gamepad_keys)});
+    }
+    int32_t steer = ((_gamepad_state == NO_BUMPER) && _control_active) ? _control_direction : -1;
+    if (steer != _sent_steer) {
+        _sent_steer = steer;
+        commands.push_back(PlayerEvent{PlayerEventType::STEER, steer});
+    }
+    return commands;
+}
+
+void PlayerShip::execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& commands) {
+    Pilot& pilot = _pilots[adm.number()];
+    pilot.events.insert(pilot.events.end(), commands.begin(), commands.end());
+
+    if (!adm->flagship().get()) {
         return;
     }
 
-    Handle<SpaceObject> flagship = g.ship;  // Pilot same ship even after minicomputer transfer.
-    for (auto e : _player_events) {
+    for (auto it = pilot.events.rbegin(); it != pilot.events.rend(); ++it) {
+        if (it->type == PlayerEventType::CLEAR) {
+            pilot.events.erase(pilot.events.begin(), it.base());
+            pilot.keys = 0;
+            break;
+        }
+    }
+
+    uint32_t& keys = pilot.keys;
+    for (auto e : pilot.events) {
         switch (e.type) {
-            case PlayerEventType::MINI_TRANSFER: transfer_control(g.admiral); break;
+            case PlayerEventType::ACCEL_ON: keys |= (kUpKey & ~g.key_mask); break;
+            case PlayerEventType::DECEL_ON: keys |= (kDownKey & ~g.key_mask); break;
+            case PlayerEventType::CCW_ON: keys |= (kLeftKey & ~g.key_mask); break;
+            case PlayerEventType::CW_ON: keys |= (kRightKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_1_ON: keys |= (kPulseKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_2_ON: keys |= (kBeamKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_S_ON: keys |= (kSpecialKey & ~g.key_mask); break;
+            case PlayerEventType::WARP_ON: keys |= (kWarpKey & ~g.key_mask); break;
+
+            case PlayerEventType::ACCEL_OFF: keys &= ~(kUpKey & ~g.key_mask); break;
+            case PlayerEventType::DECEL_OFF: keys &= ~(kDownKey & ~g.key_mask); break;
+            case PlayerEventType::CCW_OFF: keys &= ~(kLeftKey & ~g.key_mask); break;
+            case PlayerEventType::CW_OFF: keys &= ~(kRightKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_1_OFF: keys &= ~(kPulseKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_2_OFF: keys &= ~(kBeamKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_S_OFF: keys &= ~(kSpecialKey & ~g.key_mask); break;
+            case PlayerEventType::WARP_OFF: keys &= ~(kWarpKey & ~g.key_mask); break;
+
+            case PlayerEventType::GAMEPAD_KEYS: pilot.gamepad_keys = e.data; break;
+            case PlayerEventType::STEER: pilot.steer = e.data; break;
+
+            case PlayerEventType::TRANSFER: transfer_control(adm); break;
+
+            case PlayerEventType::MINI_BUILD: build_ship(adm, e.data); break;
+
+            case PlayerEventType::MINI_HOLD: hold_position(adm); break;
+            case PlayerEventType::MINI_COME: come_to_me(adm); break;
+            case PlayerEventType::MINI_FIRE_1: fire_weapon(adm, kPulseKey); break;
+            case PlayerEventType::MINI_FIRE_2: fire_weapon(adm, kBeamKey); break;
+            case PlayerEventType::MINI_FIRE_S: fire_weapon(adm, kSpecialKey); break;
+
             default: break;
         }
     }
-    handle_destination_key(_player_events);
-    handle_hotkeys(_player_events);
-    if (!_cursor.active()) {
-        handle_target_keys(_player_events);
-    }
-    handle_pilot_keys(
-            flagship, gTheseKeys, _gamepad_keys, (_gamepad_state == NO_BUMPER) && _control_active,
-            _control_direction);
-    handle_order_key(_player_events);
-    handle_autopilot_keys(_player_events);
 
-    _player_events.clear();
+    Handle<SpaceObject> flagship = adm->flagship();  // Pilot same ship even after transfer.
+    if (!flagship->active) {
+        return;
+    }
+    if (adm == g.admiral) {
+        sound_klaxon();
+    }
+    if (!(flagship->attributes & kIsPlayerShip)) {
+        return;
+    }
+
+    for (auto e : pilot.events) {
+        if (e.type == PlayerEventType::MINI_TRANSFER) {
+            transfer_control(adm);
+        }
+    }
+    handle_destination_key(adm, pilot.events);
+    handle_selections(adm, pilot.events);
+    handle_target_keys(adm, pilot.events);
+    handle_pilot_keys(flagship, keys, pilot.gamepad_keys, pilot.steer);
+    handle_order_key(adm, pilot.events);
+    handle_autopilot_keys(adm, pilot.events);
+
+    pilot.events.clear();
+}
+
+std::vector<pn::string> PlayerShip::take_messages() {
+    std::vector<pn::string> messages;
+    messages.swap(_message.sent);
+    return messages;
 }
 
 bool PlayerShip::show_select() const {
@@ -1005,7 +1006,11 @@ const StyledText& PlayerShip::MessageText::styled_text() const { return g.send_l
 
 void PlayerShip::MessageText::accept() {
     Cheat cheat = GetCheatFromString(text());
-    if (cheat != Cheat::NONE) {
+    if (g.level->type() == Level::Type::NET) {
+        if (!text().empty()) {
+            sent.push_back(text().copy());
+        }
+    } else if (cheat != Cheat::NONE) {
         ExecuteCheat(cheat, g.admiral);
     } else if (!text().empty()) {
         if (g.admiral->cheats() & kNameObjectBit) {
@@ -1022,7 +1027,7 @@ void PlayerShip::MessageText::escape() {
     g.admiral->cheats() &= ~kNameObjectBit;
 }
 
-void PlayerShipHandleClick(Point where, int button) {
+void PlayerShip::click(Point where, int button) {
     if (g.key_mask & kMouseMask) {
         return;
     }
@@ -1037,21 +1042,14 @@ void PlayerShipHandleClick(Point where, int button) {
                     where.v + kCursorBoundsSize,
             };
 
-            if (target) {
-                auto target        = g.admiral->target();
-                auto selectShipNum = GetSpritePointSelectObject(
-                        &bounds, g.ship, kCanBeDestination | kIsDestination, target,
-                        FRIENDLY_OR_HOSTILE);
-                if (selectShipNum.get()) {
-                    select_object(selectShipNum, true, g.admiral);
-                }
-            } else {
-                auto control       = g.admiral->control();
-                auto selectShipNum = GetSpritePointSelectObject(
-                        &bounds, g.ship, kCanBeDestination | kIsDestination, control, FRIENDLY);
-                if (selectShipNum.get()) {
-                    select_object(selectShipNum, false, g.admiral);
-                }
+            auto selectShipNum = GetSpritePointSelectObject(
+                    &bounds, g.ship, kCanBeDestination | kIsDestination,
+                    target ? g.admiral->target() : g.admiral->control(),
+                    target ? FRIENDLY_OR_HOSTILE : FRIENDLY);
+            if (selectShipNum.get()) {
+                _player_events.push_back(PlayerEvent{
+                        target ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
+                        selectShipNum.number()});
             }
         }
     }

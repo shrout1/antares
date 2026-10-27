@@ -1,0 +1,139 @@
+// Copyright (C) 1997, 1999-2001, 2008 Nathan Lamont
+// Copyright (C) 2008-2026 The Antares Authors
+//
+// This file is part of Antares, a tactical space combat game.
+//
+// Antares is free software: you can redistribute it and/or modify it
+// under the terms of the Lesser GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Antares is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with Antares.  If not, see http://www.gnu.org/licenses/
+
+#include "net/lockstep.hpp"
+
+#include <gmock/gmock.h>
+#include <stdexcept>
+
+namespace antares {
+namespace net {
+namespace {
+
+using LockstepTest = testing::Test;
+
+Lockstep::Turn turn(uint32_t type, int32_t data) {
+    Turns::Event e;
+    e.type = type;
+    e.data = data;
+    return {e};
+}
+
+void exchange(Lockstep* a, Lockstep* b) {
+    a->receive(b->outgoing(a->local()));
+    b->receive(a->outgoing(b->local()));
+}
+
+TEST_F(LockstepTest, Delay) {
+    Lockstep a(2, 0, 10, 3);
+    EXPECT_TRUE(a.ready(10));
+    EXPECT_TRUE(a.ready(12));
+    EXPECT_FALSE(a.ready(13));
+    EXPECT_EQ(2u, a.take(10).size());
+    EXPECT_THROW(a.take(12), std::runtime_error);
+    EXPECT_THROW(a.submit(11, {}), std::runtime_error);
+}
+
+TEST_F(LockstepTest, Play) {
+    Lockstep a(2, 0, 1, 2), b(2, 1, 1, 2);
+    for (uint32_t t = 1; t <= 20; ++t) {
+        a.submit(t, turn(1, t));
+        b.submit(t, (t % 3) ? Lockstep::Turn{} : turn(2, -t));
+        exchange(&a, &b);
+        ASSERT_TRUE(a.ready(t));
+        ASSERT_TRUE(b.ready(t));
+        std::vector<Lockstep::Turn> x = a.take(t), y = b.take(t);
+        ASSERT_EQ(2u, x.size());
+        ASSERT_EQ(x[0].size(), y[0].size());
+        ASSERT_EQ(x[1].size(), y[1].size());
+        if (t > 2) {
+            ASSERT_EQ(1u, x[0].size());
+            EXPECT_EQ(static_cast<int32_t>(t - 2), x[0][0].data);
+            EXPECT_EQ(x[0][0].data, y[0][0].data);
+            EXPECT_EQ(((t - 2) % 3) ? 0u : 1u, y[1].size());
+        }
+    }
+}
+
+TEST_F(LockstepTest, WaitsForLostTurns) {
+    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+    a.submit(1, turn(1, 1));
+    b.submit(1, {});
+    b.receive(a.outgoing(1));  // a never hears from b.
+    EXPECT_FALSE(a.ready(2));
+    EXPECT_TRUE(b.ready(2));
+
+    a.take(1);
+    b.take(1);
+    b.take(2);
+    b.submit(2, {});
+    a.submit(2, turn(1, 2));
+    EXPECT_FALSE(a.ready(2));
+
+    Turns resent = b.outgoing(0);
+    EXPECT_EQ(2u, resent.first);
+    EXPECT_EQ(2u, resent.turns.size());
+    a.receive(resent);
+    EXPECT_TRUE(a.ready(3));
+}
+
+TEST_F(LockstepTest, AcknowledgedTurnsAreNotResent) {
+    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+    for (uint32_t t = 1; t <= 5; ++t) {
+        a.submit(t, {});
+        b.submit(t, {});
+    }
+    EXPECT_EQ(5u, a.outgoing(1).turns.size());
+    exchange(&a, &b);
+    exchange(&a, &b);
+    EXPECT_EQ(0u, a.outgoing(1).turns.size());
+    EXPECT_EQ(7u, a.outgoing(1).first);
+}
+
+TEST_F(LockstepTest, Desync) {
+    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+    a.sync(1, 100);
+    b.sync(1, 100);
+    exchange(&a, &b);
+    EXPECT_FALSE(a.desynced());
+    EXPECT_FALSE(b.desynced());
+
+    a.sync(2, 101);
+    exchange(&a, &b);  // b hasn't executed turn 2 yet.
+    b.sync(2, 999);
+    EXPECT_TRUE(b.desynced());
+    exchange(&a, &b);
+    EXPECT_TRUE(a.desynced());
+}
+
+TEST_F(LockstepTest, IgnoresInvalidPlayers) {
+    Lockstep a(2, 0, 1, 1);
+    Turns    t;
+    t.player = 5;
+    t.first  = 2;
+    t.turns.push_back(turn(1, 1));
+    a.receive(t);
+    t.player = 0;
+    a.receive(t);
+    EXPECT_FALSE(a.ready(2));
+    EXPECT_THROW(a.outgoing(0), std::runtime_error);
+}
+
+}  // namespace
+}  // namespace net
+}  // namespace antares

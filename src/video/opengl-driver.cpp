@@ -393,7 +393,10 @@ class OpenGlTextureImpl : public Texture::Impl {
 
 OpenGlVideoDriver::OpenGlVideoDriver() : _static_seed{0} {}
 
-int OpenGlVideoDriver::scale() const { return viewport_size().width / screen_size().width; }
+int OpenGlVideoDriver::scale() const {
+    const int width = screen_size().width;
+    return (width > 0) ? (viewport_size().width / width) : 1;
+}
 
 vec4 OpenGlVideoDriver::region_transform(Region region) const {
     float s = scale();

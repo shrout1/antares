@@ -50,7 +50,7 @@ void create_initial(Handle<const Initial> initial) {
 
     int32_t attributes = 0;
     if (initial->flagship.value_or(false)) {
-        if ((owner == g.admiral) && !owner->flagship().get()) {
+        if (owner.get() && (owner->attributes() & kAIsHuman) && !owner->flagship().get()) {
             attributes |= kIsPlayerShip;
         }
     }
@@ -143,7 +143,7 @@ void UnhideInitialObject(Handle<const Initial> initial) {
 
     uint32_t attributes = 0;
     if (initial->flagship.value_or(false)) {
-        if ((owner == g.admiral) && !owner->flagship().get()) {
+        if (owner.get() && (owner->attributes() & kAIsHuman) && !owner->flagship().get()) {
             attributes |= kIsPlayerShip;
         }
     }
