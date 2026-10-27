@@ -32,6 +32,8 @@ namespace antares {
 
 // One line of text typed into an interface box.
 class NetTextField : public EditableText {
+    using TextReceiver::range;
+
   public:
     NetTextField(int32_t width, std::function<void()> accept, std::function<void()> escape);
 
