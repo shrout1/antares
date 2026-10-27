@@ -406,6 +406,9 @@ void construct_level(LoadState* state) {
     }
     ++state->step;
     if (state->step == state->max) {
+        if (g.level->type() == Level::Type::NET) {
+            assign_net_flagships();
+        }
         state->done = true;
     }
     return;
