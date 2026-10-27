@@ -66,10 +66,12 @@ const char* const kHueNames[] = {
 };
 const int kHueCount = 16;
 
+// Net levels for as many players as a session holds.
 std::vector<pn::string_view> net_levels() {
     std::vector<pn::string_view> names;
     for (const auto& kv : plug.levels) {
-        if (kv.second.type() == Level::Type::NET) {
+        if ((kv.second.type() == Level::Type::NET) &&
+            (kv.second.net.players.size() == net::kSessionPlayers)) {
             names.push_back(kv.first);
         }
     }
