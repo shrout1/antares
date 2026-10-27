@@ -675,7 +675,7 @@ void NetLobbyScreen::overlay() const {
         if (hue == me.hue) {
             Rect frame = r;
             frame.inset(-2, -2);
-            Rects().fill(frame, GetRGBTranslateColorShade(Hue::GRAY, LIGHTEST));
+            Rects().fill(frame, RgbColor::white());
         }
         const bool ok = !me.race.empty() && allowed(me.race, hue, other);
         Rects().fill(r, GetRGBTranslateColorShade(static_cast<Hue>(hue), ok ? LIGHT : VERY_DARK));
