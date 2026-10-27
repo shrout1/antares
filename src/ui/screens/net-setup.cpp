@@ -29,6 +29,7 @@
 #include "game/sys.hpp"
 #include "game/time.hpp"
 #include "math/units.hpp"
+#include "sound/fx.hpp"
 #include "video/driver.hpp"
 
 namespace antares {
@@ -51,7 +52,7 @@ static constexpr char kLagRect[]               = "lag";
 static constexpr char kNextSpeciesButton[]     = "next-species";
 static constexpr char kPreviousSpeciesButton[] = "previous-species";
 static constexpr char kSpeciesRect[]           = "species";
-static constexpr char kColorButton[]           = "color";
+static constexpr char kSelectColorRect[]       = "select-color";
 
 namespace {
 
@@ -142,6 +143,79 @@ Rect inner_bounds(const Widget& w, Point off) {
 void draw_centered(const Rect& r, pn::string_view text, Hue hue, const Font& font) {
     Point at(r.center().h - (font.string_width(text) / 2), r.center().v - (font.height / 2));
     font.draw(Point(at.h, at.v + font.ascent), text, GetRGBTranslateColorShade(hue, LIGHTEST));
+}
+
+int level_index(const std::vector<pn::string_view>& levels, pn::string_view level) {
+    auto it = std::find(levels.begin(), levels.end(), level);
+    return (it == levels.end()) ? -1 : (it - levels.begin());
+}
+
+int race_index(const std::vector<NamedHandle<const Race>>& races, pn::string_view name) {
+    for (int i = 0; i < races.size(); ++i) {
+        if (races[i].name() == name) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// The rows of a list that fit in `box`, scrolled to show `selected`.
+struct ListRows {
+    int first;
+    int count;
+    int top;
+};
+
+ListRows list_rows(const Rect& box, int size, int selected) {
+    const int height = sys.fonts.button.height;
+    const int rows   = std::max(1, box.height() / height);
+    ListRows  r;
+    r.first = std::max(0, std::min(selected - (rows / 2), size - rows));
+    r.count = std::min(rows, size - r.first);
+    r.top   = box.top + ((box.height() - (rows * height)) / 2);
+    return r;
+}
+
+Rect list_row(const Rect& box, const ListRows& rows, int i) {
+    const int top = rows.top + ((i - rows.first) * sys.fonts.button.height);
+    return Rect(box.left, top, box.right, top + sys.fonts.button.height);
+}
+
+int list_index(const Rect& box, int size, int selected, Point where) {
+    const ListRows rows = list_rows(box, size, selected);
+    for (int i = rows.first; i < rows.first + rows.count; ++i) {
+        if (list_row(box, rows, i).contains(where)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void draw_list(const Rect& box, const std::vector<pn::string>& items, int selected, Hue hue) {
+    const Font&    font = sys.fonts.button;
+    const ListRows rows = list_rows(box, items.size(), selected);
+    for (int i = rows.first; i < rows.first + rows.count; ++i) {
+        const Rect row = list_row(box, rows, i);
+        if (i == selected) {
+            Rects().fill(row, GetRGBTranslateColorShade(hue, DARK));
+        }
+        font.draw(
+                Point(row.left + 4, row.top + font.ascent), items[i],
+                GetRGBTranslateColorShade(hue, (i == selected) ? LIGHTEST : LIGHT));
+    }
+}
+
+// Colors other than gray, in two rows.
+const int kSwatchColumns = 8;
+
+Rect swatch(const Rect& box, int hue) {
+    const int i = hue - 1;
+    const int w = box.width() / kSwatchColumns;
+    const int h = box.height() / 2;
+    Rect      r(box.left + ((i % kSwatchColumns) * w), box.top + ((i / kSwatchColumns) * h),
+                box.left + ((i % kSwatchColumns + 1) * w), box.top + ((i / kSwatchColumns + 1) * h));
+    r.inset(2, 2);
+    return r;
 }
 
 }  // namespace
@@ -318,7 +392,6 @@ NetLobbyScreen::NetLobbyScreen(net::Session* session)
     };
     button(kNextSpeciesButton)->bind({[this] { change_race(+1); }, can_change_race});
     button(kPreviousSpeciesButton)->bind({[this] { change_race(-1); }, can_change_race});
-    button(kColorButton)->bind({[this] { change_hue(+1); }});
 }
 
 void NetLobbyScreen::become_front() {
@@ -363,12 +436,69 @@ void NetLobbyScreen::fire_timer() {
     update();
 }
 
+void NetLobbyScreen::mouse_down(const MouseDownEvent& event) {
+    Point where = event.where();
+    Point off   = offset();
+    where.offset(-off.h, -off.v);
+    if (event.button() != 0) {
+        InterfaceScreen::mouse_down(event);
+        return;
+    }
+
+    const net::Setup setup = _session->setup();
+    const int        local = _session->local();
+    if (widget(kEnterTextRect)->inner_bounds().contains(where)) {
+        if (!_editing && sys.video->start_editing(&_field)) {
+            _editing = true;
+        }
+        return;
+    }
+
+    if (_session->is_host()) {
+        std::vector<pn::string_view> levels = net_levels();
+        int                          i      = list_index(
+                widget(kLevelRect)->inner_bounds(), levels.size(),
+                level_index(levels, setup.level), where);
+        if (i >= 0) {
+            sys.sound.select();
+            choose_level(i);
+            return;
+        }
+    }
+
+    if (setup.players.size() > local) {
+        const auto& races = races_for(setup, local);
+        int         i     = list_index(
+                widget(kSpeciesRect)->inner_bounds(), races.size(),
+                race_index(races, setup.players[local].race), where);
+        if (i >= 0) {
+            sys.sound.select();
+            choose(races[i].name(), -1);
+            update();
+            return;
+        }
+
+        const Rect colors = widget(kSelectColorRect)->inner_bounds();
+        for (int hue = 1; hue < kHueCount; ++hue) {
+            if (swatch(colors, hue).contains(where)) {
+                choose_hue(hue);
+                return;
+            }
+        }
+    }
+
+    InterfaceScreen::mouse_down(event);
+}
+
 void NetLobbyScreen::change_level(int by) {
     std::vector<pn::string_view> levels = net_levels();
-    net::Setup                   setup  = _session->setup();
-    auto it     = std::find(levels.begin(), levels.end(), pn::string_view{setup.level});
-    int  i      = (it == levels.end()) ? 0 : (it - levels.begin());
-    setup.level = levels[(i + by + levels.size()) % levels.size()].copy();
+    int                          i = std::max(0, level_index(levels, _session->setup().level));
+    choose_level((i + by + levels.size()) % levels.size());
+}
+
+void NetLobbyScreen::choose_level(int index) {
+    net::Setup setup = _session->setup();
+    setup.level      = net_levels()[index].copy();
     _session->set_setup(std::move(setup));
     update();
 }
@@ -391,14 +521,15 @@ void NetLobbyScreen::change_race(int by) {
     update();
 }
 
-void NetLobbyScreen::change_hue(int by) {
+void NetLobbyScreen::choose_hue(int hue) {
     const net::Setup setup = _session->setup();
     const int        local = _session->local();
-    if ((setup.players.size() <= local) || setup.players[local].race.empty()) {
+    if ((setup.players.size() <= local) || setup.players[local].race.empty() ||
+        !allowed(setup.players[local].race, hue, other_hue(setup, local))) {
         return;
     }
-    const net::Setup::Player& me = setup.players[local];
-    _session->choose(me.race, next_hue(me.race, me.hue, by, other_hue(setup, local)));
+    sys.sound.select();
+    _session->choose(setup.players[local].race, hue);
     update();
 }
 
@@ -436,8 +567,8 @@ void NetLobbyScreen::send() {
     sys.video->stop_editing(&_field);
 }
 
-// Keeps the local choice valid for the level and the other player, notes players joining and
-// the other player's choice, and shows the local color.
+// Keeps the local choice valid for the level and the other player, and notes players joining and
+// the other player's choice.
 void NetLobbyScreen::update() {
     net::Setup setup = _session->setup();
     const int  local = _session->local();
@@ -477,14 +608,6 @@ void NetLobbyScreen::update() {
     if (_messages.size() > kMaxMessages) {
         _messages.erase(_messages.begin(), _messages.end() - kMaxMessages);
     }
-
-    int hue = setup.players[local].hue;
-    if ((hue < 0) || (kHueCount <= hue)) {
-        hue = 0;
-    }
-    PlainButton* color = button(kColorButton);
-    color->label()     = kHueNames[hue];
-    color->hue()       = static_cast<Hue>(hue);
 }
 
 void NetLobbyScreen::overlay() const {
@@ -492,14 +615,16 @@ void NetLobbyScreen::overlay() const {
     const int        local = _session->local();
     const Point      off   = offset();
 
-    Rect level = inner_bounds(*widget(kLevelRect), off);
-    if (Level::get(setup.level)) {
-        StyledText::retro(
-                level_title(setup.level), {sys.fonts.title, level.width(), 0, 2},
-                GetRGBTranslateColorShade(Hue::AQUA, LIGHTEST))
-                .draw(level);
-    } else {
+    const Rect                   level  = inner_bounds(*widget(kLevelRect), off);
+    std::vector<pn::string_view> levels = net_levels();
+    if (levels.empty()) {
         draw_centered(level, "No net levels", Hue::AQUA, sys.fonts.button);
+    } else {
+        std::vector<pn::string> titles;
+        for (pn::string_view l : levels) {
+            titles.push_back(level_title(l));
+        }
+        draw_list(level, titles, level_index(levels, setup.level), Hue::AQUA);
     }
 
     _field.draw(inner_bounds(*widget(kEnterTextRect), off), _editing);
@@ -530,10 +655,30 @@ void NetLobbyScreen::overlay() const {
                             .count()),
             Hue::GREEN, sys.fonts.button);
 
-    if ((setup.players.size() > local) && !setup.players[local].race.empty()) {
-        draw_centered(
-                inner_bounds(*widget(kSpeciesRect), off), race(setup.players[local].race)->plural,
-                Hue::SALMON, sys.fonts.button);
+    if (setup.players.size() <= local) {
+        return;
+    }
+    const net::Setup::Player& me    = setup.players[local];
+    const auto&               races = races_for(setup, local);
+    std::vector<pn::string>   names;
+    for (const auto& r : races) {
+        names.push_back(race(r.name())->plural.copy());
+    }
+    draw_list(
+            inner_bounds(*widget(kSpeciesRect), off), names, race_index(races, me.race),
+            Hue::SALMON);
+
+    const Rect colors = inner_bounds(*widget(kSelectColorRect), off);
+    const int  other  = other_hue(setup, local);
+    for (int hue = 1; hue < kHueCount; ++hue) {
+        const Rect r = swatch(colors, hue);
+        if (hue == me.hue) {
+            Rect frame = r;
+            frame.inset(-2, -2);
+            Rects().fill(frame, GetRGBTranslateColorShade(Hue::GRAY, LIGHTEST));
+        }
+        const bool ok = !me.race.empty() && allowed(me.race, hue, other);
+        Rects().fill(r, GetRGBTranslateColorShade(static_cast<Hue>(hue), ok ? LIGHT : VERY_DARK));
     }
 }
 
