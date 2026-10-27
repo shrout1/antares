@@ -21,9 +21,11 @@
 
 #include <bitset>
 #include <map>
-#include <pn/fwd>
+#include <pn/string>
+#include <vector>
 
 #include "data/base-object.hpp"
+#include "data/enums.hpp"
 #include "data/handle.hpp"
 #include "math/geometry.hpp"
 #include "math/scale.hpp"
@@ -31,6 +33,16 @@
 namespace antares {
 
 union Level;
+struct Race;
+
+struct NetPlayer {
+    pn::string              name;
+    NamedHandle<const Race> race;
+    Hue                     hue;
+};
+
+// Sets who plays the next net level constructed, and which of them is local.
+void set_net_players(std::vector<NetPlayer> players, int local);
 
 struct LoadState {
     bool    done = false;

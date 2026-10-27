@@ -122,6 +122,13 @@ Handle<Admiral> Admiral::make(int index, const SoloLevel::Player& player) {
 }
 
 Handle<Admiral> Admiral::make(
+        int index, const NetLevel::Player& player, pn::string_view name,
+        const NamedHandle<const Race>& race, Hue hue, bool remote) {
+    uint32_t attributes = kAIsHuman | (remote ? kAIsRemote : 0);
+    return make(index, attributes, name, player.earning_power, race, sfz::make_optional(Hue{hue}));
+}
+
+Handle<Admiral> Admiral::make(
         int index, uint32_t attributes, pn::string_view name, sfz::optional<Fixed> earning_power,
         const NamedHandle<const Race>& race, sfz::optional<Hue> hue) {
     Handle<Admiral> a(index);

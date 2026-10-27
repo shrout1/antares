@@ -170,6 +170,29 @@ void GetInitialCoord(Handle<const Initial> initial, Point* coord, int32_t rotati
 
 }  // namespace
 
+static ANTARES_GLOBAL std::vector<NetPlayer> net_players;
+static ANTARES_GLOBAL int                    net_local;
+
+void set_net_players(std::vector<NetPlayer> players, int local) {
+    net_players = std::move(players);
+    net_local   = local;
+}
+
+static void construct_net_players(const std::vector<NetLevel::Player>& players) {
+    if (players.size() != net_players.size()) {
+        throw std::runtime_error("wrong number of net players");
+    }
+    for (int i = 0; i < players.size(); ++i) {
+        const NetPlayer& p = net_players[i];
+        auto admiral       = Admiral::make(i, players[i], p.name, p.race, p.hue, i != net_local);
+        if (i == net_local) {
+            g.admiral = admiral;
+        }
+        admiral->pay(Cash{Fixed::from_long(5000)});
+        load_race(admiral->race());
+    }
+}
+
 template <typename Players>
 static void construct_players(const Players& players) {
     int i = 0;
@@ -214,7 +237,7 @@ LoadState start_construct_level(const Level& level) {
         case Level::Type::NONE: throw std::runtime_error("level with type NONE?");
         case Level::Type::DEMO: construct_players(g.level->demo.players); break;
         case Level::Type::SOLO: construct_players(g.level->solo.players); break;
-        case Level::Type::NET: throw std::runtime_error("can’t construct net player");
+        case Level::Type::NET: construct_net_players(g.level->net.players); break;
     }
     // *** END INIT ADMIRALS ***
 

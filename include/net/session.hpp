@@ -77,7 +77,7 @@ class Session {
     // Sends Quit and closes.
     void quit();
 
-    // While playing; see Lockstep.
+    // While playing; see Lockstep.  No turn is ready until every player is.
     void                        submit(uint32_t at, Lockstep::Turn turn);
     bool                        ready_turn(uint32_t at) const;
     std::vector<Lockstep::Turn> take(uint32_t at);

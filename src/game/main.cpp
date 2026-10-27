@@ -55,6 +55,7 @@
 #include "game/vector.hpp"
 #include "lang/defines.hpp"
 #include "math/units.hpp"
+#include "net/session.hpp"
 #include "sound/driver.hpp"
 #include "sound/fx.hpp"
 #include "sound/music.hpp"
@@ -89,7 +90,7 @@ Rect viewport() {
 
 class GamePlay : public Card {
   public:
-    GamePlay(bool replay, InputSource* input, GameResult* game_result);
+    GamePlay(bool replay, InputSource* input, GameResult* game_result, net::Session* session);
 
     virtual void become_front();
     virtual void resign_front();
@@ -111,6 +112,9 @@ class GamePlay : public Card {
     virtual void gamepad_stick(const GamepadStickEvent& event);
 
   private:
+    void play_turn();
+    void end_net_game(pn::string_view message);
+
     enum State {
         PLAYING,
         PAUSED,
@@ -138,19 +142,22 @@ class GamePlay : public Card {
     // clock.
     wall_time _real_time;
 
-    InputSource* _input_source;
+    InputSource*             _input_source;
+    net::Session* const      _session;
+    sfz::optional<wall_time> _stalled_since;
 };
 
 MainPlay::MainPlay(
         const Level& level, bool replay, InputSource* input, bool show_loading_screen,
-        GameResult* game_result)
+        GameResult* game_result, net::Session* session)
         : _state(NEW),
           _level(level),
           _replay(replay),
           _show_loading_screen(show_loading_screen),
           _cancelled(false),
           _game_result(game_result),
-          _input_source(input) {}
+          _input_source(input),
+          _session(session) {}
 
 void MainPlay::become_front() {
     switch (_state) {
@@ -210,7 +217,7 @@ void MainPlay::become_front() {
                 sys.music.play(Music::IN_GAME, *g.level->base.song);
             }
 
-            stack()->push(new GamePlay(_replay, _input_source, _game_result));
+            stack()->push(new GamePlay(_replay, _input_source, _game_result, _session));
         } break;
 
         case PLAYING:
@@ -222,7 +229,27 @@ void MainPlay::become_front() {
     }
 }
 
-GamePlay::GamePlay(bool replay, InputSource* input, GameResult* game_result)
+static uint32_t turn_at(game_ticks at) { return at.time_since_epoch() / kMajorTick; }
+
+static net::Lockstep::Turn to_turn(const std::vector<PlayerEvent>& events) {
+    net::Lockstep::Turn turn;
+    for (const PlayerEvent& e : events) {
+        turn.emplace_back();
+        turn.back().type = static_cast<uint32_t>(e.type);
+        turn.back().data = e.data;
+    }
+    return turn;
+}
+
+static std::vector<PlayerEvent> from_turn(const net::Lockstep::Turn& turn) {
+    std::vector<PlayerEvent> events;
+    for (const net::Turns::Event& e : turn) {
+        events.push_back(PlayerEvent{static_cast<PlayerEventType>(e.type), e.data});
+    }
+    return events;
+}
+
+GamePlay::GamePlay(bool replay, InputSource* input, GameResult* game_result, net::Session* session)
         : _state(PLAYING),
           _replay(replay),
           _game_result(game_result),
@@ -232,7 +259,8 @@ GamePlay::GamePlay(bool replay, InputSource* input, GameResult* game_result)
           _fast_motion(false),
           _player_paused(false),
           _real_time(now()),
-          _input_source(input) {}
+          _input_source(input),
+          _session(session) {}
 
 static const usecs kSwitchAfter = usecs(1000000 / 3);  // TODO(sfiera): ticks(20)
 static const usecs kSleepAfter  = secs(60);
@@ -334,6 +362,9 @@ void GamePlay::become_front() {
     switch (_state) {
         case PLAYING:
             _input_source->start();
+            if (_session) {
+                _session->ready(turn_at(g.time) + 1);
+            }
             if (_replay) {
                 _player_ship.cursor().show = false;
             } else {
@@ -350,6 +381,9 @@ void GamePlay::become_front() {
         case PLAY_AGAIN:
             switch (_play_again) {
                 case PlayAgainScreen::QUIT:
+                    if (_session) {
+                        _session->quit();
+                    }
                     *_game_result  = QUIT_GAME;
                     g.game_over    = true;
                     g.next_level   = nullptr;
@@ -384,7 +418,7 @@ void GamePlay::become_front() {
             break;
 
         case DEBRIEFING:
-            if (*_game_result == WIN_GAME) {
+            if (_session || (*_game_result == WIN_GAME)) {
                 stack()->pop(this);
             } else {  // LOSE_GAME
                 _state = PLAY_AGAIN;
@@ -415,6 +449,13 @@ void GamePlay::draw() const {
     }
     HintLine::draw();
     globals()->transitions.draw();
+    if (_stalled_since.has_value() && (now() >= (*_stalled_since + secs(1)))) {
+        pn::string_view text = "Waiting for the other player";
+        Point           at(
+                play_screen().center().h - (sys.fonts.title.string_width(text) / 2),
+                play_screen().center().v);
+        sys.fonts.title.draw(at, text, GetRGBTranslateColorShade(Hue::GREEN, LIGHTER));
+    }
 }
 
 bool GamePlay::next_timer(wall_time& time) {
@@ -454,11 +495,40 @@ void GamePlay::fire_timer() {
         _real_time     = now();
     }
 
+    if (_session) {
+        for (const pn::string& message : _player_ship.take_messages()) {
+            _session->chat(message);
+            Messages::add(pn::format("{0}: {1}", g.admiral->name(), message));
+        }
+        for (const pn::string& message : _session->take_chats()) {
+            Messages::add(message);
+        }
+        if (_session->desynced()) {
+            _session->quit();
+            end_net_game("The game is out of sync.");
+            return;
+        } else if (_session->state() == net::Session::CLOSED) {
+            end_net_game(_session->error());
+            return;
+        }
+    }
+
     while (unitsPassed > ticks(0)) {
         ticks unitsToDo   = unitsPassed;
         ticks minor_ticks = g.time.time_since_epoch() % kMajorTick;
         if (minor_ticks + unitsToDo > kMajorTick) {
             unitsToDo = kMajorTick - minor_ticks;
+        }
+
+        if (_session && (minor_ticks + unitsToDo == kMajorTick)) {
+            if (!_session->ready_turn(turn_at(g.time + unitsToDo))) {
+                if (!_stalled_since.has_value()) {
+                    _stalled_since.emplace(now());
+                }
+                _real_time = now();
+                break;
+            }
+            _stalled_since = sfz::nullopt;
         }
 
         // executed arbitrarily, but at least once every major tick
@@ -480,11 +550,14 @@ void GamePlay::fire_timer() {
                 g.game_over    = true;
                 g.game_over_at = g.time;
             }
-            _player_ship.update();
+            play_turn();
 
             CollideSpaceObjects();
             if ((g.time.time_since_epoch() % kConditionTick) == ticks(0)) {
                 CheckLevelConditions();
+            }
+            if (_session) {
+                _session->sync(turn_at(g.time), g.sync);
             }
         }
 
@@ -548,6 +621,8 @@ void GamePlay::fire_timer() {
             if (_replay) {
                 *_game_result = QUIT_GAME;
                 stack()->pop(this);
+            } else if (_session && !g.victory_text.has_value()) {
+                stack()->pop(this);
             } else if (!g.victory_text.has_value()) {
                 _state = PLAY_AGAIN;
                 stack()->push(new PlayAgainScreen(false, false, &_play_again));
@@ -563,7 +638,31 @@ void GamePlay::fire_timer() {
     }
 }
 
+void GamePlay::play_turn() {
+    if (!_session) {
+        _player_ship.execute(g.admiral, _player_ship.commands());
+        return;
+    }
+    uint32_t turn = turn_at(g.time);
+    _session->submit(turn, to_turn(_player_ship.commands()));
+    std::vector<net::Lockstep::Turn> turns = _session->take(turn);
+    for (int i = 0; i < turns.size(); ++i) {
+        _player_ship.execute(Handle<Admiral>(i), from_turn(turns[i]));
+    }
+}
+
+void GamePlay::end_net_game(pn::string_view message) {
+    *_game_result = QUIT_GAME;
+    _state        = DEBRIEFING;
+    stack()->push(new DebriefingScreen(message));
+}
+
 void GamePlay::key_down(const KeyDownEvent& event) {
+    if (_session &&
+        ((event.key() == Key::CAPS_LOCK) || (event.key() == sys.prefs->key(kHelpKeyNum)) ||
+         (event.key() == sys.prefs->key(kFastMotionKeyNum)))) {
+        return;
+    }
     switch (event.key().value()) {
         case Key::CAPS_LOCK:
             _state         = PAUSED;
