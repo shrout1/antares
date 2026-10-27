@@ -319,11 +319,11 @@ void main(int argc, char* const* argv) {
                     return true;
                 } else if (opt == "host") {
                     net.emplace();
-                    net->mode = NetSetupScreen::HOST;
+                    net->mode = NetGame::HOST;
                     return true;
                 } else if (opt == "join") {
                     net.emplace();
-                    net->mode    = NetSetupScreen::JOIN;
+                    net->mode    = NetGame::JOIN;
                     net->address = get_value().copy();
                     return true;
                 } else if (opt == "port") {

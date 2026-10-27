@@ -65,7 +65,7 @@ MainScreen::MainScreen()
     button(kNetButton)
             ->bind({
                     [this] {
-                        stack()->push(new NetGame(NetSetupScreen::ASK, "", net::kDefaultPort));
+                        stack()->push(new NetGame(NetGame::ASK, "", net::kDefaultPort));
                     },
             });
 
