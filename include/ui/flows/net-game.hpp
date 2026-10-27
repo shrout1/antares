@@ -29,30 +29,41 @@
 
 namespace antares {
 
-struct NetStart {
-    NetSetupScreen::Mode mode = NetSetupScreen::ASK;
-    pn::string           address;
-    uint16_t             port = net::kDefaultPort;
-};
-
 class NetGame : public Card {
   public:
-    NetGame(NetSetupScreen::Mode mode, pn::string_view address, uint16_t port);
+    enum Mode { ASK, HOST, JOIN };
+
+    NetGame(Mode mode, pn::string_view address, uint16_t port);
 
     virtual void become_front();
 
   private:
-    enum State { NEW, SETUP, PLAYING };
+    enum State { NEW, ASKING, ADDRESS, CONNECTING, LOBBY, FAILED, PLAYING };
 
+    void ask();
+    void ask_address();
+    void host();
+    void join(pn::string_view address);
+    void lobby();
+    void fail(pn::string_view error);
+    void back();
     void start();
 
-    const NetSetupScreen::Mode    _mode;
-    const pn::string              _address;
+    const Mode                    _mode;
+    pn::string                    _address;
     const uint16_t                _port;
-    State                         _state = NEW;
+    State                         _state     = NEW;
+    HostOrJoinScreen::Choice      _choice    = HostOrJoinScreen::CANCEL;
+    bool                          _cancelled = false;
     std::unique_ptr<net::Session> _session;
     GameResult                    _game_result = NO_GAME;
     RealInputSource               _input_source;
+};
+
+struct NetStart {
+    NetGame::Mode mode = NetGame::ASK;
+    pn::string    address;
+    uint16_t      port = net::kDefaultPort;
 };
 
 }  // namespace antares

@@ -96,10 +96,13 @@ Modules
     ``net/lockstep``.
 
 ``ui/screens/net-setup``
-    Host or join; choose level, race, and color.
+    Host or Join, Host Address, Status, and the lobby, where players
+    choose the level, lag, species, and color, and chat.  Laid out
+    after Ares's own net interfaces.
 
 ``ui/flows/net-game``
-    Runs setup, then the level, with the session's players and seed.
+    Hosts or joins, runs the lobby, then the level, with the session's
+    players and seed.
 
 Each turn, ``PlayerShip`` turns local input into a list of
 ``PlayerEvent`` commands, and the game executes every player_'s

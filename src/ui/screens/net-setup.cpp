@@ -18,28 +18,46 @@
 
 #include "ui/screens/net-setup.hpp"
 
-#include <stdlib.h>
 #include <algorithm>
 #include <pn/output>
 
-#include "build/defs.hpp"
 #include "data/level.hpp"
 #include "data/plugin.hpp"
 #include "data/races.hpp"
 #include "drawing/color.hpp"
-#include "drawing/shapes.hpp"
 #include "drawing/text.hpp"
-#include "game/globals.hpp"
 #include "game/sys.hpp"
 #include "game/time.hpp"
+#include "math/units.hpp"
 #include "video/driver.hpp"
 
 namespace antares {
 
+static constexpr char kJoinButton[]            = "join";
+static constexpr char kHostButton[]            = "host";
+static constexpr char kCancelButton[]          = "cancel";
+static constexpr char kAddressRect[]           = "address";
+static constexpr char kStatusRect[]            = "status";
+static constexpr char kBeginButton[]           = "begin";
+static constexpr char kPreviousButton[]        = "previous";
+static constexpr char kNextButton[]            = "next";
+static constexpr char kLevelRect[]             = "level";
+static constexpr char kSendTextButton[]        = "send-text";
+static constexpr char kEnterTextRect[]         = "enter-text";
+static constexpr char kMessagesRect[]          = "messages";
+static constexpr char kIncreaseButton[]        = "increase";
+static constexpr char kDecreaseButton[]        = "decrease";
+static constexpr char kLagRect[]               = "lag";
+static constexpr char kNextSpeciesButton[]     = "next-species";
+static constexpr char kPreviousSpeciesButton[] = "previous-species";
+static constexpr char kSpeciesRect[]           = "species";
+static constexpr char kColorButton[]           = "color";
+
 namespace {
 
-const usecs   kPollInterval = std::chrono::milliseconds(100);
-const int32_t kWidth        = 500;
+const usecs    kPollInterval = std::chrono::milliseconds(100);
+const uint32_t kMaxDelay     = 20;
+const int      kMaxMessages  = 50;
 
 const char* const kHueNames[] = {
         "Gray", "Orange", "Yellow", "Blue",       "Green",       "Purple",   "Indigo", "Salmon",
@@ -57,22 +75,6 @@ std::vector<pn::string_view> net_levels() {
     return names;
 }
 
-pn::string level_title(pn::string_view name) {
-    const Level* level = Level::get(name);
-    if (!level) {
-        return name.copy();
-    }
-    pn::string_view rest = level->base.name;
-    rest                 = rest.substr(0, std::min(rest.find("\n"), rest.size()));
-    pn::string title;
-    for (int i = rest.find("\\"); i != pn::string_view::npos; i = rest.find("\\")) {
-        title += rest.substr(0, i);
-        rest = rest.substr(std::min(i + 2, rest.size()));
-    }
-    title += rest;
-    return title;
-}
-
 const std::vector<NamedHandle<const Race>>& races_for(const net::Setup& setup, int player) {
     static const std::vector<NamedHandle<const Race>> kNone;
     const Level*                                      level = Level::get(setup.level);
@@ -85,6 +87,16 @@ const std::vector<NamedHandle<const Race>>& races_for(const net::Setup& setup, i
 const Race* race(pn::string_view name) {
     load_race(NamedHandle<const Race>(name));
     return Race::get(name);
+}
+
+bool has_race(const std::vector<NamedHandle<const Race>>& races, pn::string_view name) {
+    return std::any_of(races.begin(), races.end(), [name](const NamedHandle<const Race>& r) {
+        return r.name() == name;
+    });
+}
+
+int other_hue(const net::Setup& setup, int local) {
+    return (setup.players.size() > 1) ? setup.players[1 - local].hue : -1;
 }
 
 bool allowed(pn::string_view race_name, int hue, int other_hue) {
@@ -105,370 +117,424 @@ int next_hue(pn::string_view race_name, int hue, int by, int other_hue) {
     return hue;
 }
 
-pn::string player_name() {
-    for (const char* var : {"USERNAME", "USER"}) {
-        const char* name = getenv(var);
-        if (name && *name) {
-            return pn::string{name};
-        }
+pn::string level_title(pn::string_view name) {
+    const Level* level = Level::get(name);
+    if (!level) {
+        return name.copy();
     }
-    return "Player";
+    pn::string_view rest = level->base.name;
+    rest                 = rest.substr(0, std::min(rest.find("\n"), rest.size()));
+    pn::string title;
+    for (int i = rest.find("\\"); i != pn::string_view::npos; i = rest.find("\\")) {
+        title += rest.substr(0, i);
+        rest = rest.substr(std::min(i + 2, rest.size()));
+    }
+    title += rest;
+    return title;
 }
 
-net::Hello hello() {
-    net::Hello h;
-    h.protocol          = net::kProtocolVersion;
-    h.antares_version   = kAntaresVersion;
-    h.plugin_identifier = plug.info.identifier.hash.copy();
-    h.plugin_version    = plug.info.version.copy();
-    h.name              = player_name();
-    return h;
+Rect inner_bounds(const Widget& w, Point off) {
+    Rect r = w.inner_bounds();
+    r.offset(off.h, off.v);
+    return r;
 }
 
-void draw_line(Point* at, pn::string_view text, Hue hue, const Font& font) {
-    font.draw(Point(at->h, at->v + font.ascent), text, GetRGBTranslateColorShade(hue, LIGHTEST));
-    at->v += font.height + 6;
+void draw_centered(const Rect& r, pn::string_view text, Hue hue, const Font& font) {
+    Point at(r.center().h - (font.string_width(text) / 2), r.center().v - (font.height / 2));
+    font.draw(Point(at.h, at.v + font.ascent), text, GetRGBTranslateColorShade(hue, LIGHTEST));
 }
 
 }  // namespace
 
-NetSetupScreen::NetSetupScreen(
-        Mode mode, pn::string_view address, uint16_t port, std::unique_ptr<net::Session>* session)
-        : _mode(mode),
-          _port(port),
-          _address(address.copy()),
-          _session(session),
-          _address_text(this),
-          _next_timer(now()) {}
+NetTextField::NetTextField(
+        int32_t width, std::function<void()> accept, std::function<void()> escape)
+        : EditableText("", ""),
+          _width(width),
+          _accept(std::move(accept)),
+          _escape(std::move(escape)),
+          _text(StyledText::plain("", {sys.fonts.tactical, width})) {}
 
-void NetSetupScreen::become_front() {
-    switch (_mode) {
-        case ASK: _state = ASKING; break;
-        case HOST: host(); break;
-        case JOIN:
-            if (_address.empty()) {
-                edit_address();
-            } else {
-                join(_address);
-            }
-            break;
-    }
-}
+void NetTextField::accept() { _accept(); }
+void NetTextField::escape() { _escape(); }
 
-void NetSetupScreen::resign_front() { sys.video->stop_editing(&_address_text); }
-
-void NetSetupScreen::host() {
-    net::Setup                   setup;
-    std::vector<pn::string_view> levels = net_levels();
-    if (levels.empty()) {
-        fail("This scenario has no net levels.");
-        return;
-    }
-    setup.level       = levels[0].copy();
-    setup.global_seed = static_cast<int32_t>(now().time_since_epoch().count());
-    setup.delay       = net::kDefaultDelay;
-    setup.players.emplace_back();
-    setup.players[0].name = player_name();
-
-    *_session = net::Session::host("", _port, hello(), std::move(setup));
-    if (!*_session) {
-        fail(pn::format("Couldn’t host a game on port {0}.", _port));
-        return;
-    }
-    _state = LOBBY;
-    _field = LEVEL;
-    choose_defaults();
-}
-
-void NetSetupScreen::join(pn::string_view address) {
-    pn::string_view host  = address;
-    uint16_t        port  = _port;
-    int             colon = pn::string_view::npos;
-    for (int i = address.find(":"); i != pn::string_view::npos; i = address.find(":", i + 1)) {
-        colon = i;
-    }
-    if (colon != pn::string_view::npos) {
-        host = address.substr(0, colon);
-        int64_t p;
-        if (!pn::strtoll(address.substr(colon + 1), &p, nullptr) || (p <= 0) || (p > 65535)) {
-            fail(pn::format("“{0}” isn’t a valid port.", address.substr(colon + 1)));
-            return;
-        }
-        port = p;
-    }
-
-    _address  = address.copy();
-    *_session = net::Session::join(host, port, hello());
-    if (!*_session) {
-        fail(pn::format("Couldn’t find “{0}”.", host));
-        return;
-    }
-    _state = CONNECTING;
-    _field = RACE;
-    _chose = false;
-}
-
-void NetSetupScreen::fail(pn::string_view error) {
-    sys.video->stop_editing(&_address_text);
-    _session->reset();
-    _error = error.copy();
-    _state = FAILED;
-}
-
-void NetSetupScreen::edit_address() {
-    _state = ADDRESS;
-    if (sys.video->start_editing(&_address_text)) {
-        _address_text.replace({0, _address_text.size()}, _address);
-    }
-}
-
-void NetSetupScreen::choose_defaults() {
-    net::Setup  setup = (*_session)->setup();
-    int         local = (*_session)->local();
-    const auto& races = races_for(setup, local);
-    if (races.empty() || (setup.players.size() <= local)) {
-        return;
-    }
-    pn::string_view race_name = races[local % races.size()].name();
-    int             other     = (setup.players.size() > 1) ? setup.players[1 - local].hue : -1;
-    int             hue       = static_cast<int>(race(race_name)->hue);
-    if (!allowed(race_name, hue, other)) {
-        hue = next_hue(race_name, hue, 1, other);
-    }
-    (*_session)->choose(race_name, hue);
-    _chose = true;
-}
-
-void NetSetupScreen::change(int by) {
-    net::Setup setup = (*_session)->setup();
-    int        local = (*_session)->local();
-    if (setup.players.size() <= local) {
-        return;
-    }
-    const net::Setup::Player& me = setup.players[local];
-    int other                    = (setup.players.size() > 1) ? setup.players[1 - local].hue : -1;
-
-    switch (_field) {
-        case LEVEL: {
-            std::vector<pn::string_view> levels = net_levels();
-            auto it     = std::find(levels.begin(), levels.end(), pn::string_view{setup.level});
-            int  i      = (it == levels.end()) ? 0 : (it - levels.begin());
-            setup.level = levels[(i + by + levels.size()) % levels.size()].copy();
-            (*_session)->set_setup(std::move(setup));
-            choose_defaults();
-        } break;
-
-        case RACE: {
-            const auto& races = races_for(setup, local);
-            if (races.empty()) {
-                return;
-            }
-            int i = 0;
-            while ((i < races.size()) && (races[i].name() != me.race)) {
-                ++i;
-            }
-            pn::string_view race_name = races[(i + by + races.size()) % races.size()].name();
-            int             hue       = static_cast<int>(race(race_name)->hue);
-            if (!allowed(race_name, hue, other)) {
-                hue = next_hue(race_name, hue, 1, other);
-            }
-            (*_session)->choose(race_name, hue);
-        } break;
-
-        case COLOR: (*_session)->choose(me.race, next_hue(me.race, me.hue, by, other)); break;
-    }
-}
-
-bool NetSetupScreen::next_timer(wall_time& time) {
-    time = _next_timer;
-    return true;
-}
-
-void NetSetupScreen::fire_timer() {
-    _next_timer = now() + kPollInterval;
-    if (!*_session) {
-        return;
-    }
-    switch ((*_session)->state()) {
-        case net::Session::CONNECTING: break;
-        case net::Session::LOBBY:
-            _state = LOBBY;
-            if (!_chose && (*_session)->has_peer()) {
-                choose_defaults();
-            }
-            break;
-        case net::Session::STARTED:
-        case net::Session::PLAYING: stack()->pop(this); break;
-        case net::Session::CLOSED: fail((*_session)->error()); break;
-    }
-}
-
-void NetSetupScreen::key_down(const KeyDownEvent& event) {
-    const bool is_host = *_session && (*_session)->is_host();
-    switch (_state) {
-        case ASKING:
-            if (event.key() == Key::H) {
-                host();
-            } else if (event.key() == Key::J) {
-                edit_address();
-            } else if (event.key() == Key::ESCAPE) {
-                stack()->pop(this);
-            }
-            break;
-
-        case ADDRESS: break;
-
-        case CONNECTING:
-        case LOBBY:
-            switch (event.key().value()) {
-                case Key::ESCAPE:
-                    (*_session)->quit();
-                    _session->reset();
-                    if (_mode == ASK) {
-                        _state = ASKING;
-                    } else {
-                        stack()->pop(this);
-                    }
-                    break;
-                case Key::UP_ARROW:
-                    _field = static_cast<Field>(std::max<int>(is_host ? LEVEL : RACE, _field - 1));
-                    break;
-                case Key::DOWN_ARROW:
-                    _field = static_cast<Field>(std::min<int>(COLOR, _field + 1));
-                    break;
-                case Key::LEFT_ARROW: change(-1); break;
-                case Key::RIGHT_ARROW: change(+1); break;
-                case Key::RETURN:
-                    if (is_host) {
-                        (*_session)->start();
-                    }
-                    break;
-                default: break;
-            }
-            break;
-
-        case FAILED:
-            if (_mode == ASK) {
-                _state = ASKING;
-            } else {
-                stack()->pop(this);
-            }
-            break;
-    }
-}
-
-void NetSetupScreen::draw() const {
-    Rects().fill(world(), RgbColor::black());
-    Point       at(world().center().h - (kWidth / 2), world().center().v - 150);
-    const Font& title  = sys.fonts.title;
-    const Font& button = sys.fonts.button;
-    draw_line(&at, "Network Game", Hue::GOLD, title);
-    at.v += 12;
-
-    switch (_state) {
-        case ASKING:
-            draw_line(
-                    &at, pn::format("H - Host a game on port {0}", _port), Hue::SKY_BLUE, button);
-            draw_line(&at, "J - Join a game", Hue::SKY_BLUE, button);
-            draw_line(&at, "ESC - Cancel", Hue::GRAY, button);
-            break;
-
-        case ADDRESS:
-            draw_line(&at, "Host address:", Hue::SKY_BLUE, button);
-            _address_text.draw(at);
-            at.v += sys.fonts.tactical.height + 12;
-            draw_line(&at, "RETURN - Join     ESC - Cancel", Hue::GRAY, button);
-            break;
-
-        case CONNECTING:
-            draw_line(&at, pn::format("Connecting to {0}...", _address), Hue::SKY_BLUE, button);
-            draw_line(&at, "ESC - Cancel", Hue::GRAY, button);
-            break;
-
-        case LOBBY: {
-            const net::Setup setup   = (*_session)->setup();
-            const int        local   = (*_session)->local();
-            const bool       is_host = (*_session)->is_host();
-            auto             mark    = [this](Field f) { return (_field == f) ? "> " : "  "; };
-
-            draw_line(
-                    &at, pn::format("{0}Level: {1}", mark(LEVEL), level_title(setup.level)),
-                    is_host ? Hue::SKY_BLUE : Hue::GRAY, button);
-            at.v += 6;
-            for (int i = 0; i < setup.players.size(); ++i) {
-                const net::Setup::Player& p   = setup.players[i];
-                Hue                       hue = Hue::GRAY;
-                if ((0 <= p.hue) && (p.hue < kHueCount)) {
-                    hue = static_cast<Hue>(p.hue);
-                }
-                pn::string_view race_name =
-                        p.race.empty() ? pn::string_view{"?"} : race(p.race)->plural;
-                draw_line(
-                        &at,
-                        pn::format(
-                                "{0}{1}: {2}, {3}", (i == local) ? "* " : "  ", p.name, race_name,
-                                kHueNames[static_cast<int>(hue)]),
-                        hue, button);
-            }
-            if (setup.players.size() < net::kSessionPlayers) {
-                draw_line(
-                        &at,
-                        pn::format(
-                                "  Waiting for a player to join on port {0}...",
-                                (*_session)->port()),
-                        Hue::GRAY, button);
-            }
-            at.v += 6;
-            draw_line(&at, pn::format("{0}Race", mark(RACE)), Hue::SKY_BLUE, button);
-            draw_line(&at, pn::format("{0}Color", mark(COLOR)), Hue::SKY_BLUE, button);
-            at.v += 12;
-            draw_line(&at, "UP/DOWN - Select     LEFT/RIGHT - Change", Hue::GRAY, button);
-            if (is_host) {
-                draw_line(
-                        &at,
-                        (*_session)->has_peer() ? "RETURN - Start     ESC - Leave" : "ESC - Leave",
-                        Hue::GRAY, button);
-            } else {
-                draw_line(&at, "Waiting for the host to start     ESC - Leave", Hue::GRAY, button);
-            }
-        } break;
-
-        case FAILED:
-            draw_line(&at, _error, Hue::RED, button);
-            draw_line(&at, "Press any key", Hue::GRAY, button);
-            break;
-    }
-}
-
-NetSetupScreen::AddressText::AddressText(NetSetupScreen* screen)
-        : EditableText("", ""), _screen(screen) {}
-
-void NetSetupScreen::AddressText::accept() {
-    sys.video->stop_editing(this);
-    _screen->join(text());
-}
-
-void NetSetupScreen::AddressText::escape() {
-    sys.video->stop_editing(this);
-    if (_screen->_mode == ASK) {
-        _screen->_state = ASKING;
-    } else {
-        _screen->stack()->pop(_screen);
-    }
-}
-
-void NetSetupScreen::AddressText::update(
-        pn::string_view text, range<int> selection, range<int> mark) {
+void NetTextField::update(pn::string_view text, range<int> selection, range<int> mark) {
     _text = StyledText::plain(
-            text, {sys.fonts.tactical, kWidth}, GetRGBTranslateColorShade(Hue::GREEN, LIGHTEST));
+            text, {sys.fonts.tactical, _width}, GetRGBTranslateColorShade(Hue::GREEN, LIGHTEST));
     _text.select(selection.begin, selection.end);
     _text.mark(mark.begin, mark.end);
 }
 
-void NetSetupScreen::AddressText::draw(Point at) const {
-    Rect bounds(at.h, at.v, at.h + kWidth, at.v + sys.fonts.tactical.height);
-    _text.draw(bounds);
-    _text.draw_cursor(bounds, GetRGBTranslateColorShade(Hue::GREEN, LIGHTEST));
+void NetTextField::draw(const Rect& bounds, bool editing) const {
+    Rect r = bounds;
+    r.inset(3, (bounds.height() - sys.fonts.tactical.height) / 2);
+    _text.draw(r);
+    if (editing) {
+        _text.draw_cursor(r, GetRGBTranslateColorShade(Hue::GREEN, LIGHTEST));
+    }
+}
+
+HostOrJoinScreen::HostOrJoinScreen(Choice* choice)
+        : InterfaceScreen("net/host-or-join", {0, 0, 640, 480}), _choice(choice) {
+    button(kJoinButton)->bind({[this] {
+        *_choice = JOIN;
+        stack()->pop(this);
+    }});
+    button(kHostButton)->bind({[this] {
+        *_choice = HOST;
+        stack()->pop(this);
+    }});
+    button(kCancelButton)->bind({[this] {
+        *_choice = CANCEL;
+        stack()->pop(this);
+    }});
+}
+
+NetAddressScreen::NetAddressScreen(bool* cancelled, pn::string* address)
+        : InterfaceScreen("net/address", {0, 0, 640, 480}),
+          _cancelled(cancelled),
+          _address(address),
+          _field(
+                  widget(kAddressRect)->inner_bounds().width() - 6, [this] { join(); },
+                  [this] {
+                      *_cancelled = true;
+                      stack()->pop(this);
+                  }) {
+    button(kJoinButton)->bind({[this] { join(); }, [this] { return _field.size() > 0; }});
+    button(kCancelButton)->bind({[this] {
+        *_cancelled = true;
+        stack()->pop(this);
+    }});
+}
+
+void NetAddressScreen::become_front() {
+    InterfaceScreen::become_front();
+    if (sys.video->start_editing(&_field)) {
+        _field.replace({0, _field.size()}, *_address);
+    }
+}
+
+void NetAddressScreen::resign_front() {
+    sys.video->stop_editing(&_field);
+    InterfaceScreen::resign_front();
+}
+
+void NetAddressScreen::join() {
+    if (_field.size() == 0) {
+        return;
+    }
+    *_address   = _field.text().copy();
+    *_cancelled = false;
+    stack()->pop(this);
+}
+
+void NetAddressScreen::overlay() const {
+    _field.draw(inner_bounds(*widget(kAddressRect), offset()), true);
+}
+
+NetStatusScreen::NetStatusScreen(net::Session* session, pn::string_view status)
+        : InterfaceScreen("net/status", {0, 0, 640, 480}),
+          _session(session),
+          _status(status.copy()),
+          _next_timer(now()) {
+    button(kCancelButton)->bind({[this] { stack()->pop(this); }});
+}
+
+bool NetStatusScreen::next_timer(wall_time& time) {
+    time = _next_timer;
+    return _session != nullptr;
+}
+
+void NetStatusScreen::fire_timer() {
+    _next_timer = now() + kPollInterval;
+    switch (_session->state()) {
+        case net::Session::CONNECTING: break;
+        case net::Session::CLOSED:
+            _status  = _session->error();
+            _session = nullptr;
+            break;
+        default: stack()->pop(this); break;
+    }
+}
+
+void NetStatusScreen::overlay() const {
+    draw_centered(
+            inner_bounds(*widget(kStatusRect), offset()), _status, Hue::TAN, sys.fonts.button);
+}
+
+NetLobbyScreen::NetLobbyScreen(net::Session* session)
+        : InterfaceScreen("net/lobby", {0, 0, 640, 480}),
+          _session(session),
+          _field(
+                  widget(kEnterTextRect)->inner_bounds().width() - 6, [this] { send(); },
+                  [this] {
+                      _editing = false;
+                      sys.video->stop_editing(&_field);
+                  }),
+          _next_timer(now()) {
+    const bool is_host = _session->is_host();
+
+    button(kBeginButton)
+            ->bind({
+                    [this] { _session->start(); },
+                    [this, is_host] {
+                        return is_host && _session->has_peer() &&
+                               Level::get(_session->setup().level);
+                    },
+            });
+    button(kCancelButton)->bind({[this] { stack()->pop(this); }});
+
+    button(kPreviousButton)
+            ->bind({
+                    [this] { change_level(-1); },
+                    [is_host] { return is_host && (net_levels().size() > 1); },
+            });
+    button(kNextButton)
+            ->bind({
+                    [this] { change_level(+1); },
+                    [is_host] { return is_host && (net_levels().size() > 1); },
+            });
+
+    button(kSendTextButton)->bind({[this] {
+        if (_editing) {
+            send();
+        } else if (sys.video->start_editing(&_field)) {
+            _editing = true;
+        }
+    }});
+
+    button(kIncreaseButton)
+            ->bind({
+                    [this] { change_delay(+1); },
+                    [this, is_host] { return is_host && (_session->setup().delay < kMaxDelay); },
+            });
+    button(kDecreaseButton)
+            ->bind({
+                    [this] { change_delay(-1); },
+                    [this, is_host] { return is_host && (_session->setup().delay > 1); },
+            });
+
+    auto can_change_race = [this] {
+        return races_for(_session->setup(), _session->local()).size() > 1;
+    };
+    button(kNextSpeciesButton)->bind({[this] { change_race(+1); }, can_change_race});
+    button(kPreviousSpeciesButton)->bind({[this] { change_race(-1); }, can_change_race});
+    button(kColorButton)->bind({[this] { change_hue(+1); }});
+}
+
+void NetLobbyScreen::become_front() {
+    InterfaceScreen::become_front();
+    if (_session->is_host()) {
+        net::Setup setup = _session->setup();
+        if (!Level::get(setup.level)) {
+            std::vector<pn::string_view> levels = net_levels();
+            if (!levels.empty()) {
+                setup.level = levels[0].copy();
+                _session->set_setup(std::move(setup));
+            }
+        }
+        if (!_session->has_peer()) {
+            _messages.push_back(
+                    pn::format("Waiting for a player to join on port {0}.", _session->port()));
+        }
+    }
+    update();
+}
+
+void NetLobbyScreen::resign_front() {
+    _editing = false;
+    sys.video->stop_editing(&_field);
+    InterfaceScreen::resign_front();
+}
+
+bool NetLobbyScreen::next_timer(wall_time& time) {
+    time = _next_timer;
+    return true;
+}
+
+void NetLobbyScreen::fire_timer() {
+    _next_timer = now() + kPollInterval;
+    if (_session->state() != net::Session::LOBBY) {
+        stack()->pop(this);
+        return;
+    }
+    for (auto& chat : _session->take_chats()) {
+        _messages.push_back(std::move(chat));
+    }
+    update();
+}
+
+void NetLobbyScreen::change_level(int by) {
+    std::vector<pn::string_view> levels = net_levels();
+    net::Setup                   setup  = _session->setup();
+    auto it     = std::find(levels.begin(), levels.end(), pn::string_view{setup.level});
+    int  i      = (it == levels.end()) ? 0 : (it - levels.begin());
+    setup.level = levels[(i + by + levels.size()) % levels.size()].copy();
+    _session->set_setup(std::move(setup));
+    update();
+}
+
+void NetLobbyScreen::change_delay(int by) {
+    net::Setup setup = _session->setup();
+    setup.delay      = std::max<int>(1, std::min<int>(kMaxDelay, setup.delay + by));
+    _session->set_setup(std::move(setup));
+}
+
+void NetLobbyScreen::change_race(int by) {
+    const net::Setup setup = _session->setup();
+    const int        local = _session->local();
+    const auto&      races = races_for(setup, local);
+    int              i     = 0;
+    while ((i < races.size()) && (races[i].name() != setup.players[local].race)) {
+        ++i;
+    }
+    choose(races[(i + by + races.size()) % races.size()].name(), -1);
+    update();
+}
+
+void NetLobbyScreen::change_hue(int by) {
+    const net::Setup setup = _session->setup();
+    const int        local = _session->local();
+    if ((setup.players.size() <= local) || setup.players[local].race.empty()) {
+        return;
+    }
+    const net::Setup::Player& me = setup.players[local];
+    _session->choose(me.race, next_hue(me.race, me.hue, by, other_hue(setup, local)));
+    update();
+}
+
+// A negative `hue` picks the race's own hue.  Either way, a hue that isn't allowed is replaced
+// by the next one that is.
+void NetLobbyScreen::choose(pn::string_view race_name, int hue) {
+    const net::Setup setup = _session->setup();
+    const int        other = other_hue(setup, _session->local());
+    if (hue < 0) {
+        hue = static_cast<int>(race(race_name)->hue);
+    }
+    if (!allowed(race_name, hue, other)) {
+        hue = next_hue(race_name, hue, 1, other);
+    }
+    _session->choose(race_name, hue);
+}
+
+void NetLobbyScreen::choose_defaults() {
+    const int   local = _session->local();
+    const auto& races = races_for(_session->setup(), local);
+    if (!races.empty()) {
+        choose(races[local % races.size()].name(), -1);
+    }
+}
+
+void NetLobbyScreen::send() {
+    const net::Setup setup = _session->setup();
+    if ((_field.size() > 0) && (setup.players.size() > _session->local())) {
+        _session->chat(_field.text());
+        _messages.push_back(
+                pn::format("{0}: {1}", setup.players[_session->local()].name, _field.text()));
+        _field.replace({0, _field.size()}, "");
+    }
+    _editing = false;
+    sys.video->stop_editing(&_field);
+}
+
+// Keeps the local choice valid for the level and the other player, notes players joining and
+// the other player's choice, and shows the local color.
+void NetLobbyScreen::update() {
+    net::Setup setup = _session->setup();
+    const int  local = _session->local();
+    if (setup.players.size() <= local) {
+        return;
+    }
+
+    for (int i = _players; i < setup.players.size(); ++i) {
+        if (i > local) {
+            _messages.push_back(pn::format("{0} joined.", setup.players[i].name));
+        }
+    }
+    _players = setup.players.size();
+
+    const auto& races = races_for(setup, local);
+    const auto& me    = setup.players[local];
+    if (!races.empty() && !has_race(races, me.race)) {
+        choose_defaults();
+    } else if (
+            !me.race.empty() && !allowed(me.race, me.hue, local ? other_hue(setup, local) : -1)) {
+        choose(me.race, me.hue);
+    }
+
+    setup = _session->setup();
+    if (setup.players.size() > 1) {
+        const auto& them = setup.players[1 - local];
+        if (!them.race.empty() && (0 <= them.hue) && (them.hue < kHueCount)) {
+            pn::string opponent = pn::format(
+                    "{0} chose {1}, {2}.", them.name, race(them.race)->plural,
+                    kHueNames[them.hue]);
+            if (opponent != _opponent) {
+                _messages.push_back(opponent.copy());
+                _opponent = std::move(opponent);
+            }
+        }
+    }
+    if (_messages.size() > kMaxMessages) {
+        _messages.erase(_messages.begin(), _messages.end() - kMaxMessages);
+    }
+
+    int hue = setup.players[local].hue;
+    if ((hue < 0) || (kHueCount <= hue)) {
+        hue = 0;
+    }
+    PlainButton* color = button(kColorButton);
+    color->label()     = kHueNames[hue];
+    color->hue()       = static_cast<Hue>(hue);
+}
+
+void NetLobbyScreen::overlay() const {
+    const net::Setup setup = _session->setup();
+    const int        local = _session->local();
+    const Point      off   = offset();
+
+    Rect level = inner_bounds(*widget(kLevelRect), off);
+    if (Level::get(setup.level)) {
+        StyledText::retro(
+                level_title(setup.level), {sys.fonts.title, level.width(), 0, 2},
+                GetRGBTranslateColorShade(Hue::AQUA, LIGHTEST))
+                .draw(level);
+    } else {
+        draw_centered(level, "No net levels", Hue::AQUA, sys.fonts.button);
+    }
+
+    _field.draw(inner_bounds(*widget(kEnterTextRect), off), _editing);
+
+    Rect messages = inner_bounds(*widget(kMessagesRect), off);
+    messages.inset(3, 3);
+    StyledText shown;
+    pn::string text;
+    for (int i = _messages.size() - 1; i >= 0; --i) {
+        text              = pn::format("{0}\n{1}", _messages[i], text);
+        StyledText styled = StyledText::plain(
+                text, {sys.fonts.tactical, messages.width()},
+                GetRGBTranslateColorShade(Hue::GREEN, LIGHTEST));
+        if (styled.height() > messages.height()) {
+            break;
+        }
+        shown = std::move(styled);
+    }
+    if (!shown.empty()) {
+        shown.draw(messages);
+    }
+
+    draw_centered(
+            inner_bounds(*widget(kLagRect), off),
+            pn::format(
+                    "{0} ms",
+                    std::chrono::duration_cast<std::chrono::milliseconds>(kMajorTick * setup.delay)
+                            .count()),
+            Hue::GREEN, sys.fonts.button);
+
+    if ((setup.players.size() > local) && !setup.players[local].race.empty()) {
+        draw_centered(
+                inner_bounds(*widget(kSpeciesRect), off), race(setup.players[local].race)->plural,
+                Hue::SALMON, sys.fonts.button);
+    }
 }
 
 }  // namespace antares
