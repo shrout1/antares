@@ -36,6 +36,8 @@ struct Hello {
     pn::string plugin_identifier;
     pn::string plugin_version;
     pn::string name;
+
+    Hello copy() const;
 };
 
 struct Welcome {
@@ -58,10 +60,12 @@ struct Setup {
         pn::string race;
         int32_t    hue = 0;
     };
-    int32_t             chapter     = 0;
+    pn::string          level;
     int32_t             global_seed = 0;
     uint32_t            delay       = 0;
     std::vector<Player> players;
+
+    Setup copy() const;
 };
 
 struct Turns {
@@ -86,6 +90,11 @@ struct Quit {
     int32_t player = 0;
 };
 
+struct Choose {
+    pn::string race;
+    int32_t    hue = 0;
+};
+
 // Only the member named by `type` is meaningful.
 struct Packet {
     enum Type {
@@ -98,6 +107,8 @@ struct Packet {
         TURNS   = 6,
         CHAT    = 7,
         QUIT    = 8,
+        CHOOSE  = 9,
+        READY   = 10,
     };
     Type    type = NONE;
     Hello   hello;
@@ -107,6 +118,7 @@ struct Packet {
     Turns   turns;
     Chat    chat;
     Quit    quit;
+    Choose  choose;
 };
 
 pn::data encode(const Packet& packet);
