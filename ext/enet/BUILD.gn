@@ -1,0 +1,56 @@
+config("enet_private") {
+  if (target_os == "win") {
+    defines = [ "_WINSOCK_DEPRECATED_NO_WARNINGS" ]
+    if (current_toolchain == "//build/lib/win:msvc") {
+      cflags = [ "/wd5287" ]
+    }
+  } else {
+    defines = [
+      "HAS_FCNTL=1",
+      "HAS_GETADDRINFO=1",
+      "HAS_GETNAMEINFO=1",
+      "HAS_INET_NTOP=1",
+      "HAS_INET_PTON=1",
+      "HAS_MSGHDR_FLAGS=1",
+      "HAS_POLL=1",
+      "HAS_SOCKLEN_T=1",
+    ]
+  }
+}
+
+config("enet_public") {
+  include_dirs = [ "enet-1.3.18/include" ]
+  if (target_os == "win") {
+    defines = [ "NOMINMAX" ]
+    if (current_toolchain == "//build/lib/win:msvc") {
+      libs = [
+        "ws2_32.lib",
+        "winmm.lib",
+      ]
+    } else {
+      libs = [
+        "ws2_32",
+        "winmm",
+      ]
+    }
+  }
+}
+
+static_library("enet") {
+  sources = [
+    "enet-1.3.18/callbacks.c",
+    "enet-1.3.18/compress.c",
+    "enet-1.3.18/host.c",
+    "enet-1.3.18/list.c",
+    "enet-1.3.18/packet.c",
+    "enet-1.3.18/peer.c",
+    "enet-1.3.18/protocol.c",
+  ]
+  if (target_os == "win") {
+    sources += [ "enet-1.3.18/win32.c" ]
+  } else {
+    sources += [ "enet-1.3.18/unix.c" ]
+  }
+  configs += [ ":enet_private" ]
+  public_configs = [ ":enet_public" ]
+}
