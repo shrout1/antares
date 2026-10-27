@@ -19,78 +19,119 @@
 #ifndef ANTARES_UI_SCREENS_NET_SETUP_HPP_
 #define ANTARES_UI_SCREENS_NET_SETUP_HPP_
 
-#include <memory>
+#include <functional>
 #include <pn/string>
+#include <vector>
 
 #include "drawing/styled-text.hpp"
 #include "net/session.hpp"
-#include "ui/card.hpp"
 #include "ui/editable-text.hpp"
+#include "ui/screen.hpp"
 
 namespace antares {
 
-// Hosts or joins a net game, and sets it up.  Pops once the host starts the game, leaving the
-// session in `session`, or when the player leaves, leaving it null.
-class NetSetupScreen : public Card {
-  public:
-    enum Mode { ASK, HOST, JOIN };
+// One line of text typed into an interface box.
+class NetTextField : public EditableText {
+    using TextReceiver::range;
 
-    NetSetupScreen(
-            Mode mode, pn::string_view address, uint16_t port,
-            std::unique_ptr<net::Session>* session);
+  public:
+    NetTextField(int32_t width, std::function<void()> accept, std::function<void()> escape);
+
+    virtual void accept();
+    virtual void escape();
+
+    void draw(const Rect& bounds, bool editing) const;
+
+  protected:
+    virtual void              update(pn::string_view text, range<int> selection, range<int> mark);
+    virtual StyledText&       styled_text() { return _text; }
+    virtual const StyledText& styled_text() const { return _text; }
+
+  private:
+    const int32_t         _width;
+    std::function<void()> _accept;
+    std::function<void()> _escape;
+    StyledText            _text;
+};
+
+class HostOrJoinScreen : public InterfaceScreen {
+  public:
+    enum Choice { CANCEL, HOST, JOIN };
+
+    explicit HostOrJoinScreen(Choice* choice);
+
+  private:
+    Choice* _choice;
+};
+
+class NetAddressScreen : public InterfaceScreen {
+  public:
+    NetAddressScreen(bool* cancelled, pn::string* address);
 
     virtual void become_front();
     virtual void resign_front();
-    virtual void draw() const;
+
+  protected:
+    virtual void overlay() const;
+
+  private:
+    void join();
+
+    bool*        _cancelled;
+    pn::string*  _address;
+    NetTextField _field;
+};
+
+// Shows `status`, or the session's error once it closes.  Pops once the session reaches the
+// lobby, or when cancelled.
+class NetStatusScreen : public InterfaceScreen {
+  public:
+    NetStatusScreen(net::Session* session, pn::string_view status);
 
     virtual bool next_timer(wall_time& time);
     virtual void fire_timer();
 
-    virtual void key_down(const KeyDownEvent& event);
+  protected:
+    virtual void overlay() const;
 
   private:
-    enum State { ASKING, ADDRESS, CONNECTING, LOBBY, FAILED };
-    enum Field { LEVEL, RACE, COLOR };
+    net::Session* _session;
+    pn::string    _status;
+    wall_time     _next_timer;
+};
 
-    class AddressText : public EditableText {
-        using TextReceiver::range;
+// Chooses the level, lag, species, and color, and carries chat.  Pops once the host starts the
+// game, the session closes, or the player cancels.
+class NetLobbyScreen : public InterfaceScreen {
+  public:
+    explicit NetLobbyScreen(net::Session* session);
 
-      public:
-        explicit AddressText(NetSetupScreen* screen);
+    virtual void become_front();
+    virtual void resign_front();
 
-        virtual void accept();
-        virtual void escape();
+    virtual bool next_timer(wall_time& time);
+    virtual void fire_timer();
 
-        void              draw(Point at) const;
-        const StyledText& text_box() const { return _text; }
+  protected:
+    virtual void overlay() const;
 
-      protected:
-        virtual void        update(pn::string_view text, range<int> selection, range<int> mark);
-        virtual StyledText& styled_text() { return _text; }
-        virtual const StyledText& styled_text() const { return _text; }
-
-      private:
-        NetSetupScreen* _screen;
-        StyledText      _text;
-    };
-
-    void host();
-    void join(pn::string_view address);
-    void fail(pn::string_view error);
-    void edit_address();
-    void change(int by);
+  private:
+    void change_level(int by);
+    void change_delay(int by);
+    void change_race(int by);
+    void change_hue(int by);
+    void choose(pn::string_view race, int hue);
     void choose_defaults();
+    void send();
+    void update();
 
-    const Mode                     _mode;
-    const uint16_t                 _port;
-    pn::string                     _address;
-    std::unique_ptr<net::Session>* _session;
-    State                          _state = ASKING;
-    Field                          _field = RACE;
-    bool                           _chose = false;
-    pn::string                     _error;
-    AddressText                    _address_text;
-    wall_time                      _next_timer;
+    net::Session*           _session;
+    bool                    _editing = false;
+    NetTextField            _field;
+    std::vector<pn::string> _messages;
+    int                     _players = 0;
+    pn::string              _opponent;
+    wall_time               _next_timer;
 };
 
 }  // namespace antares
