@@ -62,6 +62,45 @@ _`predictive networking`
 ..  _input logs: log_
 ..  _desync: desynchronization_
 
+Lockstep
+--------
+
+The first implementation uses `pre-delay networking`_ between two
+players_.  A turn is ``kMajorTick``.  Input from turn *n* executes on
+turn *n* + ``Setup.delay`` on every node_, and a node_ waits while it
+lacks any player_'s input for the turn it is about to execute.
+
+Packets are ``antares.pb.net.Packet`` messages (``proto/net.proto``),
+sent over ENet.  Turns go on an unreliable channel, repeating every turn
+the recipient hasn't acknowledged; everything else goes on a reliable
+channel.
+
+Modules
+~~~~~~~
+
+``net/packet``
+    Reads and writes packets.
+
+``net/host``
+    Connects, accepts, sends, and polls.  The only module that uses
+    ENet (``ext/enet``).
+
+``net/lobby``
+    Exchanges Hello, Setup, and Start, and rejects a peer_ with a
+    different protocol, Antares version, or plugin.
+
+``net/lockstep``
+    Keeps each player_'s turns, decides when the next turn may execute,
+    and compares sync values.
+
+``ui/screens/net-setup``
+    Host or join; choose level, race, and color.
+
+The game loop takes each turn's ``PlayerEvent`` list from
+``net/lockstep`` and applies it to that player_'s admiral.  Selecting
+with the mouse in the battlefield produces a ``PlayerEvent`` whose data
+is the object's number.
+
 Protocol
 --------
 
