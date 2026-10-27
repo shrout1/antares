@@ -85,21 +85,28 @@ Modules
     Connects, accepts, sends, and polls.  The only module that uses
     ENet (``ext/enet``).
 
-``net/lobby``
-    Exchanges Hello, Setup, and Start, and rejects a peer_ with a
-    different protocol, Antares version, or plugin.
-
 ``net/lockstep``
     Keeps each player_'s turns, decides when the next turn may execute,
     and compares sync values.
 
+``net/session``
+    Services the connection on its own thread.  Exchanges Hello, Setup,
+    Choose, Start, and Ready, rejects a peer_ with a different
+    protocol, Antares version, or plugin, and routes Turns to
+    ``net/lockstep``.
+
 ``ui/screens/net-setup``
     Host or join; choose level, race, and color.
 
-The game loop takes each turn's ``PlayerEvent`` list from
-``net/lockstep`` and applies it to that player_'s admiral.  Selecting
-with the mouse in the battlefield produces a ``PlayerEvent`` whose data
-is the object's number.
+``ui/flows/net-game``
+    Runs setup, then the level, with the session's players and seed.
+
+Each turn, ``PlayerShip`` turns local input into a list of
+``PlayerEvent`` commands, and the game executes every player_'s
+commands for that turn.  Selections made with the mouse, hotkeys, or a
+gamepad become ``SELECT_OBJECT`` or ``TARGET_OBJECT``, whose data is the
+object's number.  Zooming, message paging, and hotkey assignment stay
+local.
 
 Protocol
 --------
