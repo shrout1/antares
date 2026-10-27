@@ -27,6 +27,7 @@ WINE_TESTS = [
     "editable-text-test",
     "fixed-test",
     "object-data",
+    "packet-test",
     "shapes",
     "tint",
 ]
@@ -181,6 +182,8 @@ def main():
         (unit_test, opts, queue, "color-test"),
         (unit_test, opts, queue, "editable-text-test"),
         (unit_test, opts, queue, "fixed-test"),
+        (unit_test, opts, queue, "host-test"),
+        (unit_test, opts, queue, "packet-test"),
         (data_test, opts, queue, "build-pix", ["--text"]),
         (data_test, opts, queue, "object-data"),
         (data_test, opts, queue, "shapes"),
