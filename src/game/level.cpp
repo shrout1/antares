@@ -335,6 +335,26 @@ static void run_game_1s() {
     } while ((g.time.time_since_epoch() % secs(1)) != ticks(0));
 }
 
+// In a net level, a player with no flagship flies the first thinking object they own.
+static void assign_net_flagships() {
+    for (auto adm : Admiral::all()) {
+        if (!adm->active() || adm->flagship().get()) {
+            continue;
+        }
+        for (auto o : SpaceObject::all()) {
+            if (o->active && (o->owner == adm) && ((o->attributes & kCanThink) == kCanThink)) {
+                o->attributes |= kIsPlayerShip;
+                adm->set_flagship(o);
+                if (adm == g.admiral) {
+                    g.ship = o;
+                    ResetPlayerShip();
+                }
+                break;
+            }
+        }
+    }
+}
+
 void construct_level(LoadState* state) {
     int32_t         step = state->step;
     std::bitset<16> all_colors;
@@ -365,6 +385,9 @@ void construct_level(LoadState* state) {
         step -= (2 * Initial::all().size());
         set_initial_destination(Handle<const Initial>(step), false);
     } else if (step == (3 * Initial::all().size())) {
+        if (g.level->type() == Level::Type::NET) {
+            assign_net_flagships();
+        }
         RecalcAllAdmiralBuildData();  // set up all the admiral's destination objects
         Messages::clear();
         g.time = game_ticks(-g.level->base.start_time.value_or(secs(0)));
