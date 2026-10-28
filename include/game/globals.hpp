@@ -66,7 +66,15 @@ struct scrollStarType;
 class Sprite;
 class InputSource;
 
-struct GlobalState {
+// The controls a player is holding.
+struct Pilot {
+    uint32_t keys         = 0;
+    uint32_t gamepad_keys = 0;
+    int32_t  steer        = -1;  // Direction the gamepad stick steers toward, or -1.
+};
+
+// Everything that each tick of the level reads or changes.
+struct World {
     uint32_t   sync;    // Indicates when net games are desynchronized.
     game_ticks time;    // Current game time.
     Random     random;  // Global random number generator.
@@ -98,6 +106,15 @@ struct GlobalState {
     const Level*    next_level = nullptr;  // Next level (or null for none).
     sfz::optional<pn::string> victory_text;  // Text to show in debriefing.
 
+    uint32_t           key_mask;  // Determines input to reject.
+    std::vector<Pilot> pilots;    // Indexed by admiral.
+};
+
+// Copies `from` over `to`, allocating `to`'s arrays as needed.
+void copy_world(World* to, const World& from);
+
+// The world, plus how the local player is viewing it.
+struct GlobalState : World {
     ticks                    radar_count;  // Counts down to a radar pulse every 5/6 seconds.
     std::unique_ptr<Point[]> radar_blips;  // Screen locations of radar blips.
     bool                     radar_on;     // Maybe false if player ship is offline.
@@ -110,8 +127,6 @@ struct GlobalState {
     Handle<Label>            send_label;     // Message local player is currently entering.
 
     int32_t bottom_border;  // When a message is being displayed.
-
-    uint32_t key_mask;  // Determines input to reject.
 
     miniComputerDataType mini;
 

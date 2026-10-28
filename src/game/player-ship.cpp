@@ -134,12 +134,10 @@ void ResetPlayerShip() {
     gDestKeyState = DEST_KEY_UP;
 }
 
+static Pilot& local_pilot() { return g.pilots[g.admiral.number()]; }
+
 PlayerShip::PlayerShip()
-        : gTheseKeys(0),
-          _gamepad_keys(0),
-          _gamepad_state(NO_BUMPER),
-          _control_active(false),
-          _control_direction(0) {}
+        : _gamepad_state(NO_BUMPER), _control_active(false), _control_direction(0) {}
 
 static sfz::optional<KeyNum> key_num(Key key) {
     for (int i = 0; i < kKeyExtendedControlNum; ++i) {
@@ -520,16 +518,16 @@ void PlayerShip::gamepad_button_down(const GamepadButtonDownEvent& event) {
     switch (event.button) {
         case Gamepad::Button::LB:
             if (_gamepad_state & SELECT_BUMPER) {
-                _gamepad_state = TARGET_BUMPER_OVERRIDE;
+                set_gamepad_state(TARGET_BUMPER_OVERRIDE);
             } else if (!(_gamepad_state & TARGET_BUMPER)) {
-                _gamepad_state = TARGET_BUMPER;
+                set_gamepad_state(TARGET_BUMPER);
             }
             return;
         case Gamepad::Button::RB:
             if (_gamepad_state & TARGET_BUMPER) {
-                _gamepad_state = SELECT_BUMPER_OVERRIDE;
+                set_gamepad_state(SELECT_BUMPER_OVERRIDE);
             } else if (!(_gamepad_state & SELECT_BUMPER)) {
-                _gamepad_state = SELECT_BUMPER;
+                set_gamepad_state(SELECT_BUMPER);
             }
             return;
         default: break;
@@ -586,18 +584,18 @@ void PlayerShip::gamepad_button_down(const GamepadButtonDownEvent& event) {
     }
 
     switch (event.button) {
-        case Gamepad::Button::A: _gamepad_keys |= kUpKey; break;
-        case Gamepad::Button::B: _gamepad_keys |= kDownKey; break;
+        case Gamepad::Button::A: local_pilot().gamepad_keys |= kUpKey; break;
+        case Gamepad::Button::B: local_pilot().gamepad_keys |= kDownKey; break;
         case Gamepad::Button::X: zoom_out(); break;
         case Gamepad::Button::Y: zoom_in(); break;
         case Gamepad::Button::BACK: Messages::advance(); break;
-        case Gamepad::Button::LT: _gamepad_keys |= kSpecialKey; break;
-        case Gamepad::Button::RT: _gamepad_keys |= (kPulseKey | kBeamKey); break;
+        case Gamepad::Button::LT: local_pilot().gamepad_keys |= kSpecialKey; break;
+        case Gamepad::Button::RT: local_pilot().gamepad_keys |= (kPulseKey | kBeamKey); break;
         case Gamepad::Button::LSB:
             if (player->presenceState == kWarpingPresence) {
-                _gamepad_keys &= !kWarpKey;
+                local_pilot().gamepad_keys &= !kWarpKey;
             } else {
-                _gamepad_keys |= kWarpKey;
+                local_pilot().gamepad_keys |= kWarpKey;
             }
             break;
         case Gamepad::Button::UP:
@@ -621,16 +619,16 @@ void PlayerShip::gamepad_button_up(const GamepadButtonUpEvent& event) {
     switch (event.button) {
         case Gamepad::Button::LB:
             if (_gamepad_state & OVERRIDE) {
-                _gamepad_state = SELECT_BUMPER;
+                set_gamepad_state(SELECT_BUMPER);
             } else {
-                _gamepad_state = NO_BUMPER;
+                set_gamepad_state(NO_BUMPER);
             }
             return;
         case Gamepad::Button::RB:
             if (_gamepad_state & OVERRIDE) {
-                _gamepad_state = TARGET_BUMPER;
+                set_gamepad_state(TARGET_BUMPER);
             } else {
-                _gamepad_state = NO_BUMPER;
+                set_gamepad_state(NO_BUMPER);
             }
             return;
         default: break;
@@ -653,13 +651,13 @@ void PlayerShip::gamepad_button_up(const GamepadButtonUpEvent& event) {
 
     auto player = g.ship;
     switch (event.button) {
-        case Gamepad::Button::A: _gamepad_keys &= ~kUpKey; break;
-        case Gamepad::Button::B: _gamepad_keys &= ~kDownKey; break;
-        case Gamepad::Button::LT: _gamepad_keys &= ~kSpecialKey; break;
-        case Gamepad::Button::RT: _gamepad_keys &= ~(kPulseKey | kBeamKey); break;
+        case Gamepad::Button::A: local_pilot().gamepad_keys &= ~kUpKey; break;
+        case Gamepad::Button::B: local_pilot().gamepad_keys &= ~kDownKey; break;
+        case Gamepad::Button::LT: local_pilot().gamepad_keys &= ~kSpecialKey; break;
+        case Gamepad::Button::RT: local_pilot().gamepad_keys &= ~(kPulseKey | kBeamKey); break;
         case Gamepad::Button::LSB:
             if (player->presenceState != kWarpingPresence) {
-                _gamepad_keys &= !kWarpKey;
+                local_pilot().gamepad_keys &= !kWarpKey;
             }
             break;
         case Gamepad::Button::RIGHT:
@@ -686,9 +684,20 @@ void PlayerShip::gamepad_stick(const GamepadStickEvent& event) {
         case Gamepad::Stick::LS:
             _control_active    = active;
             _control_direction = direction;
+            update_steer();
             break;
         default: break;
     }
+}
+
+void PlayerShip::set_gamepad_state(int state) {
+    _gamepad_state = static_cast<GamepadState>(state);
+    update_steer();
+}
+
+void PlayerShip::update_steer() {
+    local_pilot().steer =
+            ((_gamepad_state == NO_BUMPER) && _control_active) ? _control_direction : -1;
 }
 
 bool PlayerShip::active() const {
@@ -794,31 +803,32 @@ void PlayerShip::update() {
     if (!g.ship.get()) {
         return;
     }
+    Pilot& pilot = local_pilot();
 
     if (_message.editing()) {
         _player_events.clear();
-        gTheseKeys = 0;
+        pilot.keys = 0;
     }
 
     for (auto e : _player_events) {
         switch (e.type) {
-            case PlayerEventType::ACCEL_ON: gTheseKeys |= (kUpKey & ~g.key_mask); break;
-            case PlayerEventType::DECEL_ON: gTheseKeys |= (kDownKey & ~g.key_mask); break;
-            case PlayerEventType::CCW_ON: gTheseKeys |= (kLeftKey & ~g.key_mask); break;
-            case PlayerEventType::CW_ON: gTheseKeys |= (kRightKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_1_ON: gTheseKeys |= (kPulseKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_2_ON: gTheseKeys |= (kBeamKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_S_ON: gTheseKeys |= (kSpecialKey & ~g.key_mask); break;
-            case PlayerEventType::WARP_ON: gTheseKeys |= (kWarpKey & ~g.key_mask); break;
+            case PlayerEventType::ACCEL_ON: pilot.keys |= (kUpKey & ~g.key_mask); break;
+            case PlayerEventType::DECEL_ON: pilot.keys |= (kDownKey & ~g.key_mask); break;
+            case PlayerEventType::CCW_ON: pilot.keys |= (kLeftKey & ~g.key_mask); break;
+            case PlayerEventType::CW_ON: pilot.keys |= (kRightKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_1_ON: pilot.keys |= (kPulseKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_2_ON: pilot.keys |= (kBeamKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_S_ON: pilot.keys |= (kSpecialKey & ~g.key_mask); break;
+            case PlayerEventType::WARP_ON: pilot.keys |= (kWarpKey & ~g.key_mask); break;
 
-            case PlayerEventType::ACCEL_OFF: gTheseKeys &= ~(kUpKey & ~g.key_mask); break;
-            case PlayerEventType::DECEL_OFF: gTheseKeys &= ~(kDownKey & ~g.key_mask); break;
-            case PlayerEventType::CCW_OFF: gTheseKeys &= ~(kLeftKey & ~g.key_mask); break;
-            case PlayerEventType::CW_OFF: gTheseKeys &= ~(kRightKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_1_OFF: gTheseKeys &= ~(kPulseKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_2_OFF: gTheseKeys &= ~(kBeamKey & ~g.key_mask); break;
-            case PlayerEventType::FIRE_S_OFF: gTheseKeys &= ~(kSpecialKey & ~g.key_mask); break;
-            case PlayerEventType::WARP_OFF: gTheseKeys &= ~(kWarpKey & ~g.key_mask); break;
+            case PlayerEventType::ACCEL_OFF: pilot.keys &= ~(kUpKey & ~g.key_mask); break;
+            case PlayerEventType::DECEL_OFF: pilot.keys &= ~(kDownKey & ~g.key_mask); break;
+            case PlayerEventType::CCW_OFF: pilot.keys &= ~(kLeftKey & ~g.key_mask); break;
+            case PlayerEventType::CW_OFF: pilot.keys &= ~(kRightKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_1_OFF: pilot.keys &= ~(kPulseKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_2_OFF: pilot.keys &= ~(kBeamKey & ~g.key_mask); break;
+            case PlayerEventType::FIRE_S_OFF: pilot.keys &= ~(kSpecialKey & ~g.key_mask); break;
+            case PlayerEventType::WARP_OFF: pilot.keys &= ~(kWarpKey & ~g.key_mask); break;
 
             case PlayerEventType::ZOOM_OUT: zoom_out(); break;
             case PlayerEventType::ZOOM_IN: zoom_in(); break;
@@ -954,9 +964,7 @@ void PlayerShip::update() {
     if (!_cursor.active()) {
         handle_target_keys(_player_events);
     }
-    handle_pilot_keys(
-            flagship, gTheseKeys, _gamepad_keys, (_gamepad_state == NO_BUMPER) && _control_active,
-            _control_direction);
+    handle_pilot_keys(flagship, pilot.keys, pilot.gamepad_keys, pilot.steer >= 0, pilot.steer);
     handle_order_key(_player_events);
     handle_autopilot_keys(_player_events);
 

@@ -186,6 +186,7 @@ static void construct_players(const Players& players) {
 LoadState start_construct_level(const Level& level) {
     ResetAllSpaceObjects();
     reset_action_queue();
+    g.pilots.assign(kMaxPlayerNum, Pilot{});
     Vectors::reset();
     ResetAllSprites();
     Label::reset();

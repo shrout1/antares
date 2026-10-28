@@ -18,6 +18,9 @@
 
 #include "game/admiral.hpp"
 
+#include <algorithm>
+#include <iterator>
+
 #include "data/base-object.hpp"
 #include "data/races.hpp"
 #include "data/resource.hpp"
@@ -102,7 +105,58 @@ Destination* Destination::get(int i) {
     return nullptr;
 }
 
+Destination::Destination(const Destination& other)
+        : whichObject{other.whichObject},
+          earn{other.earn},
+          buildTime{other.buildTime},
+          totalBuildTime{other.totalBuildTime},
+          buildObjectBaseNum{other.buildObjectBaseNum},
+          name{other.name.copy()} {
+    for (const BuildableObject& o : other.canBuildType) {
+        canBuildType.push_back(BuildableObject{o.name.copy()});
+    }
+    std::copy(std::begin(other.occupied), std::end(other.occupied), std::begin(occupied));
+}
+
 bool Destination::can_build() const { return !canBuildType.empty(); }
+
+Admiral::Admiral(const Admiral& other)
+        : _attributes{other._attributes},
+          _has_destination{other._has_destination},
+          _destinationObject{other._destinationObject},
+          _destinationObjectID{other._destinationObjectID},
+          _flagship{other._flagship},
+          _considerShip{other._considerShip},
+          _considerShipID{other._considerShipID},
+          _considerDestination{other._considerDestination},
+          _buildAtObject{other._buildAtObject},
+          _race{other._race.copy()},
+          _cash{other._cash},
+          _saveGoal{other._saveGoal},
+          _earning_power{other._earning_power},
+          _kills{other._kills},
+          _losses{other._losses},
+          _shipsLeft{other._shipsLeft},
+          _blitzkrieg{other._blitzkrieg},
+          _lastFreeEscortStrength{other._lastFreeEscortStrength},
+          _thisFreeEscortStrength{other._thisFreeEscortStrength},
+          _totalBuildChance{other._totalBuildChance},
+          _hue{other._hue},
+          _active{other._active},
+          _cheats{other._cheats},
+          _name{other._name.copy()} {
+    std::copy(std::begin(other._score), std::end(other._score), std::begin(_score));
+    for (const admiralBuildType& b : other._canBuildType) {
+        admiralBuildType copy;
+        copy.base        = b.base;
+        copy.buildable   = BuildableObject{b.buildable.name.copy()};
+        copy.chanceRange = b.chanceRange;
+        _canBuildType.push_back(std::move(copy));
+    }
+    if (other._hopeToBuild.has_value()) {
+        _hopeToBuild.emplace(BuildableObject{other._hopeToBuild->name.copy()});
+    }
+}
 
 Admiral* Admiral::get(int i) {
     if ((0 <= i) && (i < kMaxPlayerNum)) {

@@ -29,6 +29,8 @@
 
 namespace antares {
 
+struct World;
+
 enum {
     kAIsHuman    = 1 << 0,
     kAIsRemote   = 1 << 1,
@@ -82,6 +84,12 @@ struct Destination {
     const BaseObject*            buildObjectBaseNum;
     pn::string                   name;
 
+    Destination() = default;
+    Destination(const Destination& other);
+    Destination(Destination&&) = default;
+    Destination& operator=(const Destination& other) { return *this = Destination{other}; }
+    Destination& operator=(Destination&&) = default;
+
     bool can_build() const;  // Can build anything.
 };
 
@@ -93,6 +101,11 @@ struct admiralBuildType {
 
 class Admiral {
   public:
+    Admiral(const Admiral& other);
+    Admiral(Admiral&&) = default;
+    Admiral& operator=(const Admiral& other) { return *this = Admiral{other}; }
+    Admiral& operator=(Admiral&&) = default;
+
     static void                init();
     static void                reset();
     static Admiral*            get(int i);
@@ -184,6 +197,8 @@ class Admiral {
     pn::string                     _name;
 
   private:
+    friend void copy_world(World* to, const World& from);
+
     Admiral() = default;
 
     void think_build();

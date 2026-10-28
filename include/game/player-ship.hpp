@@ -128,9 +128,9 @@ class PlayerShip : public EventReceiver {
 
   private:
     bool active() const;
+    void set_gamepad_state(int state);
+    void update_steer();
 
-    uint32_t                 gTheseKeys;
-    uint32_t                 _gamepad_keys;
     std::vector<PlayerEvent> _player_events;
 
     enum GamepadState {
