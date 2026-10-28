@@ -192,6 +192,7 @@ class GamePlay : public Card {
 
   private:
     void play_turn();
+    void play_net(ticks units);
     void end_net_game(pn::string_view message);
 
     enum State {
@@ -205,9 +206,10 @@ class GamePlay : public Card {
 
     // Runs `units` of the game, and updates the display to match.
     void step(ticks units, bool input);
-    // Runs `units` of the world only. With `input`, reads the input source and executes the
-    // turn's commands; without, each player keeps the controls they hold.
+    // Runs `units` of the world only. With `input`, executes the turn's commands; without, each
+    // player keeps the controls they hold.
     void simulate(ticks units, bool input);
+    void simulate_to(game_ticks at);
     // Updates local display state for `units` of elapsed time.
     void update_display(ticks units);
     void move_stars(ticks units);
@@ -234,6 +236,8 @@ class GamePlay : public Card {
     InputSource*             _input_source;
     net::Session* const      _session;
     sfz::optional<wall_time> _stalled_since;
+    game_ticks               _frontier;             // In net games, the time head has reached.
+    uint32_t                 _sampled_through = 0;  // In net games, the last turn of local input.
 };
 
 MainPlay::MainPlay(
@@ -318,7 +322,11 @@ void MainPlay::become_front() {
     }
 }
 
-static uint32_t turn_at(game_ticks at) { return at.time_since_epoch() / kMajorTick; }
+static uint32_t   turn_at(game_ticks at) { return at.time_since_epoch() / kMajorTick; }
+static game_ticks turn_start(uint32_t turn) { return game_ticks(turn * kMajorTick); }
+
+// How many turns head may run ahead of the input every player has sent.
+const uint32_t kRollbackTurns = 20;
 
 static net::Lockstep::Turn to_turn(const std::vector<PlayerEvent>& events) {
     net::Lockstep::Turn turn;
@@ -453,6 +461,9 @@ void GamePlay::become_front() {
             _input_source->start();
             if (_session) {
                 _session->ready(turn_at(g.time) + 1);
+                copy_world(&tail, g);
+                _frontier        = g.time;
+                _sampled_through = turn_at(g.time);
             }
             if (_replay) {
                 _player_ship.cursor().show = false;
@@ -597,30 +608,20 @@ void GamePlay::fire_timer() {
             end_net_game("The game is out of sync.");
             return;
         } else if (_session->state() == net::Session::CLOSED) {
-            if (!g.game_over) {
+            if (!tail.game_over) {
                 end_net_game(_session->error());
                 return;
             }
-            g.game_over_at = g.time;
+            tail.game_over_at = tail.time;
         }
+        play_net(unitsPassed);
     }
 
-    while (unitsPassed > ticks(0)) {
+    while (!_session && (unitsPassed > ticks(0))) {
         ticks unitsToDo   = unitsPassed;
         ticks minor_ticks = g.time.time_since_epoch() % kMajorTick;
         if (minor_ticks + unitsToDo > kMajorTick) {
             unitsToDo = kMajorTick - minor_ticks;
-        }
-
-        if (_session && (minor_ticks + unitsToDo == kMajorTick)) {
-            if (!_session->ready_turn(turn_at(g.time + unitsToDo))) {
-                if (!_stalled_since.has_value()) {
-                    _stalled_since.emplace(now());
-                }
-                _real_time = now();
-                break;
-            }
-            _stalled_since = sfz::nullopt;
         }
 
         if ((minor_ticks == ticks(0)) && rollback_test.lookahead) {
@@ -635,9 +636,11 @@ void GamePlay::fire_timer() {
         unitsPassed -= unitsToDo;
     }
 
-    if (g.game_over && (g.time >= g.game_over_at)) {
+    // In net games, only what every player's input confirms can end the game.
+    const World& world = _session ? static_cast<const World&>(tail) : g;
+    if (world.game_over && (world.time >= world.game_over_at)) {
         if (*_game_result == NO_GAME) {
-            if (g.victor == g.admiral) {
+            if (world.victor == g.admiral) {
                 *_game_result = WIN_GAME;
             } else {
                 *_game_result = LOSE_GAME;
@@ -650,7 +653,7 @@ void GamePlay::fire_timer() {
         case RESTART_GAME: stack()->pop(this); break;
 
         case WIN_GAME:
-            if (_replay || !g.victory_text.has_value()) {
+            if (_replay || !world.victory_text.has_value()) {
                 stack()->pop(this);
             } else {
                 _state        = DEBRIEFING;
@@ -663,7 +666,7 @@ void GamePlay::fire_timer() {
                                 g.level->solo.par.kills));
                         break;
 
-                    default: stack()->push(new DebriefingScreen(*g.victory_text)); break;
+                    default: stack()->push(new DebriefingScreen(*world.victory_text)); break;
                 }
             }
             break;
@@ -672,14 +675,14 @@ void GamePlay::fire_timer() {
             if (_replay) {
                 *_game_result = QUIT_GAME;
                 stack()->pop(this);
-            } else if (_session && !g.victory_text.has_value()) {
+            } else if (_session && !world.victory_text.has_value()) {
                 stack()->pop(this);
-            } else if (!g.victory_text.has_value()) {
+            } else if (!world.victory_text.has_value()) {
                 _state = PLAY_AGAIN;
                 stack()->push(new PlayAgainScreen(false, false, &_play_again));
             } else {
                 _state = DEBRIEFING;
-                stack()->push(new DebriefingScreen(*g.victory_text));
+                stack()->push(new DebriefingScreen(*world.victory_text));
             }
             break;
 
@@ -692,9 +695,6 @@ void GamePlay::fire_timer() {
 void GamePlay::step(ticks units, bool input) {
     move_stars(units);
     simulate(units, input);
-    if (_session && ((g.time.time_since_epoch() % kMajorTick) == ticks(0))) {
-        _session->sync(turn_at(g.time), g.sync);
-    }
     update_display(units);
 }
 
@@ -714,10 +714,6 @@ void GamePlay::simulate(ticks units, bool input) {
         execute_action_queue();
 
         if (input) {
-            if (!_input_source->get(g.admiral, g.time, _player_ship)) {
-                g.game_over    = true;
-                g.game_over_at = g.time;
-            }
             play_turn();
         } else {
             _player_ship.execute(g.admiral, {});
@@ -780,15 +776,77 @@ void GamePlay::look_ahead() {
 }
 
 void GamePlay::play_turn() {
+    uint32_t turn = turn_at(g.time);
+    if (!_session || (turn > _sampled_through)) {
+        if (!_input_source->get(g.admiral, g.time, _player_ship)) {
+            g.game_over    = true;
+            g.game_over_at = g.time;
+        }
+    }
     if (!_session) {
         _player_ship.execute(g.admiral, _player_ship.sample());
         return;
     }
-    uint32_t turn = turn_at(g.time);
-    _session->submit(turn, to_turn(_player_ship.sample()));
-    std::vector<net::Lockstep::Turn> turns = _session->take(turn);
-    for (int i = 0; i < turns.size(); ++i) {
-        _player_ship.execute(Handle<Admiral>(i), from_turn(turns[i]));
+
+    if (turn > _sampled_through) {
+        _session->submit(turn, to_turn(_player_ship.sample()));
+        _sampled_through = turn;
+    }
+    for (int i = 0; i < net::kSessionPlayers; ++i) {
+        // A player whose input hasn't arrived keeps holding the same controls.
+        sfz::optional<net::Lockstep::Turn> commands = _session->known(i, turn);
+        _player_ship.execute(
+                Handle<Admiral>(i),
+                commands.has_value() ? from_turn(*commands) : std::vector<PlayerEvent>{});
+    }
+}
+
+// Advances tail through each turn that every player's input has reached, then predicts head from
+// tail to `units` past where head was.
+void GamePlay::play_net(ticks units) {
+    game_ticks target = _frontier + units;
+    game_ticks limit  = turn_start(_session->confirmed() + kRollbackTurns);
+    if (target > limit) {
+        target = std::max(limit, _frontier);
+        if (!_stalled_since.has_value()) {
+            _stalled_since.emplace(now());
+        }
+        _real_time = now();
+    } else {
+        _stalled_since = sfz::nullopt;
+    }
+    units = target - _frontier;
+    if (units <= ticks(0)) {
+        return;
+    }
+
+    move_stars(units);
+
+    copy_world(&g, tail);
+    while (turn_at(g.time) < _session->confirmed()) {
+        game_ticks next = turn_start(turn_at(g.time) + 1);
+        if (next > target) {
+            break;
+        }
+        simulate_to(next);
+        _session->sync(turn_at(g.time), g.sync);
+        _session->confirm(turn_at(g.time));
+    }
+    copy_world(&tail, g);
+
+    globals()->confirmed = false;
+    simulate_to(target);
+    globals()->confirmed = true;
+    _frontier            = target;
+
+    update_display(units);
+}
+
+// One minor tick at a time, so that every player's world runs the same steps however their frames
+// fall.
+void GamePlay::simulate_to(game_ticks at) {
+    while (g.time < at) {
+        simulate(kMinorTick, true);
     }
 }
 
