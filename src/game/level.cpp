@@ -170,6 +170,29 @@ void GetInitialCoord(Handle<const Initial> initial, Point* coord, int32_t rotati
 
 }  // namespace
 
+static ANTARES_GLOBAL std::vector<NetPlayer> net_players;
+static ANTARES_GLOBAL int                    net_local;
+
+void set_net_players(std::vector<NetPlayer> players, int local) {
+    net_players = std::move(players);
+    net_local   = local;
+}
+
+static void construct_net_players(const std::vector<NetLevel::Player>& players) {
+    if (players.size() != net_players.size()) {
+        throw std::runtime_error("wrong number of net players");
+    }
+    for (int i = 0; i < players.size(); ++i) {
+        const NetPlayer& p = net_players[i];
+        auto admiral       = Admiral::make(i, players[i], p.name, p.race, p.hue, i != net_local);
+        if (i == net_local) {
+            g.admiral = admiral;
+        }
+        admiral->pay(Cash{Fixed::from_long(5000)});
+        load_race(admiral->race());
+    }
+}
+
 template <typename Players>
 static void construct_players(const Players& players) {
     int i = 0;
@@ -214,7 +237,7 @@ LoadState start_construct_level(const Level& level) {
         case Level::Type::NONE: throw std::runtime_error("level with type NONE?");
         case Level::Type::DEMO: construct_players(g.level->demo.players); break;
         case Level::Type::SOLO: construct_players(g.level->solo.players); break;
-        case Level::Type::NET: throw std::runtime_error("can’t construct net player");
+        case Level::Type::NET: construct_net_players(g.level->net.players); break;
     }
     // *** END INIT ADMIRALS ***
 
@@ -312,6 +335,26 @@ static void run_game_1s() {
     } while ((g.time.time_since_epoch() % secs(1)) != ticks(0));
 }
 
+// In a net level, a player with no flagship flies the first thinking object they own.
+static void assign_net_flagships() {
+    for (auto adm : Admiral::all()) {
+        if (!adm->active() || adm->flagship().get()) {
+            continue;
+        }
+        for (auto o : SpaceObject::all()) {
+            if (o->active && (o->owner == adm) && ((o->attributes & kCanThink) == kCanThink)) {
+                o->attributes |= kIsPlayerShip;
+                adm->set_flagship(o);
+                if (adm == g.admiral) {
+                    g.ship = o;
+                    ResetPlayerShip();
+                }
+                break;
+            }
+        }
+    }
+}
+
 void construct_level(LoadState* state) {
     int32_t         step = state->step;
     std::bitset<16> all_colors;
@@ -352,6 +395,9 @@ void construct_level(LoadState* state) {
         step -= (2 * Initial::all().size());
         set_initial_destination(Handle<const Initial>(step), false);
     } else if (step == (3 * Initial::all().size())) {
+        if (g.level->type() == Level::Type::NET) {
+            assign_net_flagships();
+        }
         RecalcAllAdmiralBuildData();  // set up all the admiral's destination objects
         Messages::clear();
         g.time = game_ticks(-g.level->base.start_time.value_or(secs(0)));
@@ -360,6 +406,9 @@ void construct_level(LoadState* state) {
     }
     ++state->step;
     if (state->step == state->max) {
+        if (g.level->type() == Level::Type::NET) {
+            assign_net_flagships();
+        }
         state->done = true;
     }
     return;

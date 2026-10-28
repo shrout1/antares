@@ -26,6 +26,7 @@
 #include "drawing/color.hpp"
 #include "mac/c/CocoaVideoDriver.h"
 #include "math/geometry.hpp"
+#include "video/layout.hpp"
 #include "video/opengl-driver.hpp"
 
 namespace antares {
@@ -38,8 +39,21 @@ class CocoaVideoDriver : public OpenGlVideoDriver {
 
     virtual pn::string_view glsl_version() const;
 
-    virtual Size viewport_size() const;
-    virtual Size screen_size() const;
+    virtual Size  viewport_size() const { return _layout.viewport_size(); }
+    virtual Rect  viewport_rect() const { return _layout.framebuffer_size().as_rect(); }
+    virtual bool  resolution_supported(Size resolution) const;
+    virtual Size  screen_size() const { return _layout.screen_size(); }
+    virtual int   scale() const { return _layout.pixel_ratio(); }
+    virtual float overlay_scale() const { return _layout.overlay_scale(); }
+    virtual float battlefield_scale(GameScale scale) const {
+        return _layout.battlefield_scale(scale);
+    }
+
+    virtual void  set_game_layout(bool game) { _game_layout = game; }
+    virtual Point convert(Point p, Region from, Region to) const {
+        return _layout.convert(p, from, to);
+    }
+    virtual Rect visible_rect(Region region) const { return _layout.visible_rect(region); }
 
     virtual Point     get_mouse();
     virtual InputMode input_mode() const;
@@ -51,14 +65,24 @@ class CocoaVideoDriver : public OpenGlVideoDriver {
 
     void loop(Card* initial);
 
+  protected:
+    virtual vec4 region_transform(Region region) const { return _layout.region_transform(region); }
+
   private:
     static wall_time _now();
+    bool             update_size();
+    void             fit_window();
 
     struct EventBridge;
     EventBridge* _bridge = nullptr;
 
     InputMode      _input_mode = KEYBOARD_MOUSE;
     AntaresWindow* _window     = nullptr;
+    Layout         _layout;
+    Size           _resolution;
+    GameScale      _game_scale  = GameScale::NATIVE;
+    bool           _game_layout = false;
+    bool           _fullscreen  = false;
 };
 
 }  // namespace antares

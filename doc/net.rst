@@ -62,6 +62,55 @@ _`predictive networking`
 ..  _input logs: log_
 ..  _desync: desynchronization_
 
+Lockstep
+--------
+
+The first implementation uses `pre-delay networking`_ between two
+players_.  A turn is ``kMajorTick``.  Input from turn *n* executes on
+turn *n* + ``Setup.delay`` on every node_, and a node_ waits while it
+lacks any player_'s input for the turn it is about to execute.
+
+Packets are ``antares.pb.net.Packet`` messages (``proto/net.proto``),
+sent over ENet.  Turns go on an unreliable channel, repeating every turn
+the recipient hasn't acknowledged; everything else goes on a reliable
+channel.
+
+Modules
+~~~~~~~
+
+``net/packet``
+    Reads and writes packets.
+
+``net/host``
+    Connects, accepts, sends, and polls.  The only module that uses
+    ENet (``ext/enet``).
+
+``net/lockstep``
+    Keeps each player_'s turns, decides when the next turn may execute,
+    and compares sync values.
+
+``net/session``
+    Services the connection on its own thread.  Exchanges Hello, Setup,
+    Choose, Start, and Ready, rejects a peer_ with a different
+    protocol, Antares version, or plugin, and routes Turns to
+    ``net/lockstep``.
+
+``ui/screens/net-setup``
+    Host or Join, Host Address, Status, and the lobby, where players
+    choose the level, lag, species, and color, and chat.  Laid out
+    after Ares's own net interfaces.
+
+``ui/flows/net-game``
+    Hosts or joins, runs the lobby, then the level, with the session's
+    players and seed.
+
+Each turn, ``PlayerShip`` turns local input into a list of
+``PlayerEvent`` commands, and the game executes every player_'s
+commands for that turn.  Selections made with the mouse, hotkeys, or a
+gamepad become ``SELECT_OBJECT`` or ``TARGET_OBJECT``, whose data is the
+object's number.  Zooming, message paging, and hotkey assignment stay
+local.
+
 Protocol
 --------
 

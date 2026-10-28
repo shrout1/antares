@@ -44,6 +44,12 @@ int32_t antares_window_screen_width(const AntaresWindow* window);
 int32_t antares_window_screen_height(const AntaresWindow* window);
 int32_t antares_window_viewport_width(const AntaresWindow* window);
 int32_t antares_window_viewport_height(const AntaresWindow* window);
+// The size of the window's display, in pixels.
+void antares_window_display_size(const AntaresWindow* window, int32_t* width, int32_t* height);
+void antares_window_set_fullscreen(AntaresWindow* window, bool fullscreen);
+// Sizes a window so its view is `width` by `height` pixels, shrunk to fit the display if needed,
+// and centers it. Does nothing in fullscreen.
+void antares_window_fit(AntaresWindow* window, int32_t width, int32_t height);
 
 void antares_get_mouse_location(AntaresWindow* window, int32_t* x, int32_t* y);
 
@@ -59,6 +65,7 @@ typedef enum {
     ANTARES_WINDOW_CALLBACK_MOUSE_DOWN,
     ANTARES_WINDOW_CALLBACK_MOUSE_UP,
     ANTARES_WINDOW_CALLBACK_MOUSE_MOVE,
+    ANTARES_WINDOW_CALLBACK_MOUSE_SCROLL,
 
     ANTARES_WINDOW_CALLBACK_REPLACE,
     ANTARES_WINDOW_CALLBACK_SELECT,
@@ -121,6 +128,11 @@ typedef union {
     struct {
         int32_t x, y;
     } mouse_move;
+
+    struct {
+        int32_t x, y;
+        double  dx, dy;
+    } mouse_scroll;
 
     struct {
         antares_window_callback_range range;

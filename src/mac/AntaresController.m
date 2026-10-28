@@ -27,6 +27,7 @@
 
 @interface AntaresController (Private)
 - (void)fail:(NSString*)message;
+- (void)relaunch:(const char*)plugin;
 @end
 
 @implementation AntaresController
@@ -35,6 +36,12 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)aNotification {
+    // A plugin path given on the command line, as when restarting with another plugin.
+    NSArray* args = [[NSProcessInfo processInfo] arguments];
+    if (!_plugin_path && ([args count] == 2) && ![args[1] hasPrefix:@"-"]) {
+        _plugin_path = [args[1] retain];
+    }
+
     CFStringRef error_message;
     drivers = antares_controller_create_drivers(&error_message);
     if (!drivers) {
@@ -73,9 +80,31 @@
         [self fail:(NSString*)error_message];
     }
 
+    const char* plugin = antares_controller_restart_plugin();
+    if (plugin) {
+        [self relaunch:plugin];
+    }
+
     antares_controller_destroy_drivers(drivers);
     _application_should_terminate = NSTerminateNow;
     [NSApp terminate:self];
+}
+
+// Starts another copy of the game with `plugin`, or the factory scenario if it's empty; this one
+// then quits.
+- (void)relaunch:(const char*)plugin {
+    NSWorkspaceOpenConfiguration* config = [NSWorkspaceOpenConfiguration configuration];
+    config.createsNewApplicationInstance = YES;
+    config.arguments = *plugin ? @[ [NSString stringWithUTF8String:plugin] ] : @[];
+    // Wait until the launch is under way, so quitting doesn't cancel it.
+    dispatch_semaphore_t started = dispatch_semaphore_create(0);
+    [[NSWorkspace sharedWorkspace]
+            openApplicationAtURL:[[NSBundle mainBundle] bundleURL]
+                   configuration:config
+               completionHandler:^(NSRunningApplication* app, NSError* error) {
+                 dispatch_semaphore_signal(started);
+               }];
+    dispatch_semaphore_wait(started, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender {

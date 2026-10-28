@@ -22,6 +22,7 @@
 
 #include "drawing/interface.hpp"
 #include "drawing/pix-map.hpp"
+#include "data/level.hpp"
 #include "game/globals.hpp"
 #include "ui/card.hpp"
 #include "video/transitions.hpp"
@@ -60,10 +61,7 @@ PlayAgainScreen::PlayAgainScreen(bool allow_resume, bool allow_skip, Item* butto
                         stack()->push(new ColorFade(
                                 ColorFade::TO_COLOR, RgbColor::black(), secs(1), false, NULL));
                     },
-                    [] {
-                        // TODO(sfiera): disable if networked.
-                        return true;
-                    }});
+                    [] { return g.level->type() != Level::Type::NET; }});
 
     button(kQuitButton)->bind({[this] {
         *_button_pressed = Item::QUIT;

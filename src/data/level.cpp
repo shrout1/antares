@@ -103,7 +103,7 @@ FIELD_READER(NetLevel::Player) {
     return required_struct<NetLevel::Player>(
             x, {{"type", &NetLevel::Player::type},
                 {"earning_power", &NetLevel::Player::earning_power},
-                {"races", nullptr}});  // TODO(sfiera): populate field
+                {"races", &NetLevel::Player::races}});
 }
 
 FIELD_READER(game_ticks) { return game_ticks{read_field<ticks>(x)}; }

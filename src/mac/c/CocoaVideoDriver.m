@@ -159,6 +159,43 @@ int32_t antares_window_viewport_height(const AntaresWindow* window) {
     return [window->view convertRectToBacking:[window->view bounds]].size.height;
 }
 
+static NSScreen* window_screen(const AntaresWindow* window) {
+    NSScreen* screen = [window->window screen];
+    return screen ? screen : [NSScreen mainScreen];
+}
+
+void antares_window_display_size(const AntaresWindow* window, int32_t* width, int32_t* height) {
+    NSScreen* screen = window_screen(window);
+    NSRect    pixels = [screen convertRectToBacking:[screen frame]];
+    *width           = pixels.size.width;
+    *height          = pixels.size.height;
+}
+
+void antares_window_set_fullscreen(AntaresWindow* window, bool fullscreen) {
+    bool is_fullscreen = ([window->window styleMask] & NSWindowStyleMaskFullScreen) != 0;
+    if (is_fullscreen != fullscreen) {
+        [window->window toggleFullScreen:nil];
+    }
+}
+
+void antares_window_fit(AntaresWindow* window, int32_t width, int32_t height) {
+    if ([window->window styleMask] & NSWindowStyleMaskFullScreen) {
+        return;
+    }
+    NSSize content = [window->view convertRectFromBacking:NSMakeRect(0, 0, width, height)].size;
+    NSSize border  = [window->window frameRectForContentRect:NSZeroRect].size;  // title bar
+    NSRect area    = [window_screen(window) visibleFrame];
+    double shrink =
+            fmin(1.0, fmin((area.size.width - border.width) / content.width,
+                           (area.size.height - border.height) / content.height));
+    content = NSMakeSize(floor(content.width * shrink), floor(content.height * shrink));
+    if (NSEqualSizes(content, [window->view bounds].size)) {
+        return;
+    }
+    [window->window setContentSize:content];
+    [window->window center];
+}
+
 static bool translate_coords(AntaresView* view, NSEvent* event, NSPoint* p) {
     if ([event window] != [view window]) {
         return false;
@@ -252,6 +289,21 @@ static void mouse_move(AntaresView* view, NSEvent* event) {
     hide_unhide(view, where);
     antares_window_callback_data data = {.mouse_move = {where.x, where.y}};
     view->callback(ANTARES_WINDOW_CALLBACK_MOUSE_MOVE, data, view->userdata);
+}
+
+static void mouse_scroll(AntaresView* view, NSEvent* event) {
+    NSPoint where;
+    if (!translate_coords(view, event, &where)) {
+        return;
+    }
+    // Trackpads report points rather than lines; a tenth of them is about a wheel's notch.
+    double dx = [event scrollingDeltaX], dy = [event scrollingDeltaY];
+    if ([event hasPreciseScrollingDeltas]) {
+        dx *= 0.1;
+        dy *= 0.1;
+    }
+    antares_window_callback_data data = {.mouse_scroll = {where.x, where.y, dx, dy}};
+    view->callback(ANTARES_WINDOW_CALLBACK_MOUSE_SCROLL, data, view->userdata);
 }
 
 static void flags_changed(AntaresView* view, NSEvent* event) {
@@ -387,6 +439,10 @@ static BOOL          isNoRange(NSRange range) { return NSEqualRanges(range, kNoR
 
 - (void)mouseMoved:(NSEvent*)event {
     mouse_move(self, event);
+}
+
+- (void)scrollWheel:(NSEvent*)event {
+    mouse_scroll(self, event);
 }
 
 // NSWindowDelegate

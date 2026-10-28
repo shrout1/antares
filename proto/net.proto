@@ -1,0 +1,110 @@
+// Copyright (C) 1997, 1999-2001, 2008 Nathan Lamont
+// Copyright (C) 2008-2026 The Antares Authors
+//
+// This file is part of Antares, a tactical space combat game.
+//
+// Antares is free software: you can redistribute it and/or modify it
+// under the terms of the Lesser GNU General Public License as published
+// by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Antares is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with Antares.  If not, see http://www.gnu.org/licenses/
+
+package antares.pb.net;
+
+message Packet {
+    oneof body {
+        Hello    hello    = 1;
+        Welcome  welcome  = 2;
+        Reject   reject   = 3;
+        Setup    setup    = 4;
+        Start    start    = 5;
+        Turns    turns    = 6;
+        Chat     chat     = 7;
+        Quit     quit     = 8;
+        Choose   choose   = 9;
+        Ready    ready    = 10;
+    }
+}
+
+// Client to host, on connecting.
+message Hello {
+    optional uint32  protocol           = 1;
+    optional string  antares_version    = 2;
+    optional string  plugin_identifier  = 3;
+    optional string  plugin_version     = 4;
+    optional string  name               = 5;
+}
+
+message Welcome {
+    optional int32  player  = 1;  // admiral number
+}
+
+message Reject {
+    optional Reason  reason  = 1;
+
+    enum Reason {
+        PROTOCOL  = 0;
+        VERSION   = 1;
+        PLUGIN    = 2;
+        FULL      = 3;
+    }
+}
+
+// Host to clients; sent again whenever it changes.
+message Setup {
+    optional string  level        = 1;
+    optional int32   global_seed  = 2;
+    optional uint32  delay        = 3;  // in turns
+    repeated Player  player       = 4;
+
+    message Player {
+        optional string  name  = 1;
+        optional string  race  = 2;
+        optional int32   hue   = 3;
+    }
+}
+
+message Start {}
+
+message Turns {
+    optional int32   player     = 1;
+    optional uint32  first      = 2;  // number of turn[0]
+    repeated Turn    turn       = 3;
+    optional uint32  ack        = 4;  // last turn received, without gaps, from the recipient
+    optional uint32  sync_turn  = 5;
+    optional uint32  sync       = 6;  // g.sync after executing sync_turn
+
+    message Turn {
+        repeated Event  event  = 1;
+    }
+
+    message Event {
+        optional uint32  type  = 1;  // PlayerEventType
+        optional int32   data  = 2;
+    }
+}
+
+message Chat {
+    optional int32   player  = 1;
+    optional string  text    = 2;
+}
+
+message Quit {
+    optional int32  player  = 1;
+}
+
+// Client to host: the client's own race and color.
+message Choose {
+    optional string  race  = 1;
+    optional int32   hue   = 2;
+}
+
+// Sent after the briefing; play starts once every player is ready.
+message Ready {}

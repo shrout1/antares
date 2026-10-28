@@ -62,12 +62,14 @@ class TitleScreenFade : public PictFade {
 
 }  // namespace
 
-Master::Master(sfz::optional<pn::string_view> plugin_path, int32_t seed)
+Master::Master(
+        sfz::optional<pn::string_view> plugin_path, int32_t seed, sfz::optional<NetStart> net)
         : _state(START),
           _plugin_path(
                   plugin_path.has_value() ? sfz::make_optional(plugin_path->copy())
                                           : sfz::nullopt),
           _seed(seed),
+          _net(std::move(net)),
           _skipped(false),
           _initialized(false) {}
 
@@ -82,6 +84,11 @@ void Master::become_front() {
     switch (_state) {
         case START:
             init();
+            if (_net.has_value()) {
+                _state = NET_GAME;
+                stack()->push(new NetGame(_net->mode, _net->address, _net->port));
+                break;
+            }
             _state = PUBLISHER_PICT;
             if (_publisher_screen) {
                 stack()->push(new PictFade(&_publisher_screen, &_skipped));
@@ -112,6 +119,7 @@ void Master::become_front() {
             [[clang::fallthrough]];
 
         case INTRO_SCROLL:
+        case NET_GAME:
             _state = MAIN_SCREEN;
             stack()->push(new MainScreen);
             break;

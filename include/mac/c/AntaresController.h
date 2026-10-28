@@ -30,6 +30,9 @@ AntaresDrivers*               antares_controller_create_drivers(CFStringRef* err
 void                          antares_controller_destroy_drivers(AntaresDrivers* drivers);
 bool                          antares_controller_loop(
                                  AntaresDrivers* drivers, const char* plugin_identifier, CFStringRef* error_message);
+// After the loop, the plugin chosen on the Plugins screen to restart with ("" for the factory
+// scenario), or NULL if none was.
+const char* antares_controller_restart_plugin();
 
 #ifdef __cplusplus
 }  // extern "C"

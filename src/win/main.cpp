@@ -25,6 +25,8 @@
 #include <GLFW/glfw3.h>
 #include <shellapi.h>
 #include <time.h>
+#include <future>
+#include <thread>
 #include <pn/output>
 #include <pn/string>
 #include <sfz/sfz.hpp>
@@ -76,9 +78,12 @@ void usage(pn::output_view out, pn::string_view progname, int retcode) {
             "                        (default: {3})\n"
             "    -p, --plugins       also list plugins found in this directory\n"
             "                        (may be repeated; {4} is always searched)\n"
-            "    -h, --help          display this help screen\n",
+            "    -h, --help          display this help screen\n"
+            "        --host          host a net game\n"
+            "        --join HOST     join a net game\n"
+            "        --port PORT     set the net game port (default: {5})\n",
             progname, default_application_path(), default_config_path(),
-            default_factory_scenario_path(), dirs().scenarios);
+            default_factory_scenario_path(), dirs().scenarios, net::kDefaultPort);
     exit(retcode);
 }
 
@@ -98,30 +103,103 @@ void extract_data() {
 
 // The Windows keys are fire keys, but Windows opens the Start menu when one is pressed and
 // released alone, taking the game out of the foreground. While a window of ours has the
-// keyboard, take them from Windows and post them to that window, where GLFW reads them as
+// keyboard, take them from Windows and hand them to that window, where GLFW reads them as
 // GLFW_KEY_LEFT_SUPER and GLFW_KEY_RIGHT_SUPER. (Linux and macOS leave this to the desktop.)
+static const UINT    kWindowsKeyMessage = WM_APP + 1;  // like WM_KEYDOWN or WM_KEYUP
+static const wchar_t kGlfwWindowProc[]  = L"Antares GLFW window procedure";
+
+// Each frame, GLFW releases any Windows key that GetKeyState() says is up, which it always would
+// be, since Windows never saw it go down. So mark it in the window thread's key state first.
+LRESULT CALLBACK
+windows_key_window_proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
+    WNDPROC glfw_proc = reinterpret_cast<WNDPROC>(GetPropW(window, kGlfwWindowProc));
+    if (message == kWindowsKeyMessage) {
+        const bool up = HIWORD(lparam) & KF_UP;
+        BYTE       keys[256];
+        if (GetKeyboardState(keys)) {
+            keys[wparam] = up ? 0x00 : 0x80;
+            SetKeyboardState(keys);
+        }
+        message = up ? WM_KEYUP : WM_KEYDOWN;
+    }
+    return CallWindowProcW(glfw_proc, window, message, wparam, lparam);
+}
+
+// The foreground window, if it's ours.
+HWND our_foreground_window() {
+    HWND  window = GetForegroundWindow();
+    DWORD pid    = 0;
+    GetWindowThreadProcessId(window, &pid);
+    return (pid == GetCurrentProcessId()) ? window : nullptr;
+}
+
 LRESULT CALLBACK windows_key_hook(int code, WPARAM wparam, LPARAM lparam) {
+    // The window each Windows key went to, while it's down, so its release goes there too.
+    static HWND held[2] = {nullptr, nullptr};
     if (code == HC_ACTION) {
-        const KBDLLHOOKSTRUCT* k      = reinterpret_cast<const KBDLLHOOKSTRUCT*>(lparam);
-        HWND                   window = GetForegroundWindow();
-        DWORD                  pid    = 0;
-        GetWindowThreadProcessId(window, &pid);
-        if (((k->vkCode == VK_LWIN) || (k->vkCode == VK_RWIN)) &&
-            (pid == GetCurrentProcessId())) {
-            const bool up    = k->flags & LLKHF_UP;
-            WORD       flags = static_cast<WORD>(k->scanCode & 0xff);
-            if (k->flags & LLKHF_EXTENDED) {
-                flags |= KF_EXTENDED;
+        const KBDLLHOOKSTRUCT* k = reinterpret_cast<const KBDLLHOOKSTRUCT*>(lparam);
+        if ((k->vkCode == VK_LWIN) || (k->vkCode == VK_RWIN)) {
+            HWND&      held_window = held[k->vkCode == VK_RWIN];
+            const bool up          = k->flags & LLKHF_UP;
+            HWND       window      = up ? held_window : our_foreground_window();
+            if (window) {
+                held_window = up ? nullptr : window;
+                if (!GetPropW(window, kGlfwWindowProc)) {
+                    SetPropW(
+                            window, kGlfwWindowProc,
+                            reinterpret_cast<HANDLE>(GetWindowLongPtrW(window, GWLP_WNDPROC)));
+                    SetWindowLongPtrW(
+                            window, GWLP_WNDPROC,
+                            reinterpret_cast<LONG_PTR>(windows_key_window_proc));
+                }
+                WORD flags = static_cast<WORD>(k->scanCode & 0xff);
+                if (k->flags & LLKHF_EXTENDED) {
+                    flags |= KF_EXTENDED;
+                }
+                if (up) {
+                    flags |= KF_REPEAT | KF_UP;
+                }
+                PostMessageW(window, kWindowsKeyMessage, k->vkCode, MAKELPARAM(1, flags));
+                return 1;
             }
-            if (up) {
-                flags |= KF_REPEAT | KF_UP;
-            }
-            PostMessageW(window, up ? WM_KEYUP : WM_KEYDOWN, k->vkCode, MAKELPARAM(1, flags));
-            return 1;
         }
     }
     return CallNextHookEx(nullptr, code, wparam, lparam);
 }
+
+// Runs windows_key_hook on a thread of its own. Windows silently removes a low-level hook that
+// doesn't answer within about a second, which the game's own thread can't promise: it doesn't
+// read messages while it's busy, such as when loading a level.
+class WindowsKeyHook {
+  public:
+    WindowsKeyHook() {
+        std::promise<DWORD> started;
+        std::future<DWORD> thread_id = started.get_future();
+        _thread = std::thread([&started] {
+            MSG msg;
+            PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE);  // creates this thread's queue
+            HHOOK hook = SetWindowsHookExW(
+                    WH_KEYBOARD_LL, windows_key_hook, GetModuleHandleW(nullptr), 0);
+            started.set_value(GetCurrentThreadId());
+            while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
+                DispatchMessageW(&msg);
+            }
+            if (hook) {
+                UnhookWindowsHookEx(hook);
+            }
+        });
+        _thread_id = thread_id.get();
+    }
+
+    ~WindowsKeyHook() {
+        PostThreadMessageW(_thread_id, WM_QUIT, 0, 0);
+        _thread.join();
+    }
+
+  private:
+    std::thread _thread;
+    DWORD       _thread_id;
+};
 
 // Quotes an argument so that CommandLineToArgvW() reads it back unchanged.
 std::wstring quote_argument(pn::string_view arg) {
@@ -196,6 +274,9 @@ void main(int argc, char* const* argv) {
         return true;
     };
 
+    sfz::optional<NetStart> net;
+    sfz::optional<int64_t>  port;
+
     pn::string_view config_path = default_config_path();
     // Options to pass on when restarting with another plugin.
     std::vector<pn::string> restart_options;
@@ -216,7 +297,7 @@ void main(int argc, char* const* argv) {
     };
 
     callbacks.long_option =
-            [&callbacks](pn::string_view opt, const args::callbacks::get_value_f& get_value) {
+            [&](pn::string_view opt, const args::callbacks::get_value_f& get_value) {
                 if (opt == "app-data") {
                     return callbacks.short_option(pn::rune{'a'}, get_value);
                 } else if (opt == "config") {
@@ -236,12 +317,31 @@ void main(int argc, char* const* argv) {
                     freopen_s(&f, "CONOUT$", "w", stdout);
                     freopen_s(&f, "CONOUT$", "w", stderr);
                     return true;
+                } else if (opt == "host") {
+                    net.emplace();
+                    net->mode = NetGame::HOST;
+                    return true;
+                } else if (opt == "join") {
+                    net.emplace();
+                    net->mode    = NetGame::JOIN;
+                    net->address = get_value().copy();
+                    return true;
+                } else if (opt == "port") {
+                    int64_t p;
+                    if (!pn::strtoll(get_value(), &p, nullptr) || (p <= 0) || (p > 65535)) {
+                        return false;
+                    }
+                    port.emplace(p);
+                    return true;
                 } else {
                     return false;
                 }
             };
 
     args::parse(argc - 1, argv + 1, callbacks);
+    if (net.has_value() && port.has_value()) {
+        net->port = *port;
+    }
 
     if (!sfz::path::isdir(application_path())) {
         throw std::runtime_error(
@@ -262,13 +362,8 @@ void main(int argc, char* const* argv) {
 #endif
         GLFWVideoDriver video;
         enable_plugin_switching();
-        // Called on this thread, from the message loop that GLFW runs each frame.
-        HHOOK hook = SetWindowsHookExW(
-                WH_KEYBOARD_LL, windows_key_hook, GetModuleHandleW(nullptr), 0);
-        video.loop(new Master(scenario, time(nullptr)));
-        if (hook) {
-            UnhookWindowsHookEx(hook);
-        }
+        WindowsKeyHook  windows_keys;
+        video.loop(new Master(scenario, time(nullptr), std::move(net)));
     }
 
     if (plugin_requested()) {

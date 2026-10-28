@@ -141,9 +141,20 @@ Point scale_to_viewport(Point p) {
                  scale_by(p.v - scaled_screen.bounds.top, scaled_screen.scale) + viewport().top};
 }
 
+// The fraction of a point that scale_to_viewport() drops for an object at `p`, including the
+// motion that the object and the camera have accumulated but not yet applied to their locations.
+// Locations move a whole unit at a time, so drawing objects without it makes them jitter at
+// large scales.
+static float viewport_fraction(int32_t p, Fixed motion, int32_t origin, Fixed origin_motion) {
+    const float units  = (p - origin) + ((origin_motion - motion).val() / 256.0f);
+    const float points = units * scaled_screen.scale.factor / SCALE_SCALE.factor;
+    return points - scale_by(p - origin, scaled_screen.scale);
+}
+
 void ResetMotionGlobals() {
     scaled_screen.bounds = Rect{};
     scaled_screen.scale  = SCALE_SCALE;
+    scaled_screen.motion = fixedPointType{Fixed::zero(), Fixed::zero()};
     g.closest            = Handle<SpaceObject>(0);
     g.farthest           = Handle<SpaceObject>(0);
 }
@@ -430,6 +441,7 @@ void MoveSpaceObjects(const ticks unitsToDo) {
                 g.ship->location.h + scale.width,
                 g.ship->location.v + scale.height,
         };
+        scaled_screen.motion = g.ship->motionFraction;
     }
 
     // !!!!!!!!
@@ -449,9 +461,16 @@ void MoveSpaceObjects(const ticks unitsToDo) {
         }
         auto& sprite = *o->sprite;
 
-        sprite.where = scale_to_viewport(o->location);
+        sprite.where    = scale_to_viewport(o->location);
+        sprite.offset.h = viewport_fraction(
+                o->location.h, o->motionFraction.h, scaled_screen.bounds.left,
+                scaled_screen.motion.h);
+        sprite.offset.v = viewport_fraction(
+                o->location.v, o->motionFraction.v, scaled_screen.bounds.top,
+                scaled_screen.motion.v);
         if (!sprite_bounds.contains(sprite.where)) {
-            sprite.where = Point{-kSpriteMaxSize, -kSpriteMaxSize};
+            sprite.where  = Point{-kSpriteMaxSize, -kSpriteMaxSize};
+            sprite.offset = {0, 0};
         }
 
         update_static(o, unitsToDo);
