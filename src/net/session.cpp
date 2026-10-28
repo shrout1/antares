@@ -179,6 +179,23 @@ uint32_t Session::confirmed() const {
     return (_state == PLAYING) ? _rollback->confirmed() : 0;
 }
 
+void Session::set_lead(int32_t lead) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    if (_state == PLAYING) {
+        _rollback->set_lead(lead);
+    }
+}
+
+int32_t Session::peer_lead() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return (_state == PLAYING) ? _rollback->lead(1 - _local) : 0;
+}
+
+uint32_t Session::peer_synced() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return (_state == PLAYING) ? _rollback->synced(1 - _local) : 0;
+}
+
 sfz::optional<Rollback::Turn> Session::known(int player, uint32_t at) const {
     std::lock_guard<std::mutex> lock(_mutex);
     const Rollback::Turn*       turn = _rollback ? _rollback->known(player, at) : nullptr;

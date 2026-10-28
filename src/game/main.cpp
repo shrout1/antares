@@ -22,6 +22,7 @@
 #include <math.h>
 
 #include <algorithm>
+#include <cmath>
 #include <pn/output>
 #include <set>
 
@@ -244,6 +245,8 @@ class GamePlay : public Card {
     sfz::optional<wall_time> _stalled_since;
     game_ticks               _frontier;             // In net games, the time head has reached.
     uint32_t                 _sampled_through = 0;  // In net games, the last turn of local input.
+    double                   _lead            = 0;  // In net games, turns head predicts, smoothed.
+    ticks                    _since_slowed    = ticks(0);
 };
 
 MainPlay::MainPlay(
@@ -333,6 +336,11 @@ static game_ticks turn_start(uint32_t turn) { return game_ticks(turn * kMajorTic
 
 // How many turns head may run ahead of the input every player has sent.
 const uint32_t kRollbackTurns = 20;
+
+// A node that predicts more turns than the other player's does is running ahead of it, so it drops
+// one tick in every kSlowEvery until the two are even.  Leads are smoothed over kLeadWindow.
+const ticks kSlowEvery  = ticks(100);
+const ticks kLeadWindow = ticks(60);
 
 static net::Rollback::Turn to_turn(const std::vector<PlayerEvent>& events) {
     net::Rollback::Turn turn;
@@ -810,6 +818,18 @@ void GamePlay::play_turn() {
 // Advances tail through each turn that every player's input has reached, then predicts head from
 // tail to `units` past where head was.
 void GamePlay::play_net(ticks units) {
+    double lead = static_cast<double>(turn_at(_frontier)) - _session->confirmed();
+    _lead += (lead - _lead) *
+             std::min(1.0, static_cast<double>(units.count()) / kLeadWindow.count());
+    _session->set_lead(static_cast<int32_t>(std::lround(_lead)));
+    if ((_lead - _session->peer_lead()) > 1) {
+        _since_slowed += units;
+        if (_since_slowed >= kSlowEvery) {
+            _since_slowed -= kSlowEvery;
+            units -= kMinorTick;
+        }
+    }
+
     game_ticks target = _frontier + units;
     game_ticks limit  = turn_start(_session->confirmed() + kRollbackTurns);
     if (target > limit) {
@@ -873,7 +893,7 @@ void GamePlay::end_net_game(pn::string_view message) {
         stack()->pop(this);
         return;
     }
-    _state        = DEBRIEFING;
+    _state = DEBRIEFING;
     stack()->push(new DebriefingScreen(message));
 }
 

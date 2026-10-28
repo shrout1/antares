@@ -136,8 +136,13 @@ class NetSimMaster : public Card {
                 break;
 
             case PLAYING:
-                // Let the other player's tail reach the last turn before quitting.
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                if (_game_result != QUIT_GAME) {
+                    // Quitting sooner would end the other player's game early.
+                    wait_for("the other player to reach the last turn", [this] {
+                        return (_session->peer_synced() >= _turns) ||
+                               (_session->state() == net::Session::CLOSED);
+                    });
+                }
                 _session->quit();
                 if (_game_result == QUIT_GAME) {
                     throw std::runtime_error("the game ended before the last turn");

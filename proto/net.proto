@@ -80,6 +80,7 @@ message Turns {
     optional uint32  ack        = 4;  // last turn received, without gaps, from the recipient
     optional uint32  sync_turn  = 5;
     optional uint32  sync       = 6;  // g.sync after executing sync_turn
+    optional int32   lead       = 7;  // turns the sender predicts past what it has confirmed
 
     message Turn {
         repeated Event  event  = 1;

@@ -37,7 +37,7 @@ class Rollback {
 
     Rollback(int players, int local, uint32_t first, uint32_t delay);
 
-    Rollback(const Rollback&) = delete;
+    Rollback(const Rollback&)            = delete;
     Rollback& operator=(const Rollback&) = delete;
 
     int local() const { return _local; }
@@ -61,6 +61,13 @@ class Rollback {
     // True if any player's sync value differed from ours for the same turn.
     bool desynced() const { return _desynced; }
 
+    // How many turns the local player predicts past confirmed(), sent with each outgoing().
+    void set_lead(int32_t lead) { _lead = lead; }
+    // The last turn `player` has reported a sync value for.
+    uint32_t synced(int player) const { return _players.at(player).synced; }
+    // The lead `player` last reported.
+    int32_t lead(int player) const { return _players.at(player).lead; }
+
     // The local turns that `player` hasn't acknowledged, with our acknowledgement of theirs.
     Turns outgoing(int player) const;
 
@@ -73,6 +80,8 @@ class Rollback {
         uint32_t                     received;  // last turn known, with no gaps before it
         uint32_t                     acked;     // last local turn the player has acknowledged
         std::map<uint32_t, uint32_t> syncs;     // reported but not yet compared
+        int32_t                      lead   = 0;
+        uint32_t                     synced = 0;
     };
 
     const int                    _local;
@@ -80,6 +89,7 @@ class Rollback {
     std::vector<Player>          _players;
     uint32_t                     _executed;
     std::map<uint32_t, uint32_t> _syncs;  // ours, recent
+    int32_t                      _lead      = 0;
     uint32_t                     _sync_turn = 0;
     uint32_t                     _sync      = 0;
     bool                         _desynced  = false;

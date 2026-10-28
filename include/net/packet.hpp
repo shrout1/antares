@@ -27,7 +27,7 @@
 namespace antares {
 namespace net {
 
-const uint32_t kProtocolVersion = 1;
+const uint32_t kProtocolVersion = 2;
 
 // See proto/net.proto.
 struct Hello {
@@ -79,6 +79,7 @@ struct Turns {
     uint32_t                        ack       = 0;
     uint32_t                        sync_turn = 0;
     uint32_t                        sync      = 0;
+    int32_t                         lead      = 0;
 };
 
 struct Chat {

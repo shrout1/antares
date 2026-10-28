@@ -137,6 +137,7 @@ TEST_F(PacketTest, Turns) {
     in.turns.ack       = 98;
     in.turns.sync_turn = 90;
     in.turns.sync      = 0xdeadbeef;
+    in.turns.lead      = -3;
 
     Packet out = round_trip(in);
     EXPECT_EQ(1, out.turns.player);
@@ -152,6 +153,7 @@ TEST_F(PacketTest, Turns) {
     EXPECT_EQ(98u, out.turns.ack);
     EXPECT_EQ(90u, out.turns.sync_turn);
     EXPECT_EQ(0xdeadbeefu, out.turns.sync);
+    EXPECT_EQ(-3, out.turns.lead);
 }
 
 TEST_F(PacketTest, Chat) {

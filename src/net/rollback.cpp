@@ -127,6 +127,7 @@ Turns Rollback::outgoing(int player) const {
     t.ack       = them.received;
     t.sync_turn = _sync_turn;
     t.sync      = _sync;
+    t.lead      = _lead;
     return t;
 }
 
@@ -135,6 +136,8 @@ void Rollback::receive(const Turns& t) {
         return;
     }
     Player& them = _players[t.player];
+    them.lead    = t.lead;
+    them.synced  = std::max(them.synced, t.sync_turn);
 
     for (size_t i = 0; i < t.turns.size(); ++i) {
         uint32_t n = t.first + i;

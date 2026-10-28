@@ -347,6 +347,7 @@ pn::data write(const Turns& t) {
     put_uint(&out, 4, t.ack);
     put_uint(&out, 5, t.sync_turn);
     put_uint(&out, 6, t.sync);
+    put_int(&out, 7, t.lead);
     return out;
 }
 
@@ -362,6 +363,7 @@ bool read(pn::data_view d, Turns* t) {
             case 4: return get(r, wire, &t->ack);
             case 5: return get(r, wire, &t->sync_turn);
             case 6: return get(r, wire, &t->sync);
+            case 7: return get(r, wire, &t->lead);
             default: return r->skip(wire);
         }
     });

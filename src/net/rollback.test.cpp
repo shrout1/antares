@@ -172,6 +172,24 @@ TEST_F(RollbackTest, NothingKnownAfterAGap) {
     EXPECT_EQ(1u, a.confirmed());  // a hasn't submitted turn 2.
 }
 
+TEST_F(RollbackTest, Lead) {
+    Rollback a(2, 0, 1, 2), b(2, 1, 1, 2);
+    EXPECT_EQ(0, a.lead(1));
+    a.set_lead(5);
+    b.set_lead(-1);
+    exchange(&a, &b);
+    EXPECT_EQ(-1, a.lead(1));
+    EXPECT_EQ(5, b.lead(0));
+}
+
+TEST_F(RollbackTest, Synced) {
+    Rollback a(2, 0, 1, 2), b(2, 1, 1, 2);
+    EXPECT_EQ(0u, a.synced(1));
+    b.sync(1, 42);
+    exchange(&a, &b);
+    EXPECT_EQ(1u, a.synced(1));
+}
+
 TEST_F(RollbackTest, IgnoresInvalidPlayers) {
     Rollback a(2, 0, 1, 1);
     Turns    t;

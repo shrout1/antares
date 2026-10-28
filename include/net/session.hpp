@@ -56,7 +56,7 @@ class Session {
             pn::string_view address, uint16_t port, Hello hello, Setup setup);
     static std::unique_ptr<Session> join(pn::string_view address, uint16_t port, Hello hello);
 
-    Session(const Session&) = delete;
+    Session(const Session&)            = delete;
     Session& operator=(const Session&) = delete;
     ~Session();
 
@@ -85,6 +85,9 @@ class Session {
     bool                          desynced() const;
     uint32_t                      confirmed() const;
     sfz::optional<Rollback::Turn> known(int player, uint32_t at) const;
+    void                          set_lead(int32_t lead);
+    int32_t                       peer_lead() const;    // 0 until playing
+    uint32_t                      peer_synced() const;  // 0 until playing
     void                          confirm(uint32_t at);
 
     void                    chat(pn::string_view text);
