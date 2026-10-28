@@ -251,6 +251,12 @@ struct CocoaVideoDriver::EventBridge {
                         _now(), self->mouse(data.mouse_move.x, data.mouse_move.y)));
                 break;
 
+            case ANTARES_WINDOW_CALLBACK_MOUSE_SCROLL:
+                self->enqueue(new MouseScrollEvent(
+                        _now(), self->mouse(data.mouse_scroll.x, data.mouse_scroll.y),
+                        data.mouse_scroll.dx, data.mouse_scroll.dy));
+                break;
+
             case ANTARES_WINDOW_CALLBACK_REPLACE:
                 if (self->text_receiver) {
                     self->text_receiver->replace(
