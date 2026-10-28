@@ -224,6 +224,15 @@ void Session::chat(pn::string_view text) {
     send(RELIABLE, std::move(p));
 }
 
+void Session::set_delay(
+        std::chrono::milliseconds delay, std::chrono::milliseconds jitter, uint32_t seed) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _delay      = delay;
+    _jitter     = jitter;
+    _delay_seed = seed;
+    _delay_set  = true;
+}
+
 std::vector<pn::string> Session::take_chats() {
     std::lock_guard<std::mutex> lock(_mutex);
     std::vector<pn::string>     chats;
@@ -239,6 +248,10 @@ void Session::run() {
         const bool  got = !stopping && _host->poll(kPollInterval, &e);
 
         std::lock_guard<std::mutex> lock(_mutex);
+        if (_delay_set) {
+            _host->set_delay(_delay, _jitter, _delay_seed);
+            _delay_set = false;
+        }
         if (got) {
             handle(e);
         }

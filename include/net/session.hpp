@@ -95,6 +95,10 @@ class Session {
     void                    chat(pn::string_view text);
     std::vector<pn::string> take_chats();
 
+    // For testing; see Host::set_delay().
+    void set_delay(
+            std::chrono::milliseconds delay, std::chrono::milliseconds jitter, uint32_t seed);
+
   private:
     Session(std::unique_ptr<Host> host, bool is_host, Hello hello);
 
@@ -121,6 +125,10 @@ class Session {
     std::vector<std::pair<Channel, Packet>> _outbox;
     std::vector<pn::string>                 _chats;
     bool                                    _turns_dirty = false;
+    bool                                    _delay_set   = false;
+    std::chrono::milliseconds               _delay{0};
+    std::chrono::milliseconds               _jitter{0};
+    uint32_t                                _delay_seed = 0;
 
     std::atomic<bool> _stop;
     std::thread       _thread;
