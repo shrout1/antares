@@ -592,6 +592,9 @@ static void apply(
 static void apply(
         const LandAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
+    if (!direct.get()) {
+        return;
+    }
     // even though this is never a reflexive verb, we only effect ourselves
     if (direct->attributes & (kIsPlayerShip | kRemoteOrHuman)) {
         direct->create_floating_player_body();
