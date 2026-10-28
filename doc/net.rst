@@ -86,8 +86,10 @@ copies it.  The rest of ``GlobalState`` is the local view.  The world
 is simulated one minor tick at a time, however frames fall, so that
 every node_ runs the same steps.
 
-A node_ waits if head_ gets 20 turns ahead of tail_.  Only tail_ can
-end the game.  Sounds and sparks play the first time any pass reaches a
+A node_ waits if head_ gets 20 turns ahead of tail_.  Each node_ sends
+how far its head_ runs ahead of tail_, and one that runs further ahead
+than its peer_ slows its clock by 1% until they even out.  Only tail_
+can end the game.  Sounds and sparks play the first time any pass reaches a
 tick.  Messages, and the zoom and select actions, wait until a tick is
 on tail_.
 
