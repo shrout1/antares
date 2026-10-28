@@ -184,6 +184,25 @@ std::vector<Lockstep::Turn> Session::take(uint32_t at) {
     return _lockstep->take(at);
 }
 
+uint32_t Session::confirmed() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return (_state == PLAYING) ? _lockstep->confirmed() : 0;
+}
+
+sfz::optional<Lockstep::Turn> Session::known(int player, uint32_t at) const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    const Lockstep::Turn*       turn = _lockstep ? _lockstep->known(player, at) : nullptr;
+    if (!turn) {
+        return sfz::nullopt;
+    }
+    return sfz::make_optional(Lockstep::Turn{*turn});
+}
+
+void Session::confirm(uint32_t at) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _lockstep->confirm(at);
+}
+
 void Session::sync(uint32_t at, uint32_t value) {
     std::lock_guard<std::mutex> lock(_mutex);
     if (_lockstep) {

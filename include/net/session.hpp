@@ -25,6 +25,8 @@
 #include <thread>
 #include <vector>
 
+#include <sfz/sfz.hpp>
+
 #include "net/host.hpp"
 #include "net/lockstep.hpp"
 #include "net/packet.hpp"
@@ -83,6 +85,12 @@ class Session {
     std::vector<Lockstep::Turn> take(uint32_t at);
     void                        sync(uint32_t at, uint32_t value);
     bool                        desynced() const;
+
+    // While playing, for running ahead of the other players; see Lockstep.  confirmed() is 0
+    // until then.
+    uint32_t                      confirmed() const;
+    sfz::optional<Lockstep::Turn> known(int player, uint32_t at) const;
+    void                          confirm(uint32_t at);
 
     void                    chat(pn::string_view text);
     std::vector<pn::string> take_chats();

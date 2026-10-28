@@ -99,6 +99,18 @@ TEST_F(SessionTest, Game) {
     EXPECT_FALSE(host->desynced());
     EXPECT_FALSE(guest->desynced());
 
+    ASSERT_TRUE(eventually([&] { return host->confirmed() == 21; }));
+    host->submit(20, {build});
+    EXPECT_EQ(21u, host->confirmed());  // The guest hasn't sent turn 22.
+    ASSERT_TRUE(host->known(0, 22).has_value());
+    EXPECT_EQ(3, (*host->known(0, 22))[0].data);
+    EXPECT_FALSE(host->known(1, 22).has_value());
+    guest->submit(20, {});
+    ASSERT_TRUE(eventually([&] { return host->confirmed() == 22; }));
+    ASSERT_TRUE(host->known(1, 22).has_value());
+    host->confirm(22);
+    EXPECT_FALSE(host->known(0, 22).has_value());
+
     host->chat("gg");
     std::vector<pn::string> chats;
     ASSERT_TRUE(eventually([&] {
