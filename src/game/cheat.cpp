@@ -109,7 +109,9 @@ void CheatFeedback(Cheat c, bool activate, Handle<Admiral> whichPlayer) {
     } else {
         feedback = sys.cheat.off.at(static_cast<int>(c) - 1);
     }
-    Messages::add(pn::format("{0}{1}", admiral_name, feedback));
+    if (confirmed()) {
+        Messages::add(pn::format("{0}{1}", admiral_name, feedback));
+    }
 }
 
 void CheatFeedbackPlus(
@@ -121,7 +123,9 @@ void CheatFeedbackPlus(
     } else {
         feedback = sys.cheat.off.at(static_cast<int>(c) - 1);
     }
-    Messages::add(pn::format("{0}{1}{2}", admiral_name, feedback, extra));
+    if (confirmed()) {
+        Messages::add(pn::format("{0}{1}{2}", admiral_name, feedback, extra));
+    }
 }
 
 }  // namespace antares

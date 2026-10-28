@@ -629,7 +629,7 @@ static void AdmiralBuildAtObject(
         auto newObject = CreateAnySpaceObject(*base, v, coord, 0, admiral, 0, sfz::nullopt);
         if (newObject.get()) {
             SetObjectDestination(newObject);
-            if (admiral == g.admiral) {
+            if ((admiral == g.admiral) && show_effects()) {
                 sys.sound.build();
             }
         }

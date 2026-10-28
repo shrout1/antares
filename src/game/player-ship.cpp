@@ -1110,13 +1110,15 @@ void ChangePlayerShipNumber(Handle<Admiral> adm, Handle<SpaceObject> newShip) {
 void TogglePlayerAutoPilot(Handle<SpaceObject> flagship) {
     if (flagship->attributes & kOnAutoPilot) {
         flagship->attributes &= ~kOnAutoPilot;
-        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip)) {
+        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip) &&
+            confirmed()) {
             Messages::autopilot(false);
         }
     } else {
         SetObjectDestination(flagship);
         flagship->attributes |= kOnAutoPilot;
-        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip)) {
+        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip) &&
+            confirmed()) {
             Messages::autopilot(true);
         }
     }
@@ -1129,7 +1131,7 @@ void PlayerShipGiveCommand(Handle<Admiral> whichAdmiral) {
 
     if (control.get()) {
         SetObjectDestination(control);
-        if (whichAdmiral == g.admiral) {
+        if ((whichAdmiral == g.admiral) && show_effects()) {
             sys.sound.order();
         }
     }

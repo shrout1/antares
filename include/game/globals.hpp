@@ -150,12 +150,23 @@ struct aresGlobalType {
 
     game_ticks next_klaxon;
 
+    game_ticks shown_through;        // Latest time whose sounds and sparks have played.
+    bool       show_effects = true;  // The step being simulated may play sounds and sparks.
+    bool       confirmed    = true;  // Every player's input has reached the step being simulated.
+
     Starfield   starfield;
     Transitions transitions;
 };
 
 aresGlobalType* globals();
 void            init_globals();
+
+// A simulated step plays sounds and sparks only the first time it reaches a time, so that
+// simulating it again doesn't repeat them.
+bool show_effects();
+
+// A simulated step shows messages and changes local controls only once it's certain to happen.
+bool confirmed();
 
 Rect world();
 Rect play_screen();

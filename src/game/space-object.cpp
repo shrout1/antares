@@ -664,7 +664,7 @@ void SpaceObject::set_owner(Handle<Admiral> new_owner, bool message) {
         StopBuilding(object->asDestination);
         RecalcAllAdmiralBuildData();
     }
-    if (message) {
+    if (message && confirmed()) {
         if (new_owner.get()) {
             Messages::add(pn::format(
                     sys.messages.at(kBaseCapturedString).c_str(), object->long_name(),
@@ -692,10 +692,14 @@ void SpaceObject::set_cloak(bool cloak) {
     auto object = Handle<SpaceObject>(number());
     if (cloak && (object->cloakState == 0)) {
         object->cloakState = 1;
-        sys.sound.cloak_on_at(object);
+        if (show_effects()) {
+            sys.sound.cloak_on_at(object);
+        }
     } else if ((!cloak || (object->attributes & kRemoteOrHuman)) && (object->cloakState >= 250)) {
         object->cloakState = kCloakOffStateMax;
-        sys.sound.cloak_off_at(object);
+        if (show_effects()) {
+            sys.sound.cloak_off_at(object);
+        }
     }
 }
 

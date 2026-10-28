@@ -187,6 +187,8 @@ LoadState start_construct_level(const Level& level) {
     ResetAllSpaceObjects();
     reset_action_queue();
     g.pilots.assign(kMaxPlayerNum, Pilot{});
+    globals()->shown_through = game_ticks::min();
+    globals()->show_effects  = true;
     Vectors::reset();
     ResetAllSprites();
     Label::reset();

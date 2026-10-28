@@ -44,6 +44,9 @@ ANTARES_GLOBAL GlobalState  tail;
 
 aresGlobalType* globals() { return gAresGlobal; }
 
+bool show_effects() { return gAresGlobal->show_effects; }
+bool confirmed() { return gAresGlobal->confirmed; }
+
 template <typename T>
 static void copy_array(std::unique_ptr<T[]>* to, const std::unique_ptr<T[]>& from, size_t size) {
     if (from) {

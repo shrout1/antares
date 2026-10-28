@@ -259,7 +259,9 @@ static void apply(
         return;
     }
 
-    if (a.absolute.value_or(false)) {
+    if (!show_effects()) {
+        return;
+    } else if (a.absolute.value_or(false)) {
         sys.sound.play(pick, a.volume, a.persistence, a.priority.level);
     } else {
         sys.sound.play_at(pick, a.volume, a.persistence, a.priority.level, direct);
@@ -269,6 +271,9 @@ static void apply(
 static void apply(
         const SparkAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
+    if (!show_effects()) {
+        return;
+    }
     Point location;
     if (direct->sprite.get()) {
         location.h = direct->sprite->where.h;
@@ -643,7 +648,9 @@ static void apply(
 static void apply(
         const MessageAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
-    Messages::start(a.id, &a.pages);
+    if (confirmed()) {
+        Messages::start(a.id, &a.pages);
+    }
 }
 
 static void apply(
@@ -705,7 +712,7 @@ static void apply(
 static void apply(
         const ZoomAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
-    if (a.value != g.zoom) {
+    if (confirmed() && (a.value != g.zoom)) {
         g.zoom = a.value;
         sys.sound.click();
         Messages::zoom(g.zoom);
@@ -715,7 +722,9 @@ static void apply(
 static void apply(
         const SelectAction& a, Handle<SpaceObject> subject, Handle<SpaceObject> direct,
         Point offset) {
-    MiniComputer_SetScreenAndLineHack(a.screen, a.line);
+    if (confirmed()) {
+        MiniComputer_SetScreenAndLineHack(a.screen, a.line);
+    }
 }
 
 static void apply(

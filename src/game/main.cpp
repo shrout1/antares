@@ -603,6 +603,8 @@ void GamePlay::fire_timer() {
 }
 
 void GamePlay::step(ticks units, bool input) {
+    globals()->show_effects = (g.time + units) > globals()->shown_through;
+
     // executed arbitrarily, but at least once every major tick
     globals()->starfield.prepare_to_move();
     globals()->starfield.move(units);
@@ -647,6 +649,7 @@ void GamePlay::step(ticks units, bool input) {
     Label::show_all();
     Vectors::cull();
     globals()->starfield.show();
+    globals()->shown_through = std::max(globals()->shown_through, g.time);
 
     if (!Messages::muted) {
         Messages::draw_message_screen(units);
