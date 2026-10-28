@@ -46,7 +46,7 @@ jobs:
           destination: 'downloads.arescentral.org/Antares'
 
   macOS:
-    runs-on: macos-15-intel
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:

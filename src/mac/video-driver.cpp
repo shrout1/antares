@@ -93,24 +93,47 @@ CocoaVideoDriver::CocoaVideoDriver() {}
 
 pn::string_view CocoaVideoDriver::glsl_version() const { return "330 core"; }
 
-Size CocoaVideoDriver::viewport_size() const {
-    return {
-            antares_window_viewport_width(_window),
-            antares_window_viewport_height(_window),
-    };
-}
-
-Size CocoaVideoDriver::screen_size() const {
-    return {
-            antares_window_screen_width(_window),
-            antares_window_screen_height(_window),
-    };
-}
-
 Point CocoaVideoDriver::get_mouse() {
-    Point p;
-    antares_get_mouse_location(_window, &p.h, &p.v);
-    return p;
+    int32_t x, y;
+    antares_get_mouse_location(_window, &x, &y);
+    return _layout.from_window(x, y, _game_layout);
+}
+
+bool CocoaVideoDriver::resolution_supported(Size resolution) const {
+    if (!_window) {
+        return true;
+    }
+    Size display;
+    antares_window_display_size(_window, &display.width, &display.height);
+    return (resolution.width <= display.width) && (resolution.height <= display.height);
+}
+
+// Lays the game out for the window's size and the video options; true if anything changed.
+bool CocoaVideoDriver::update_size() {
+    const Size window = {
+            antares_window_screen_width(_window), antares_window_screen_height(_window)};
+    const Size framebuffer = {
+            antares_window_viewport_width(_window), antares_window_viewport_height(_window)};
+    if ((window == _layout.window_size()) && (framebuffer == _layout.framebuffer_size()) &&
+        (sys.prefs->resolution() == _resolution) && (sys.prefs->game_scale() == _game_scale)) {
+        return false;
+    }
+    _resolution = sys.prefs->resolution();
+    _game_scale = sys.prefs->game_scale();
+    _layout.update(
+            window, framebuffer, resolution_supported(_resolution) ? _resolution : Size{},
+            _game_scale);
+    return true;
+}
+
+// In a window, a fixed resolution sets the window's size, so the game runs at exactly that many
+// pixels (fewer if the display can't hold it). "Fill Screen" keeps whatever size the window has.
+void CocoaVideoDriver::fit_window() {
+    const Size resolution = sys.prefs->resolution();
+    if (_fullscreen || resolution.as_rect().empty() || !resolution_supported(resolution)) {
+        return;
+    }
+    antares_window_fit(_window, resolution.width, resolution.height);
 }
 
 InputMode CocoaVideoDriver::input_mode() const { return _input_mode; }
@@ -165,6 +188,7 @@ static const Key key_codes[key_code_count] = {
 };
 
 struct CocoaVideoDriver::EventBridge {
+    CocoaVideoDriver&  driver;
     InputMode&         input_mode;
     MainLoop&          main_loop;
     cgl::Context&      context;
@@ -182,6 +206,10 @@ struct CocoaVideoDriver::EventBridge {
         switch (type) {
             case ANTARES_WINDOW_CALLBACK_FULLSCREEN:
                 sys.prefs->set_fullscreen(data.fullscreen);
+                self->driver._fullscreen = data.fullscreen;
+                if (!data.fullscreen) {
+                    self->driver.fit_window();
+                }
                 break;
 
             case ANTARES_WINDOW_CALLBACK_RESIZE:
@@ -209,17 +237,18 @@ struct CocoaVideoDriver::EventBridge {
             case ANTARES_WINDOW_CALLBACK_MOUSE_DOWN:
                 self->enqueue(new MouseDownEvent(
                         _now(), data.mouse_down.button, data.mouse_down.count,
-                        Point(data.mouse_down.x, data.mouse_down.y)));
+                        self->mouse(data.mouse_down.x, data.mouse_down.y)));
                 break;
 
             case ANTARES_WINDOW_CALLBACK_MOUSE_UP:
                 self->enqueue(new MouseUpEvent(
-                        _now(), data.mouse_up.button, Point(data.mouse_up.x, data.mouse_up.y)));
+                        _now(), data.mouse_up.button,
+                        self->mouse(data.mouse_up.x, data.mouse_up.y)));
                 break;
 
             case ANTARES_WINDOW_CALLBACK_MOUSE_MOVE:
-                self->enqueue(
-                        new MouseMoveEvent(_now(), Point(data.mouse_move.x, data.mouse_move.y)));
+                self->enqueue(new MouseMoveEvent(
+                        _now(), self->mouse(data.mouse_move.x, data.mouse_move.y)));
                 break;
 
             case ANTARES_WINDOW_CALLBACK_REPLACE:
@@ -578,6 +607,10 @@ struct CocoaVideoDriver::EventBridge {
         }
     }
 
+    Point mouse(int32_t x, int32_t y) const {
+        return driver._layout.from_window(x, y, driver._game_layout);
+    }
+
     void enqueue(Event* event) {
         event_queue.emplace(event);
         antares_window_cancel_event(window.c_obj());
@@ -626,7 +659,10 @@ void CocoaVideoDriver::loop(Card* initial) {
     cgl::PixelFormat pixel_format(attrs);
     cgl::Context     context(pixel_format.c_obj(), NULL);
     AntaresWindow    window(pixel_format, context);
-    _window             = window.c_obj();
+    _window     = window.c_obj();
+    _fullscreen = sys.prefs->fullscreen();
+    fit_window();
+    update_size();
     GLint swap_interval = 1;
     CGLSetParameter(context.c_obj(), kCGLCPSwapInterval, &swap_interval);
     CGLSetCurrentContext(context.c_obj());
@@ -634,7 +670,7 @@ void CocoaVideoDriver::loop(Card* initial) {
     MainLoop main_loop(*this, initial);
     main_loop.draw();
     CGLFlushDrawable(context.c_obj());
-    EventBridge bridge = {_input_mode, main_loop, context, window};
+    EventBridge bridge = {*this, _input_mode, main_loop, context, window};
     _bridge            = &bridge;
 
     antares_window_set_callback(_window, EventBridge::text, &bridge);
@@ -655,7 +691,25 @@ void CocoaVideoDriver::loop(Card* initial) {
     }
     IOHIDManagerRegisterInputValueCallback(hid_manager, EventBridge::hid_event, &bridge);
 
+    // Follows changes to the video options and the window's size.
+    auto relayout = [this, &main_loop, &context] {
+        if (sys.prefs->fullscreen() != _fullscreen) {
+            _fullscreen = sys.prefs->fullscreen();
+            antares_window_set_fullscreen(_window, _fullscreen);
+        }
+        const bool new_resolution = sys.prefs->resolution() != _resolution;
+        if (update_size()) {
+            if (new_resolution) {
+                fit_window();
+                update_size();
+            }
+            main_loop.draw();
+            CGLFlushDrawable(context.c_obj());
+        }
+    };
+
     while (!main_loop.done()) {
+        relayout();
         wall_time at;
         if (main_loop.top()->next_timer(at)) {
             if (antares_window_next_event(_window, at.time_since_epoch().count())) {
