@@ -121,6 +121,45 @@ TEST_F(LockstepTest, Desync) {
     EXPECT_TRUE(a.desynced());
 }
 
+TEST_F(LockstepTest, KnownBeforeConfirmed) {
+    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+    a.submit(1, turn(1, 1));
+    a.submit(2, turn(1, 2));
+    EXPECT_EQ(1u, a.confirmed());
+    ASSERT_NE(nullptr, a.known(0, 3));
+    EXPECT_EQ(2, (*a.known(0, 3))[0].data);
+    EXPECT_EQ(nullptr, a.known(1, 2));  // Not heard from b yet.
+    EXPECT_EQ(nullptr, a.known(0, 4));
+
+    b.submit(1, turn(2, 1));
+    a.receive(b.outgoing(0));
+    EXPECT_EQ(2u, a.confirmed());
+    ASSERT_NE(nullptr, a.known(1, 2));
+    EXPECT_EQ(1, (*a.known(1, 2))[0].data);
+
+    a.confirm(2);
+    EXPECT_EQ(nullptr, a.known(0, 2));
+    EXPECT_EQ(nullptr, a.known(1, 2));
+    ASSERT_NE(nullptr, a.known(0, 3));
+    EXPECT_THROW(a.confirm(3), std::runtime_error);
+    EXPECT_THROW(a.confirm(2), std::runtime_error);
+}
+
+TEST_F(LockstepTest, NothingKnownAfterAGap) {
+    Lockstep a(2, 0, 1, 1);
+    Turns    t;
+    t.player = 1;
+    t.first  = 3;
+    t.turns.push_back(turn(1, 3));
+    a.receive(t);  // Turn 2 was lost.
+    EXPECT_EQ(nullptr, a.known(1, 3));
+    t.first = 2;
+    t.turns = {turn(1, 2), turn(1, 3)};
+    a.receive(t);
+    ASSERT_NE(nullptr, a.known(1, 3));
+    EXPECT_EQ(1u, a.confirmed());  // a hasn't submitted turn 2.
+}
+
 TEST_F(LockstepTest, IgnoresInvalidPlayers) {
     Lockstep a(2, 0, 1, 1);
     Turns    t;

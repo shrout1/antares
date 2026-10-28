@@ -50,6 +50,16 @@ class Lockstep {
     // Each player's input for turn `at`, which must be ready.
     std::vector<Turn> take(uint32_t at);
 
+    // The last turn for which every player's input is known.
+    uint32_t confirmed() const;
+
+    // `player`'s input for turn `at`, or null if it isn't known yet.  Turns already passed to
+    // confirm() are forgotten.
+    const Turn* known(int player, uint32_t at) const;
+
+    // Forgets input for turns up to `at`, which must be confirmed, once they have executed.
+    void confirm(uint32_t at);
+
     // Records the sync value after executing turn `at`.
     void sync(uint32_t at, uint32_t value);
 

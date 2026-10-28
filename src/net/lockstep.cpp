@@ -59,18 +59,42 @@ void Lockstep::submit(uint32_t at, Turn turn) {
     me.turns[++me.received] = std::move(turn);
 }
 
-bool Lockstep::ready(uint32_t at) const {
-    for (const Player& p : _players) {
-        if (p.received < at) {
-            return false;
-        }
-    }
-    return true;
-}
+bool Lockstep::ready(uint32_t at) const { return at <= confirmed(); }
 
 std::vector<Lockstep::Turn> Lockstep::take(uint32_t at) {
     if (!ready(at) || (at != _executed + 1)) {
         throw std::runtime_error("turn taken out of order");
+    }
+    std::vector<Turn> result;
+    for (int i = 0; i < _players.size(); ++i) {
+        result.push_back(std::move(_players[i].turns[at]));
+    }
+    confirm(at);
+    return result;
+}
+
+uint32_t Lockstep::confirmed() const {
+    uint32_t at = _players[0].received;
+    for (const Player& p : _players) {
+        at = std::min(at, p.received);
+    }
+    return at;
+}
+
+const Lockstep::Turn* Lockstep::known(int player, uint32_t at) const {
+    if ((player < 0) || (_players.size() <= player) || (at <= _executed)) {
+        return nullptr;
+    }
+    auto it = _players[player].turns.find(at);
+    if ((it == _players[player].turns.end()) || (_players[player].received < at)) {
+        return nullptr;
+    }
+    return &it->second;
+}
+
+void Lockstep::confirm(uint32_t at) {
+    if ((confirmed() < at) || (at <= _executed)) {
+        throw std::runtime_error("turn confirmed out of order");
     }
     _executed = at;
 
@@ -80,14 +104,10 @@ std::vector<Lockstep::Turn> Lockstep::take(uint32_t at) {
             acked = std::min(acked, _players[i].acked);
         }
     }
-
-    std::vector<Turn> result;
     for (int i = 0; i < _players.size(); ++i) {
         auto& turns = _players[i].turns;
-        result.push_back(std::move(turns[at]));
         turns.erase(turns.begin(), turns.upper_bound((i == _local) ? acked : at));
     }
-    return result;
 }
 
 void Lockstep::sync(uint32_t at, uint32_t value) {
