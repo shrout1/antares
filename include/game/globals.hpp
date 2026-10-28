@@ -20,6 +20,7 @@
 #define ANTARES_GAME_GLOBALS_HPP_
 
 #include <queue>
+#include <vector>
 
 #include "config/keys.hpp"
 #include "data/enums.hpp"
@@ -27,6 +28,7 @@
 #include "data/level.hpp"
 #include "drawing/color.hpp"
 #include "game/action.hpp"
+#include "game/player-event.hpp"
 #include "game/starfield.hpp"
 #include "math/random.hpp"
 #include "math/units.hpp"
@@ -68,9 +70,10 @@ class InputSource;
 
 // The controls a player is holding.
 struct Pilot {
-    uint32_t keys         = 0;
-    uint32_t gamepad_keys = 0;
-    int32_t  steer        = -1;  // Direction the gamepad stick steers toward, or -1.
+    std::vector<PlayerEvent> events;  // Commands received but not yet executed.
+    uint32_t                 keys         = 0;
+    uint32_t                 gamepad_keys = 0;
+    int32_t                  steer = -1;  // Direction the gamepad stick steers toward, or -1.
 };
 
 // Everything that each tick of the level reads or changes.

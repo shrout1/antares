@@ -133,6 +133,10 @@ uint32_t world_hash() {
         post(p.keys);
         post(p.gamepad_keys);
         post(p.steer);
+        for (const auto& e : p.events) {
+            post(static_cast<uint32_t>(e.type));
+            post(e.data);
+        }
     }
     post(g.key_mask);
     post(g.game_over);

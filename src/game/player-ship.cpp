@@ -138,7 +138,6 @@ PlayerShip::PlayerShip()
         : _gamepad_keys(0),
           _sent_gamepad_keys(0),
           _sent_steer(-1),
-          _events(kMaxPlayerNum),
           _gamepad_state(NO_BUMPER),
           _control_active(false),
           _control_direction(0) {}
@@ -880,7 +879,7 @@ std::vector<PlayerEvent> PlayerShip::commands() {
 
 void PlayerShip::execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& commands) {
     Pilot&                    pilot  = g.pilots[adm.number()];
-    std::vector<PlayerEvent>& events = _events[adm.number()];
+    std::vector<PlayerEvent>& events = pilot.events;
     events.insert(events.end(), commands.begin(), commands.end());
 
     if (!adm->flagship().get()) {

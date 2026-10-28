@@ -246,6 +246,7 @@ source_set("libantares-game") {
     "include/game/minicomputer.hpp",
     "include/game/motion.hpp",
     "include/game/non-player-ship.hpp",
+    "include/game/player-event.hpp",
     "include/game/player-ship.hpp",
     "include/game/space-object.hpp",
     "include/game/starfield.hpp",

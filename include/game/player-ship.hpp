@@ -24,84 +24,11 @@
 #include "config/keys.hpp"
 #include "data/base-object.hpp"
 #include "game/cursor.hpp"
+#include "game/player-event.hpp"
 #include "ui/editable-text.hpp"
 #include "ui/event.hpp"
 
 namespace antares {
-
-enum class PlayerEventType {
-    ACCEL_ON   = 0x00,
-    ACCEL_OFF  = 0x01,
-    DECEL_ON   = 0x02,
-    DECEL_OFF  = 0x03,
-    CCW_ON     = 0x04,
-    CCW_OFF    = 0x05,
-    CW_ON      = 0x06,
-    CW_OFF     = 0x07,
-    FIRE_1_ON  = 0x08,
-    FIRE_1_OFF = 0x09,
-    FIRE_2_ON  = 0x0a,
-    FIRE_2_OFF = 0x0b,
-    FIRE_S_ON  = 0x0c,
-    FIRE_S_OFF = 0x0d,
-    WARP_ON    = 0x0e,
-    WARP_OFF   = 0x0f,
-
-    ZOOM_IN  = 0x010,
-    ZOOM_OUT = 0x011,
-    ZOOM_1X  = 0x012,
-    ZOOM_2X  = 0x013,
-    ZOOM_4X  = 0x014,
-    ZOOM_16X = 0x015,
-    ZOOM_FOE = 0x016,
-    ZOOM_OBJ = 0x017,
-    ZOOM_ALL = 0x018,
-
-    SELECT_FRIEND = 0x020,
-    TARGET_FRIEND = 0x021,
-    TARGET_FOE    = 0x022,
-    SELECT_BASE   = 0x023,
-    TARGET_BASE   = 0x024,
-    TARGET_SELF   = 0x025,
-
-    AUTOPILOT     = 0x030,
-    ORDER         = 0x031,
-    TRANSFER      = 0x032,
-    MINI_TRANSFER = 0x033,
-    MINI_HOLD     = 0x034,
-    MINI_COME     = 0x035,
-    MINI_FIRE_1   = 0x036,
-    MINI_FIRE_2   = 0x037,
-    MINI_FIRE_S   = 0x038,
-
-    NEXT_PAGE         = 0x040,
-    MINI_NEXT_PAGE    = 0x041,
-    MINI_PREV_PAGE    = 0x042,
-    MINI_LAST_MESSAGE = 0x043,
-
-    MINI_BUILD    = 0x050,
-    HOTKEY_SET    = 0x051,
-    HOTKEY_SELECT = 0x052,
-    HOTKEY_TARGET = 0x053,
-
-    SELECT_OBJECT = 0x060,
-    TARGET_OBJECT = 0x061,
-    GAMEPAD_KEYS  = 0x062,
-    STEER         = 0x063,
-    CLEAR         = 0x064,
-};
-
-struct PlayerEvent {
-    PlayerEventType type;
-    int             data;
-
-    bool operator==(PlayerEvent other) const;
-    bool operator!=(PlayerEvent other) const { return !(*this == other); }
-    bool operator<(PlayerEvent other) const;
-    bool operator<=(PlayerEvent other) const { return !(other < *this); }
-    bool operator>(PlayerEvent other) const { return (other < *this); }
-    bool operator>=(PlayerEvent other) const { return !(*this < other); }
-};
 
 class GameCursor;
 class InputSource;
@@ -143,11 +70,10 @@ class PlayerShip : public EventReceiver {
     void click(Point where, int button);
     void pick(PlayerEventType type, int32_t direction);
 
-    uint32_t                              _gamepad_keys;
-    uint32_t                              _sent_gamepad_keys;
-    int32_t                               _sent_steer;
-    std::vector<PlayerEvent>              _player_events;
-    std::vector<std::vector<PlayerEvent>> _events;  // Each admiral's commands not yet executed.
+    uint32_t                 _gamepad_keys;
+    uint32_t                 _sent_gamepad_keys;
+    int32_t                  _sent_steer;
+    std::vector<PlayerEvent> _player_events;
 
     enum GamepadState {
         NO_BUMPER              = 0,
