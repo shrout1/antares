@@ -59,6 +59,10 @@ namespace {
 // const int32_t kSendMessageVOffset = 20;
 const int32_t kCursorBoundsSize = 16;  // should be same in instruments.c
 
+// The data of a SELECT_OBJECT or TARGET_OBJECT command: the object's number and its ID, so that
+// the command does nothing if another object has taken the number by the time it executes.
+int32_t selection(Handle<SpaceObject> o) { return (o->id * kMaxSpaceObject) + o.number(); }
+
 }  // namespace
 
 const static ticks kKlaxonInterval      = ticks(125);
@@ -573,7 +577,7 @@ void PlayerShip::gamepad_button_down(const GamepadButtonDownEvent& event) {
             case Gamepad::Button::LSB:
                 if (_gamepad_state & TARGET_BUMPER) {
                     _player_events.push_back(
-                            PlayerEvent{PlayerEventType::TARGET_OBJECT, player.number()});
+                            PlayerEvent{PlayerEventType::TARGET_OBJECT, selection(player)});
                 } else {
                     _player_events.push_back(PlayerEvent{PlayerEventType::TRANSFER});
                 }
@@ -698,7 +702,7 @@ void PlayerShip::pick(PlayerEventType type, int32_t direction) {
     if (o.get()) {
         _player_events.push_back(PlayerEvent{
                 targets(type) ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
-                o.number()});
+                selection(o)});
     }
 }
 
@@ -731,7 +735,7 @@ static sfz::optional<PlayerEvent> use_hotkey(int i, bool target) {
             target = target || (o->owner != g.admiral);
             return sfz::make_optional(PlayerEvent{
                     target ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
-                    o.number()});
+                    selection(o)});
         } else {
             globals()->hotKey[i].object = SpaceObject::none();
         }
@@ -743,9 +747,9 @@ static void handle_selections(Handle<Admiral> adm, const std::vector<PlayerEvent
     for (const auto& e : player_events) {
         if (((e.type == PlayerEventType::SELECT_OBJECT) ||
              (e.type == PlayerEventType::TARGET_OBJECT)) &&
-            (0 <= e.data) && (e.data < kMaxSpaceObject)) {
-            Handle<SpaceObject> o(e.data);
-            if (o->active) {
+            (0 <= e.data)) {
+            Handle<SpaceObject> o(e.data % kMaxSpaceObject);
+            if (o->active && (o->id == (e.data / kMaxSpaceObject))) {
                 select_object(o, e.type == PlayerEventType::TARGET_OBJECT, adm);
             }
         }
@@ -1049,7 +1053,7 @@ void PlayerShip::click(Point where, int button) {
             if (selectShipNum.get()) {
                 _player_events.push_back(PlayerEvent{
                         target ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
-                        selectShipNum.number()});
+                        selection(selectShipNum)});
             }
         }
     }
