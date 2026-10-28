@@ -35,7 +35,7 @@ WINE_TESTS = [
 ]
 
 
-def run(opts, queue, name, cmd):
+def command(opts, cmd):
     if cmd[0].startswith("out/cur/") and not os.path.islink("out/cur"):
         with open("out/cur") as f:
             cur = f.read().strip()
@@ -43,7 +43,11 @@ def run(opts, queue, name, cmd):
     if opts.wine and cmd[0].startswith("out/cur/"):
         cmd[0] += ".exe"
         cmd.insert(0, "wine")
-    sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return cmd
+
+
+def run(opts, queue, name, cmd):
+    sub = subprocess.Popen(command(opts, cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output, _ = sub.communicate()
     if sub.returncode != 0:
         print(
@@ -161,7 +165,9 @@ def net_sim_pair(opts, queue, name, d, level, seed, delay, jitter):
                 "--world-log=%s" % log,
             ]
         )
-    host = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    host = subprocess.Popen(
+        command(opts, cmds[0]), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
     joined = run(opts, queue, name, cmds[1])
     output, _ = host.communicate()
     if host.returncode != 0:
