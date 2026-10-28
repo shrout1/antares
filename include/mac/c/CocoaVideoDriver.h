@@ -59,6 +59,7 @@ typedef enum {
     ANTARES_WINDOW_CALLBACK_MOUSE_DOWN,
     ANTARES_WINDOW_CALLBACK_MOUSE_UP,
     ANTARES_WINDOW_CALLBACK_MOUSE_MOVE,
+    ANTARES_WINDOW_CALLBACK_MOUSE_SCROLL,
 
     ANTARES_WINDOW_CALLBACK_REPLACE,
     ANTARES_WINDOW_CALLBACK_SELECT,
@@ -121,6 +122,11 @@ typedef union {
     struct {
         int32_t x, y;
     } mouse_move;
+
+    struct {
+        int32_t x, y;
+        double  dx, dy;
+    } mouse_scroll;
 
     struct {
         antares_window_callback_range range;

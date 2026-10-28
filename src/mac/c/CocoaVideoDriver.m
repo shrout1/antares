@@ -254,6 +254,21 @@ static void mouse_move(AntaresView* view, NSEvent* event) {
     view->callback(ANTARES_WINDOW_CALLBACK_MOUSE_MOVE, data, view->userdata);
 }
 
+static void mouse_scroll(AntaresView* view, NSEvent* event) {
+    NSPoint where;
+    if (!translate_coords(view, event, &where)) {
+        return;
+    }
+    // Trackpads report points rather than lines; a tenth of them is about a wheel's notch.
+    double dx = [event scrollingDeltaX], dy = [event scrollingDeltaY];
+    if ([event hasPreciseScrollingDeltas]) {
+        dx *= 0.1;
+        dy *= 0.1;
+    }
+    antares_window_callback_data data = {.mouse_scroll = {where.x, where.y, dx, dy}};
+    view->callback(ANTARES_WINDOW_CALLBACK_MOUSE_SCROLL, data, view->userdata);
+}
+
 static void flags_changed(AntaresView* view, NSEvent* event) {
     int32_t old_flags = view->modifier_flags;
     int32_t new_flags = view->modifier_flags = [event modifierFlags];
@@ -387,6 +402,10 @@ static BOOL          isNoRange(NSRange range) { return NSEqualRanges(range, kNoR
 
 - (void)mouseMoved:(NSEvent*)event {
     mouse_move(self, event);
+}
+
+- (void)scrollWheel:(NSEvent*)event {
+    mouse_scroll(self, event);
 }
 
 // NSWindowDelegate
