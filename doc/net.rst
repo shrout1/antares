@@ -62,13 +62,14 @@ _`predictive networking`
 ..  _input logs: log_
 ..  _desync: desynchronization_
 
-Lockstep
---------
+Implementation
+--------------
 
-The first implementation uses `pre-delay networking`_ between two
-players_.  A turn is ``kMajorTick``.  Input from turn *n* executes on
-turn *n* + ``Setup.delay`` on every node_, and a node_ waits while it
-lacks any player_'s input for the turn it is about to execute.
+The implementation uses `predictive networking`_ between two players_,
+following Protocol_ below.  A turn is ``kMajorTick``.  Input from turn
+*n* executes on turn *n* + ``Setup.delay`` on every node_.  A player_
+whose input for a turn hasn't arrived keeps holding the same controls.
+A node_ waits if head_ gets 20 turns ahead of tail_.
 
 Packets are ``antares.pb.net.Packet`` messages (``proto/net.proto``),
 sent over ENet.  Turns go on an unreliable channel, repeating every turn
@@ -85,15 +86,15 @@ Modules
     Connects, accepts, sends, and polls.  The only module that uses
     ENet (``ext/enet``).
 
-``net/lockstep``
-    Keeps each player_'s turns, decides when the next turn may execute,
-    and compares sync values.
+``net/rollback``
+    Keeps each player_'s turns, reports which are known and which every
+    player_'s input has reached, and compares sync values.
 
 ``net/session``
     Services the connection on its own thread.  Exchanges Hello, Setup,
     Choose, Start, and Ready, rejects a peer_ with a different
     protocol, Antares version, or plugin, and routes Turns to
-    ``net/lockstep``.
+    ``net/rollback``.
 
 ``ui/screens/net-setup``
     Host or Join, Host Address, Status, and the lobby, where players

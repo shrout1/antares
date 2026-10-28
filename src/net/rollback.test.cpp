@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with Antares.  If not, see http://www.gnu.org/licenses/
 
-#include "net/lockstep.hpp"
+#include "net/rollback.hpp"
 
 #include <gmock/gmock.h>
 #include <stdexcept>
@@ -25,39 +25,49 @@ namespace antares {
 namespace net {
 namespace {
 
-using LockstepTest = testing::Test;
+using RollbackTest = testing::Test;
 
-Lockstep::Turn turn(uint32_t type, int32_t data) {
+Rollback::Turn turn(uint32_t type, int32_t data) {
     Turns::Event e;
     e.type = type;
     e.data = data;
     return {e};
 }
 
-void exchange(Lockstep* a, Lockstep* b) {
+// Each player's input for turn `at`, which must be confirmed, then forgets it.
+std::vector<Rollback::Turn> take(Rollback* r, uint32_t at) {
+    std::vector<Rollback::Turn> turns;
+    for (int i = 0; i < 2; ++i) {
+        turns.push_back(*r->known(i, at));
+    }
+    r->confirm(at);
+    return turns;
+}
+
+void exchange(Rollback* a, Rollback* b) {
     a->receive(b->outgoing(a->local()));
     b->receive(a->outgoing(b->local()));
 }
 
-TEST_F(LockstepTest, Delay) {
-    Lockstep a(2, 0, 10, 3);
-    EXPECT_TRUE(a.ready(10));
-    EXPECT_TRUE(a.ready(12));
-    EXPECT_FALSE(a.ready(13));
-    EXPECT_EQ(2u, a.take(10).size());
-    EXPECT_THROW(a.take(12), std::runtime_error);
+TEST_F(RollbackTest, Delay) {
+    Rollback a(2, 0, 10, 3);
+    EXPECT_TRUE((10 <= a.confirmed()));
+    EXPECT_TRUE((12 <= a.confirmed()));
+    EXPECT_FALSE((13 <= a.confirmed()));
+    EXPECT_EQ(2u, take(&a, 10).size());
+    EXPECT_THROW(a.confirm(12), std::runtime_error);
     EXPECT_THROW(a.submit(11, {}), std::runtime_error);
 }
 
-TEST_F(LockstepTest, Play) {
-    Lockstep a(2, 0, 1, 2), b(2, 1, 1, 2);
+TEST_F(RollbackTest, Play) {
+    Rollback a(2, 0, 1, 2), b(2, 1, 1, 2);
     for (uint32_t t = 1; t <= 20; ++t) {
         a.submit(t, turn(1, t));
-        b.submit(t, (t % 3) ? Lockstep::Turn{} : turn(2, -t));
+        b.submit(t, (t % 3) ? Rollback::Turn{} : turn(2, -t));
         exchange(&a, &b);
-        ASSERT_TRUE(a.ready(t));
-        ASSERT_TRUE(b.ready(t));
-        std::vector<Lockstep::Turn> x = a.take(t), y = b.take(t);
+        ASSERT_TRUE((t <= a.confirmed()));
+        ASSERT_TRUE((t <= b.confirmed()));
+        std::vector<Rollback::Turn> x = take(&a, t), y = take(&b, t);
         ASSERT_EQ(2u, x.size());
         ASSERT_EQ(x[0].size(), y[0].size());
         ASSERT_EQ(x[1].size(), y[1].size());
@@ -70,30 +80,30 @@ TEST_F(LockstepTest, Play) {
     }
 }
 
-TEST_F(LockstepTest, WaitsForLostTurns) {
-    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+TEST_F(RollbackTest, WaitsForLostTurns) {
+    Rollback a(2, 0, 1, 1), b(2, 1, 1, 1);
     a.submit(1, turn(1, 1));
     b.submit(1, {});
     b.receive(a.outgoing(1));  // a never hears from b.
-    EXPECT_FALSE(a.ready(2));
-    EXPECT_TRUE(b.ready(2));
+    EXPECT_FALSE((2 <= a.confirmed()));
+    EXPECT_TRUE((2 <= b.confirmed()));
 
-    a.take(1);
-    b.take(1);
-    b.take(2);
+    take(&a, 1);
+    take(&b, 1);
+    take(&b, 2);
     b.submit(2, {});
     a.submit(2, turn(1, 2));
-    EXPECT_FALSE(a.ready(2));
+    EXPECT_FALSE((2 <= a.confirmed()));
 
     Turns resent = b.outgoing(0);
     EXPECT_EQ(2u, resent.first);
     EXPECT_EQ(2u, resent.turns.size());
     a.receive(resent);
-    EXPECT_TRUE(a.ready(3));
+    EXPECT_TRUE((3 <= a.confirmed()));
 }
 
-TEST_F(LockstepTest, AcknowledgedTurnsAreNotResent) {
-    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+TEST_F(RollbackTest, AcknowledgedTurnsAreNotResent) {
+    Rollback a(2, 0, 1, 1), b(2, 1, 1, 1);
     for (uint32_t t = 1; t <= 5; ++t) {
         a.submit(t, {});
         b.submit(t, {});
@@ -105,8 +115,8 @@ TEST_F(LockstepTest, AcknowledgedTurnsAreNotResent) {
     EXPECT_EQ(7u, a.outgoing(1).first);
 }
 
-TEST_F(LockstepTest, Desync) {
-    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+TEST_F(RollbackTest, Desync) {
+    Rollback a(2, 0, 1, 1), b(2, 1, 1, 1);
     a.sync(1, 100);
     b.sync(1, 100);
     exchange(&a, &b);
@@ -121,8 +131,8 @@ TEST_F(LockstepTest, Desync) {
     EXPECT_TRUE(a.desynced());
 }
 
-TEST_F(LockstepTest, KnownBeforeConfirmed) {
-    Lockstep a(2, 0, 1, 1), b(2, 1, 1, 1);
+TEST_F(RollbackTest, KnownBeforeConfirmed) {
+    Rollback a(2, 0, 1, 1), b(2, 1, 1, 1);
     a.submit(1, turn(1, 1));
     a.submit(2, turn(1, 2));
     EXPECT_EQ(1u, a.confirmed());
@@ -137,6 +147,8 @@ TEST_F(LockstepTest, KnownBeforeConfirmed) {
     ASSERT_NE(nullptr, a.known(1, 2));
     EXPECT_EQ(1, (*a.known(1, 2))[0].data);
 
+    EXPECT_THROW(a.confirm(2), std::runtime_error);  // Turn 1 comes first.
+    a.confirm(1);
     a.confirm(2);
     EXPECT_EQ(nullptr, a.known(0, 2));
     EXPECT_EQ(nullptr, a.known(1, 2));
@@ -145,8 +157,8 @@ TEST_F(LockstepTest, KnownBeforeConfirmed) {
     EXPECT_THROW(a.confirm(2), std::runtime_error);
 }
 
-TEST_F(LockstepTest, NothingKnownAfterAGap) {
-    Lockstep a(2, 0, 1, 1);
+TEST_F(RollbackTest, NothingKnownAfterAGap) {
+    Rollback a(2, 0, 1, 1);
     Turns    t;
     t.player = 1;
     t.first  = 3;
@@ -160,8 +172,8 @@ TEST_F(LockstepTest, NothingKnownAfterAGap) {
     EXPECT_EQ(1u, a.confirmed());  // a hasn't submitted turn 2.
 }
 
-TEST_F(LockstepTest, IgnoresInvalidPlayers) {
-    Lockstep a(2, 0, 1, 1);
+TEST_F(RollbackTest, IgnoresInvalidPlayers) {
+    Rollback a(2, 0, 1, 1);
     Turns    t;
     t.player = 5;
     t.first  = 2;
@@ -169,7 +181,7 @@ TEST_F(LockstepTest, IgnoresInvalidPlayers) {
     a.receive(t);
     t.player = 0;
     a.receive(t);
-    EXPECT_FALSE(a.ready(2));
+    EXPECT_FALSE((2 <= a.confirmed()));
     EXPECT_THROW(a.outgoing(0), std::runtime_error);
 }
 

@@ -328,8 +328,8 @@ static game_ticks turn_start(uint32_t turn) { return game_ticks(turn * kMajorTic
 // How many turns head may run ahead of the input every player has sent.
 const uint32_t kRollbackTurns = 20;
 
-static net::Lockstep::Turn to_turn(const std::vector<PlayerEvent>& events) {
-    net::Lockstep::Turn turn;
+static net::Rollback::Turn to_turn(const std::vector<PlayerEvent>& events) {
+    net::Rollback::Turn turn;
     for (const PlayerEvent& e : events) {
         turn.emplace_back();
         turn.back().type = static_cast<uint32_t>(e.type);
@@ -338,7 +338,7 @@ static net::Lockstep::Turn to_turn(const std::vector<PlayerEvent>& events) {
     return turn;
 }
 
-static std::vector<PlayerEvent> from_turn(const net::Lockstep::Turn& turn) {
+static std::vector<PlayerEvent> from_turn(const net::Rollback::Turn& turn) {
     std::vector<PlayerEvent> events;
     for (const net::Turns::Event& e : turn) {
         events.push_back(PlayerEvent{static_cast<PlayerEventType>(e.type), e.data});
@@ -794,7 +794,7 @@ void GamePlay::play_turn() {
     }
     for (int i = 0; i < net::kSessionPlayers; ++i) {
         // A player whose input hasn't arrived keeps holding the same controls.
-        sfz::optional<net::Lockstep::Turn> commands = _session->known(i, turn);
+        sfz::optional<net::Rollback::Turn> commands = _session->known(i, turn);
         _player_ship.execute(
                 Handle<Admiral>(i),
                 commands.has_value() ? from_turn(*commands) : std::vector<PlayerEvent>{});

@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with Antares.  If not, see http://www.gnu.org/licenses/
 
-#include "net/lockstep.hpp"
+#include "net/rollback.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -38,10 +38,10 @@ void trim(std::map<uint32_t, uint32_t>* syncs) {
 
 }  // namespace
 
-Lockstep::Lockstep(int players, int local, uint32_t first, uint32_t delay)
+Rollback::Rollback(int players, int local, uint32_t first, uint32_t delay)
         : _local(local), _delay(delay), _players(players), _executed(first - 1) {
     if ((local < 0) || (players <= local) || (first == 0)) {
-        throw std::runtime_error("invalid lockstep");
+        throw std::runtime_error("invalid rollback");
     }
     for (Player& p : _players) {
         for (uint32_t t = first; t < first + delay; ++t) {
@@ -51,7 +51,7 @@ Lockstep::Lockstep(int players, int local, uint32_t first, uint32_t delay)
     }
 }
 
-void Lockstep::submit(uint32_t at, Turn turn) {
+void Rollback::submit(uint32_t at, Turn turn) {
     Player& me = _players[_local];
     if (at + _delay != me.received + 1) {
         throw std::runtime_error("turn submitted out of order");
@@ -59,21 +59,7 @@ void Lockstep::submit(uint32_t at, Turn turn) {
     me.turns[++me.received] = std::move(turn);
 }
 
-bool Lockstep::ready(uint32_t at) const { return at <= confirmed(); }
-
-std::vector<Lockstep::Turn> Lockstep::take(uint32_t at) {
-    if (!ready(at) || (at != _executed + 1)) {
-        throw std::runtime_error("turn taken out of order");
-    }
-    std::vector<Turn> result;
-    for (int i = 0; i < _players.size(); ++i) {
-        result.push_back(std::move(_players[i].turns[at]));
-    }
-    confirm(at);
-    return result;
-}
-
-uint32_t Lockstep::confirmed() const {
+uint32_t Rollback::confirmed() const {
     uint32_t at = _players[0].received;
     for (const Player& p : _players) {
         at = std::min(at, p.received);
@@ -81,7 +67,7 @@ uint32_t Lockstep::confirmed() const {
     return at;
 }
 
-const Lockstep::Turn* Lockstep::known(int player, uint32_t at) const {
+const Rollback::Turn* Rollback::known(int player, uint32_t at) const {
     if ((player < 0) || (_players.size() <= player) || (at <= _executed)) {
         return nullptr;
     }
@@ -92,8 +78,8 @@ const Lockstep::Turn* Lockstep::known(int player, uint32_t at) const {
     return &it->second;
 }
 
-void Lockstep::confirm(uint32_t at) {
-    if ((confirmed() < at) || (at <= _executed)) {
+void Rollback::confirm(uint32_t at) {
+    if ((confirmed() < at) || (at != _executed + 1)) {
         throw std::runtime_error("turn confirmed out of order");
     }
     _executed = at;
@@ -110,7 +96,7 @@ void Lockstep::confirm(uint32_t at) {
     }
 }
 
-void Lockstep::sync(uint32_t at, uint32_t value) {
+void Rollback::sync(uint32_t at, uint32_t value) {
     _syncs[at] = value;
     trim(&_syncs);
     _sync_turn = at;
@@ -125,7 +111,7 @@ void Lockstep::sync(uint32_t at, uint32_t value) {
     }
 }
 
-Turns Lockstep::outgoing(int player) const {
+Turns Rollback::outgoing(int player) const {
     if ((player < 0) || (_players.size() <= player) || (player == _local)) {
         throw std::runtime_error("invalid player");
     }
@@ -144,7 +130,7 @@ Turns Lockstep::outgoing(int player) const {
     return t;
 }
 
-void Lockstep::receive(const Turns& t) {
+void Rollback::receive(const Turns& t) {
     if ((t.player < 0) || (_players.size() <= t.player) || (t.player == _local)) {
         return;
     }

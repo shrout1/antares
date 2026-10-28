@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU Lesser General Public
 // License along with Antares.  If not, see http://www.gnu.org/licenses/
 
-#ifndef ANTARES_NET_LOCKSTEP_HPP_
-#define ANTARES_NET_LOCKSTEP_HPP_
+#ifndef ANTARES_NET_ROLLBACK_HPP_
+#define ANTARES_NET_ROLLBACK_HPP_
 
 #include <stdint.h>
 #include <map>
@@ -28,27 +28,22 @@
 namespace antares {
 namespace net {
 
-// Every player's input for each turn of a game played in lockstep.  Input made on turn t executes
-// on turn t + delay; turns before first + delay have no input.
-class Lockstep {
+// Every player's input for each turn of a net game.  Input made on turn t executes on turn
+// t + delay; turns before first + delay have no input.  A node may run ahead on the input it
+// knows, and run again from the last confirmed turn as more arrives.
+class Rollback {
   public:
     typedef std::vector<Turns::Event> Turn;
 
-    Lockstep(int players, int local, uint32_t first, uint32_t delay);
+    Rollback(int players, int local, uint32_t first, uint32_t delay);
 
-    Lockstep(const Lockstep&) = delete;
-    Lockstep& operator=(const Lockstep&) = delete;
+    Rollback(const Rollback&) = delete;
+    Rollback& operator=(const Rollback&) = delete;
 
     int local() const { return _local; }
 
     // Records the local player's input from turn `at`.  Turns must be submitted in order.
     void submit(uint32_t at, Turn turn);
-
-    // True if every player's input for turn `at` is known.
-    bool ready(uint32_t at) const;
-
-    // Each player's input for turn `at`, which must be ready.
-    std::vector<Turn> take(uint32_t at);
 
     // The last turn for which every player's input is known.
     uint32_t confirmed() const;
@@ -57,7 +52,7 @@ class Lockstep {
     // confirm() are forgotten.
     const Turn* known(int player, uint32_t at) const;
 
-    // Forgets input for turns up to `at`, which must be confirmed, once they have executed.
+    // Forgets input for turn `at` once it has executed.  Turns must be confirmed in order.
     void confirm(uint32_t at);
 
     // Records the sync value after executing turn `at`.
@@ -93,4 +88,4 @@ class Lockstep {
 }  // namespace net
 }  // namespace antares
 
-#endif  // ANTARES_NET_LOCKSTEP_HPP_
+#endif  // ANTARES_NET_ROLLBACK_HPP_

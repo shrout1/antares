@@ -31,7 +31,7 @@ group("default") {
     ":gen-install",
     ":hash-data",
     ":host-test",
-    ":lockstep-test",
+    ":rollback-test",
     ":object-data",
     ":offscreen",
     ":packet-test",
@@ -326,11 +326,11 @@ source_set("libantares-math") {
 source_set("libantares-net") {
   sources = [
     "include/net/host.hpp",
-    "include/net/lockstep.hpp",
+    "include/net/rollback.hpp",
     "include/net/packet.hpp",
     "include/net/session.hpp",
     "src/net/host.cpp",
-    "src/net/lockstep.cpp",
+    "src/net/rollback.cpp",
     "src/net/packet.cpp",
     "src/net/session.cpp",
   ]
@@ -613,10 +613,10 @@ executable("host-test") {
   configs += [ ":antares_private" ]
 }
 
-executable("lockstep-test") {
+executable("rollback-test") {
   testonly = true
   output_extension = exe
-  sources = [ "src/net/lockstep.test.cpp" ]
+  sources = [ "src/net/rollback.test.cpp" ]
   deps = [
     ":libantares-test",
     "//ext/gmock:gmock_main",

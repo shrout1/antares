@@ -28,8 +28,8 @@
 #include <sfz/sfz.hpp>
 
 #include "net/host.hpp"
-#include "net/lockstep.hpp"
 #include "net/packet.hpp"
+#include "net/rollback.hpp"
 
 namespace antares {
 namespace net {
@@ -79,17 +79,12 @@ class Session {
     // Sends Quit and closes.
     void quit();
 
-    // While playing; see Lockstep.  No turn is ready until every player is.
-    void                        submit(uint32_t at, Lockstep::Turn turn);
-    bool                        ready_turn(uint32_t at) const;
-    std::vector<Lockstep::Turn> take(uint32_t at);
-    void                        sync(uint32_t at, uint32_t value);
-    bool                        desynced() const;
-
-    // While playing, for running ahead of the other players; see Lockstep.  confirmed() is 0
-    // until then.
+    // While playing; see Rollback.  confirmed() is 0 until every player is ready.
+    void                          submit(uint32_t at, Rollback::Turn turn);
+    void                          sync(uint32_t at, uint32_t value);
+    bool                          desynced() const;
     uint32_t                      confirmed() const;
-    sfz::optional<Lockstep::Turn> known(int player, uint32_t at) const;
+    sfz::optional<Rollback::Turn> known(int player, uint32_t at) const;
     void                          confirm(uint32_t at);
 
     void                    chat(pn::string_view text);
@@ -121,7 +116,7 @@ class Session {
     int                                     _peer  = -1;
     Setup                                   _setup;
     bool                                    _peer_ready = false;
-    std::unique_ptr<Lockstep>               _lockstep;
+    std::unique_ptr<Rollback>               _rollback;
     std::vector<std::pair<Channel, Packet>> _outbox;
     std::vector<pn::string>                 _chats;
     bool                                    _turns_dirty = false;
