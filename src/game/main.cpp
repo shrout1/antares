@@ -89,6 +89,7 @@ namespace {
 struct RollbackTest {
     sfz::optional<pn::output> log;
     int                       lookahead = 0;
+    uint32_t                  last_turn = 0;
 };
 ANTARES_GLOBAL RollbackTest rollback_test;
 
@@ -148,6 +149,11 @@ uint32_t world_hash() {
 void set_rollback_test(pn::string_view log, int lookahead) {
     rollback_test.log.emplace(log, pn::text);
     rollback_test.lookahead = lookahead;
+}
+
+void set_net_test(pn::string_view log, uint32_t last_turn) {
+    rollback_test.log.emplace(log, pn::text);
+    rollback_test.last_turn = last_turn;
 }
 
 bool uses_local_conditions(const Level& level) {
@@ -831,6 +837,15 @@ void GamePlay::play_net(ticks units) {
         simulate_to(next);
         _session->sync(turn_at(g.time), g.sync);
         _session->confirm(turn_at(g.time));
+        if (rollback_test.log.has_value()) {
+            rollback_test.log->format(
+                    "{0}\t{1}\n", g.time.time_since_epoch().count(), world_hash());
+        }
+        if (rollback_test.last_turn && (turn_at(g.time) >= rollback_test.last_turn)) {
+            g.game_over    = true;
+            g.game_over_at = g.time;
+            break;
+        }
     }
     copy_world(&tail, g);
 

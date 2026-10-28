@@ -38,6 +38,10 @@ class Session;
 // state the copy misses changes the log.
 void set_rollback_test(pn::string_view log, int lookahead);
 
+// For testing net games. Writes a line to `log` after each turn that every player's input has
+// reached, identifying the state of the world, and ends the game after `last_turn`.
+void set_net_test(pn::string_view log, uint32_t last_turn);
+
 // True if `level` has conditions on local state, which differs between players (not net-safe).
 bool uses_local_conditions(const Level& level);
 

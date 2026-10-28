@@ -31,6 +31,7 @@ group("default") {
     ":gen-install",
     ":hash-data",
     ":host-test",
+    ":net-sim",
     ":rollback-test",
     ":object-data",
     ":offscreen",
@@ -658,6 +659,14 @@ executable("replay") {
   testonly = true
   output_extension = exe
   sources = [ "src/bin/replay.cpp" ]
+  deps = [ ":libantares-test" ]
+  configs += [ ":antares_private" ]
+}
+
+executable("net-sim") {
+  testonly = true
+  output_extension = exe
+  sources = [ "src/bin/net-sim.cpp" ]
   deps = [ ":libantares-test" ]
   configs += [ ":antares_private" ]
 }
