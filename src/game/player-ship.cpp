@@ -817,7 +817,7 @@ static void sound_klaxon() {
     }
 }
 
-std::vector<PlayerEvent> PlayerShip::commands() {
+std::vector<PlayerEvent> PlayerShip::sample() {
     std::vector<PlayerEvent> commands;
     if (_message.editing()) {
         _player_events.clear();
@@ -936,7 +936,7 @@ void PlayerShip::execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& co
     if (!flagship->active) {
         return;
     }
-    if (adm == g.admiral) {
+    if ((adm == g.admiral) && confirmed()) {
         sound_klaxon();
     }
     if (!(flagship->attributes & kIsPlayerShip)) {

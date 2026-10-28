@@ -49,7 +49,7 @@ class PlayerShip : public EventReceiver {
     virtual void gamepad_stick(const GamepadStickEvent& event);
 
     // Translates the input received since the last call into the local admiral's commands.
-    std::vector<PlayerEvent> commands();
+    std::vector<PlayerEvent> sample();
     // Executes one turn of an admiral's commands.
     void execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& commands);
 

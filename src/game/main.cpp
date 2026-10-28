@@ -781,11 +781,11 @@ void GamePlay::look_ahead() {
 
 void GamePlay::play_turn() {
     if (!_session) {
-        _player_ship.execute(g.admiral, _player_ship.commands());
+        _player_ship.execute(g.admiral, _player_ship.sample());
         return;
     }
     uint32_t turn = turn_at(g.time);
-    _session->submit(turn, to_turn(_player_ship.commands()));
+    _session->submit(turn, to_turn(_player_ship.sample()));
     std::vector<net::Lockstep::Turn> turns = _session->take(turn);
     for (int i = 0; i < turns.size(); ++i) {
         _player_ship.execute(Handle<Admiral>(i), from_turn(turns[i]));
