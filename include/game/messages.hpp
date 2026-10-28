@@ -54,10 +54,6 @@ class Messages {
 
     static pn::string_view pause_string();
 
-    // While true, messages from the game are dropped. The rollback test sets this while it looks
-    // ahead, until re-simulation stops repeating side effects (P2).
-    static bool muted;
-
   private:
     struct longMessageType;
 

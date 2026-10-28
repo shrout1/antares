@@ -634,7 +634,7 @@ void GamePlay::step(ticks units, bool input) {
 
     UpdateMiniScreenLines();
 
-    if (!Messages::muted) {
+    if (confirmed()) {
         Messages::clip();
         Messages::draw_long_message(units);
     }
@@ -651,7 +651,7 @@ void GamePlay::step(ticks units, bool input) {
     globals()->starfield.show();
     globals()->shown_through = std::max(globals()->shown_through, g.time);
 
-    if (!Messages::muted) {
+    if (confirmed()) {
         Messages::draw_message_screen(units);
     }
     UpdateRadar(units);
@@ -661,14 +661,16 @@ void GamePlay::step(ticks units, bool input) {
 void GamePlay::look_ahead() {
     static World ahead;
     copy_world(&ahead, g);
-    Messages::muted = true;
+    // The steps ahead play their own sounds, and the steps that replace them stay silent, so the
+    // sound log means nothing with a look-ahead.
+    globals()->confirmed = false;
     for (auto& p : g.pilots) {
         p.keys ^= kUpKey | kLeftKey | kPulseKey;  // Look ahead with other controls held.
     }
     for (int i = 0; (i < rollback_test.lookahead) && !g.game_over; ++i) {
         step(kMajorTick, false);
     }
-    Messages::muted = false;
+    globals()->confirmed = true;
     copy_world(&g, ahead);
 }
 

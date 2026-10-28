@@ -113,7 +113,6 @@ struct Messages::longMessageType {
 ANTARES_GLOBAL std::queue<pn::string> Messages::message_data;
 ANTARES_GLOBAL Messages::longMessageType* Messages::long_message_data;
 ANTARES_GLOBAL ticks                      Messages::time_count;
-ANTARES_GLOBAL bool                       Messages::muted;
 
 void MessageLabel_Set_Special(Handle<Label> id, pn::string_view text);
 
@@ -156,16 +155,9 @@ void Messages::clear() {
     long_message_data->labelMessageID->set_keep_on_screen_anyway(true);
 }
 
-void Messages::add(pn::string_view message) {
-    if (!muted) {
-        message_data.emplace(message.copy());
-    }
-}
+void Messages::add(pn::string_view message) { message_data.emplace(message.copy()); }
 
 void Messages::start(sfz::optional<int64_t> start_id, const std::vector<pn::string>* pages) {
-    if (muted) {
-        return;
-    }
     longMessageType* m = long_message_data;
     if (!m->have_current()) {
         m->retro_text    = StyledText{};
@@ -330,9 +322,6 @@ void Messages::draw_message_screen(ticks by_units) {
 }
 
 void Messages::set_status(pn::string_view status, Hue hue) {
-    if (muted) {
-        return;
-    }
     g.status_label->set_hue(hue);
     g.status_label->text() = StyledText::plain(
             status, sys.fonts.tactical, GetRGBTranslateColorShade(hue, LIGHTEST));
