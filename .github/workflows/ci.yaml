@@ -68,6 +68,9 @@ jobs:
           APPLE_USER: ${{ secrets.APPLE_USER }}
           APPLE_PASS: ${{ secrets.APPLE_PASS }}
           APPLE_TEAM: ${{ secrets.APPLE_TEAM }}
+      # Without arescentral's certificate, sign it ad hoc so Apple Silicon Macs will open it.
+      - if: ${{ github.event_name == 'pull_request' || github.repository_owner != 'arescentral' }}
+        run: codesign --force --deep --sign - out/mac/opt/Antares.app
 
       - run: ./scripts/dist.py mac zip
       - uses: actions/upload-artifact@v4
