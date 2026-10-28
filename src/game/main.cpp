@@ -203,7 +203,14 @@ class GamePlay : public Card {
     };
     State _state;
 
+    // Runs `units` of the game, and updates the display to match.
     void step(ticks units, bool input);
+    // Runs `units` of the world only. With `input`, reads the input source and executes the
+    // turn's commands; without, each player keeps the controls they hold.
+    void simulate(ticks units, bool input);
+    // Updates local display state for `units` of elapsed time.
+    void update_display(ticks units);
+    void move_stars(ticks units);
     void look_ahead();
 
     const bool            _replay;
@@ -683,11 +690,17 @@ void GamePlay::fire_timer() {
 }
 
 void GamePlay::step(ticks units, bool input) {
+    move_stars(units);
+    simulate(units, input);
+    if (_session && ((g.time.time_since_epoch() % kMajorTick) == ticks(0))) {
+        _session->sync(turn_at(g.time), g.sync);
+    }
+    update_display(units);
+}
+
+void GamePlay::simulate(ticks units, bool input) {
     globals()->show_effects = (g.time + units) > globals()->shown_through;
 
-    // executed arbitrarily, but at least once every major tick
-    globals()->starfield.prepare_to_move();
-    globals()->starfield.move(units);
     MoveSpaceObjects(units);
 
     g.time += units;
@@ -714,11 +727,19 @@ void GamePlay::step(ticks units, bool input) {
         if ((g.time.time_since_epoch() % kConditionTick) == ticks(0)) {
             CheckLevelConditions();
         }
-        if (_session) {
-            _session->sync(turn_at(g.time), g.sync);
-        }
     }
 
+    CullSprites();
+    Vectors::cull();
+    globals()->shown_through = std::max(globals()->shown_through, g.time);
+}
+
+void GamePlay::move_stars(ticks units) {
+    globals()->starfield.prepare_to_move();
+    globals()->starfield.move(units);
+}
+
+void GamePlay::update_display(ticks units) {
     UpdateMiniScreenLines();
 
     if (confirmed()) {
@@ -732,11 +753,8 @@ void GamePlay::step(ticks units, bool input) {
     Label::update_contents(units);
     _should_draw_site = update_site();
 
-    CullSprites();
     Label::show_all();
-    Vectors::cull();
     globals()->starfield.show();
-    globals()->shown_through = std::max(globals()->shown_through, g.time);
 
     if (confirmed()) {
         Messages::draw_message_screen(units);
