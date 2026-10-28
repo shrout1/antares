@@ -867,6 +867,12 @@ void GamePlay::simulate_to(game_ticks at) {
 
 void GamePlay::end_net_game(pn::string_view message) {
     *_game_result = QUIT_GAME;
+    if (rollback_test.last_turn) {
+        // No one is there to dismiss the debriefing.
+        pn::err.format("{0}\n", message);
+        stack()->pop(this);
+        return;
+    }
     _state        = DEBRIEFING;
     stack()->push(new DebriefingScreen(message));
 }
