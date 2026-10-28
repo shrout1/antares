@@ -28,6 +28,7 @@
 #include "config/gamepad.hpp"
 #include "config/keys.hpp"
 #include "config/preferences.hpp"
+#include "data/condition.hpp"
 #include "data/plugin.hpp"
 #include "data/replay.hpp"
 #include "data/resource.hpp"
@@ -82,6 +83,80 @@ Rect play_screen() {
     return Rect(kLeftPanelWidth, 0, size.width - kRightPanelWidth, size.height);
 }
 
+namespace {
+
+struct RollbackTest {
+    sfz::optional<pn::output> log;
+    int                       lookahead = 0;
+};
+ANTARES_GLOBAL RollbackTest rollback_test;
+
+uint32_t world_hash() {
+    uint32_t h    = g.sync;
+    auto     post = [&h](int32_t x) { h = (h * 16777619) ^ uint32_t(x); };
+    for (auto o : SpaceObject::all()) {
+        if (!o->active) {
+            continue;
+        }
+        post(o.number());
+        post(o->id);
+        post(o->location.h);
+        post(o->location.v);
+        post(o->velocity.h.val());
+        post(o->velocity.v.val());
+        post(o->direction);
+        post(o->health());
+        post(o->energy());
+        post(o->owner.number());
+        post(o->targetObject.number());
+        post(o->destObject.number());
+    }
+    for (auto a : Admiral::all()) {
+        post(a->active());
+        post(a->cash().amount.val());
+        post(a->saveGoal().amount.val());
+        post(a->kills());
+        post(a->losses());
+        post(a->shipsLeft());
+        for (int i = 0; i < kAdmiralScoreNum; ++i) {
+            post(a->score()[i]);
+        }
+        post(a->blitzkrieg());
+        post(a->flagship().number());
+        post(a->considerShip().number());
+        post(a->destinationObject().number());
+        post(a->hopeToBuild().has_value());
+        post(a->totalBuildChance().val());
+    }
+    for (const auto& p : g.pilots) {
+        post(p.keys);
+        post(p.gamepad_keys);
+        post(p.steer);
+    }
+    post(g.key_mask);
+    post(g.game_over);
+    return h;
+}
+
+}  // namespace
+
+void set_rollback_test(pn::string_view log, int lookahead) {
+    rollback_test.log.emplace(log, pn::text);
+    rollback_test.lookahead = lookahead;
+}
+
+bool uses_local_conditions(const Level& level) {
+    for (const auto& c : level.base.conditions) {
+        switch (c.when.type()) {
+            case ConditionType::COMPUTER:
+            case ConditionType::MESSAGE:
+            case ConditionType::ZOOM: return true;
+            default: break;
+        }
+    }
+    return false;
+}
+
 Rect viewport() {
     const Size size = sys.video->screen_size();
     return Rect(kLeftPanelWidth, 0, size.width - kRightPanelWidth, size.height - g.bottom_border);
@@ -119,6 +194,9 @@ class GamePlay : public Card {
         HELP,
     };
     State _state;
+
+    void step(ticks units, bool input);
+    void look_ahead();
 
     const bool            _replay;
     GameResult* const     _game_result;
@@ -460,54 +538,15 @@ void GamePlay::fire_timer() {
         if (minor_ticks + unitsToDo > kMajorTick) {
             unitsToDo = kMajorTick - minor_ticks;
         }
-
-        // executed arbitrarily, but at least once every major tick
-        globals()->starfield.prepare_to_move();
-        globals()->starfield.move(unitsToDo);
-        MoveSpaceObjects(unitsToDo);
-
-        g.time += unitsToDo;
-
-        if ((g.time.time_since_epoch() % kMajorTick) == ticks(0)) {
-            // everything in here gets executed once every major tick
-            _player_paused = false;
-
-            NonplayerShipThink();
-            AdmiralThink();
-            execute_action_queue();
-
-            if (!_input_source->get(g.admiral, g.time, _player_ship)) {
-                g.game_over    = true;
-                g.game_over_at = g.time;
-            }
-            _player_ship.update();
-
-            CollideSpaceObjects();
-            if ((g.time.time_since_epoch() % kConditionTick) == ticks(0)) {
-                CheckLevelConditions();
-            }
+        if ((minor_ticks == ticks(0)) && rollback_test.lookahead) {
+            look_ahead();
         }
-
-        UpdateMiniScreenLines();
-
-        Messages::clip();
-        Messages::draw_long_message(unitsToDo);
-
-        _should_draw_sector_lines = update_sector_lines();
-        Vectors::update();
-        Label::update_positions(unitsToDo);
-        Label::update_contents(unitsToDo);
-        _should_draw_site = update_site();
-
-        CullSprites();
-        Label::show_all();
-        Vectors::cull();
-        globals()->starfield.show();
-
-        Messages::draw_message_screen(unitsToDo);
-        UpdateRadar(unitsToDo);
-        globals()->transitions.update_boolean(unitsToDo);
-
+        step(unitsToDo, true);
+        if (rollback_test.log.has_value() &&
+            ((g.time.time_since_epoch() % kMajorTick) == ticks(0))) {
+            rollback_test.log->format(
+                    "{0}\t{1}\n", g.time.time_since_epoch().count(), world_hash());
+        }
         unitsPassed -= unitsToDo;
     }
 
@@ -561,6 +600,73 @@ void GamePlay::fire_timer() {
             // Continue playing.
             break;
     }
+}
+
+void GamePlay::step(ticks units, bool input) {
+    // executed arbitrarily, but at least once every major tick
+    globals()->starfield.prepare_to_move();
+    globals()->starfield.move(units);
+    MoveSpaceObjects(units);
+
+    g.time += units;
+
+    if ((g.time.time_since_epoch() % kMajorTick) == ticks(0)) {
+        // everything in here gets executed once every major tick
+        _player_paused = false;
+
+        NonplayerShipThink();
+        AdmiralThink();
+        execute_action_queue();
+
+        if (input && !_input_source->get(g.admiral, g.time, _player_ship)) {
+            g.game_over    = true;
+            g.game_over_at = g.time;
+        }
+        _player_ship.update();
+
+        CollideSpaceObjects();
+        if ((g.time.time_since_epoch() % kConditionTick) == ticks(0)) {
+            CheckLevelConditions();
+        }
+    }
+
+    UpdateMiniScreenLines();
+
+    if (!Messages::muted) {
+        Messages::clip();
+        Messages::draw_long_message(units);
+    }
+
+    _should_draw_sector_lines = update_sector_lines();
+    Vectors::update();
+    Label::update_positions(units);
+    Label::update_contents(units);
+    _should_draw_site = update_site();
+
+    CullSprites();
+    Label::show_all();
+    Vectors::cull();
+    globals()->starfield.show();
+
+    if (!Messages::muted) {
+        Messages::draw_message_screen(units);
+    }
+    UpdateRadar(units);
+    globals()->transitions.update_boolean(units);
+}
+
+void GamePlay::look_ahead() {
+    static World ahead;
+    copy_world(&ahead, g);
+    Messages::muted = true;
+    for (auto& p : g.pilots) {
+        p.keys ^= kUpKey | kLeftKey | kPulseKey;  // Look ahead with other controls held.
+    }
+    for (int i = 0; (i < rollback_test.lookahead) && !g.game_over; ++i) {
+        step(kMajorTick, false);
+    }
+    Messages::muted = false;
+    copy_world(&g, ahead);
 }
 
 void GamePlay::key_down(const KeyDownEvent& event) {

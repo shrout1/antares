@@ -28,6 +28,15 @@ namespace antares {
 class InputSource;
 union Level;
 
+// For testing rollback. Writes a line to `log` after each major tick, identifying the state of
+// the world. With `lookahead`, the game also simulates that many major ticks ahead before each
+// major tick, with other controls held and no other input, then copies the world back, so that
+// state the copy misses changes the log.
+void set_rollback_test(pn::string_view log, int lookahead);
+
+// True if `level` has conditions on local state, which differs between players (not net-safe).
+bool uses_local_conditions(const Level& level);
+
 enum GameResult {
     NO_GAME      = -1,
     LOSE_GAME    = 0,

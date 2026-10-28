@@ -91,7 +91,32 @@ def replay_test(opts, queue, name, args=[]):
         expected = "test/smoke/%s" % name
     else:
         expected = "test/%s" % name
-    return diff_test(opts, queue, name, cmd + args, expected)
+    with NamedTemporaryDir() as d:
+        log = os.path.join(d, "world.log")
+        return diff_test(
+            opts, queue, name, cmd + args + ["--world-log=%s" % log], expected
+        ) and rollback_test(opts, queue, name, log)
+
+
+def rollback_test(opts, queue, name, expected_log):
+    # Simulating ahead and copying the world back must not change the game.
+    with NamedTemporaryDir() as d:
+        log = os.path.join(d, "world.log")
+        cmd = ["out/cur/replay", "test/%s.NLRP" % name, "--smoke", "--look-ahead=2"]
+        if not run(opts, queue, name, cmd + ["--world-log=%s" % log]):
+            return False
+        with open(expected_log) as f:
+            expected = f.readlines()
+        with open(log) as f:
+            actual = f.readlines()
+    for x, y in zip(expected, actual):
+        if x != y:
+            print("%s: world differs at tick %s after looking ahead" % (name, x.split()[0]))
+            return False
+    if len(expected) != len(actual):
+        print("%s: %d ticks after looking ahead, not %d" % (name, len(actual), len(expected)))
+        return False
+    return True
 
 
 def call(args):
