@@ -30,7 +30,11 @@ namespace input_log {
 // the keys the game was told about and the ship's controls disagree for longer than a moment.
 
 bool enabled();
+#ifdef __GNUC__
 void write(const char* format, ...) __attribute__((format(printf, 1, 2)));
+#else
+void write(const char* format, ...);
+#endif
 
 // What the game was told by key events, and what the keyboard reports, for the pilot keys.
 void told(Key key, bool down);
