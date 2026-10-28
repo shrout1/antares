@@ -18,6 +18,7 @@
 
 #include "game/action.hpp"
 
+#include <algorithm>
 #include <set>
 #include <sfz/sfz.hpp>
 
@@ -71,6 +72,18 @@ struct ActionCursor {
     std::unique_ptr<ActionCursor> continuation;
 
     ActionCursor() = default;
+    ActionCursor(const ActionCursor& other)
+            : begin{other.begin},
+              end{other.end},
+              subject{other.subject},
+              subject_id{other.subject_id},
+              direct{other.direct},
+              direct_id{other.direct_id},
+              offset{other.offset},
+              continuation{other.continuation ? new ActionCursor{*other.continuation} : nullptr} {}
+    ActionCursor(ActionCursor&&) = default;
+    ActionCursor& operator=(const ActionCursor& other) { return *this = ActionCursor{other}; }
+    ActionCursor& operator=(ActionCursor&&) = default;
     ActionCursor(
             const std::vector<Action>& actions, Handle<SpaceObject> subject,
             Handle<SpaceObject> direct, Point offset)
@@ -95,15 +108,33 @@ struct ActionCursor {
 };
 
 struct actionQueueType {
-    ActionCursor     cursor;
-    ticks            scheduledTime;
-    actionQueueType* nextActionQueue;
+    ActionCursor cursor;
+    ticks        scheduledTime;
+    int32_t      nextActionQueue = -1;
 
     bool empty() const { return cursor.begin == cursor.end; }
 };
 
-ActionQueue::ActionQueue()  = default;
+ActionQueue::ActionQueue() = default;
+ActionQueue::ActionQueue(const ActionQueue& other) { *this = other; }
 ActionQueue::~ActionQueue() = default;
+
+ActionQueue& ActionQueue::operator=(const ActionQueue& other) {
+    first = other.first;
+    if (!other.data) {
+        data.reset();
+    } else {
+        if (!data) {
+            data.reset(new actionQueueType[kActionQueueLength]);
+        }
+        std::copy(other.data.get(), other.data.get() + kActionQueueLength, data.get());
+    }
+    return *this;
+}
+
+static actionQueueType* queue_at(int32_t i) { return (i < 0) ? nullptr : &g.action_queue.data[i]; }
+
+static actionQueueType* front() { return queue_at(g.action_queue.first); }
 
 static void queue_action(ActionCursor cursor, ticks delayTime);
 
@@ -846,7 +877,7 @@ void exec(
 void reset_action_queue() {
     g.action_queue.data.reset(new actionQueueType[kActionQueueLength]);
 
-    g.action_queue.first = NULL;
+    g.action_queue.first = -1;
 
     actionQueueType* action = g.action_queue.data.get();
     for (int32_t i = 0; i < kActionQueueLength; i++) {
@@ -870,18 +901,18 @@ static void queue_action(ActionCursor cursor, ticks delayTime) {
     actionQueue->scheduledTime = delayTime;
 
     actionQueueType* previousQueue = NULL;
-    actionQueueType* nextQueue     = g.action_queue.first;
+    actionQueueType* nextQueue     = front();
     while (nextQueue && (nextQueue->scheduledTime < delayTime)) {
         previousQueue = nextQueue;
-        nextQueue     = nextQueue->nextActionQueue;
+        nextQueue     = queue_at(nextQueue->nextActionQueue);
     }
     if (previousQueue) {
         actionQueue->nextActionQueue = previousQueue->nextActionQueue;
 
-        previousQueue->nextActionQueue = actionQueue;
+        previousQueue->nextActionQueue = queueNumber;
     } else {
         actionQueue->nextActionQueue = g.action_queue.first;
-        g.action_queue.first         = actionQueue;
+        g.action_queue.first         = queueNumber;
     }
 }
 
@@ -893,26 +924,22 @@ void execute_action_queue() {
         }
     }
 
-    while (g.action_queue.first && !g.action_queue.first->empty() &&
-           (g.action_queue.first->scheduledTime <= ticks(0))) {
+    while (front() && !front()->empty() && (front()->scheduledTime <= ticks(0))) {
         int32_t subjectid = -1;
-        if (g.action_queue.first->cursor.subject.get() &&
-            g.action_queue.first->cursor.subject->active) {
-            subjectid = g.action_queue.first->cursor.subject->id;
+        if (front()->cursor.subject.get() && front()->cursor.subject->active) {
+            subjectid = front()->cursor.subject->id;
         }
 
         int32_t directid = -1;
-        if (g.action_queue.first->cursor.direct.get() &&
-            g.action_queue.first->cursor.direct->active) {
-            directid = g.action_queue.first->cursor.direct->id;
+        if (front()->cursor.direct.get() && front()->cursor.direct->active) {
+            directid = front()->cursor.direct->id;
         }
-        if ((subjectid == g.action_queue.first->cursor.subject_id) &&
-            (directid == g.action_queue.first->cursor.direct_id)) {
-            execute_actions(std::move(g.action_queue.first->cursor));
+        if ((subjectid == front()->cursor.subject_id) && (directid == front()->cursor.direct_id)) {
+            execute_actions(std::move(front()->cursor));
         }
 
-        g.action_queue.first->cursor.begin = g.action_queue.first->cursor.end = nullptr;
-        g.action_queue.first = g.action_queue.first->nextActionQueue;
+        front()->cursor.begin = front()->cursor.end = nullptr;
+        g.action_queue.first                        = front()->nextActionQueue;
     }
 }
 

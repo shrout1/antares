@@ -37,10 +37,12 @@ void exec(
 
 struct actionQueueType;
 struct ActionQueue {
-    actionQueueType*                   first;
+    int32_t                            first = -1;  // Index into `data`, or -1.
     std::unique_ptr<actionQueueType[]> data;
 
     ActionQueue();
+    ActionQueue(const ActionQueue& other);
+    ActionQueue& operator=(const ActionQueue& other);
     ~ActionQueue();
 };
 
