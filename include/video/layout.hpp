@@ -71,6 +71,7 @@ class Layout {
     float _viewport_scale     = 1;  // pixels per point at the viewport's own size
     float _battlefield_scale  = 1;  // pixels per point on the battlefield
     float _ui_scale           = 1;  // pixels per point in panels and SCREEN
+    float _fill_scale         = 1;  // _ui_scale if the game scale were "fill"
     int   _left_panel_pixels  = 0;
     int   _right_panel_pixels = 0;
 };
