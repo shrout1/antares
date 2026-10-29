@@ -203,11 +203,31 @@ void GLFWVideoDriver::update_size() {
     _window_size = _layout.window_size();
 }
 
+// Keeps a window at `size`, or lets it take any size if `size` is null.
+static void fix_window_size(GLFWwindow* window, const Size* size) {
+#if GLFW_VERSION_MINOR >= 3
+    glfwSetWindowAttrib(window, GLFW_RESIZABLE, size ? GLFW_FALSE : GLFW_TRUE);
+#endif
+#if GLFW_VERSION_MINOR >= 2
+    if (size) {
+        glfwSetWindowSizeLimits(window, size->width, size->height, size->width, size->height);
+    } else {
+        glfwSetWindowSizeLimits(
+                window, GLFW_DONT_CARE, GLFW_DONT_CARE, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    }
+#endif
+}
+
 // In a window, a fixed resolution sets the window's size, so the game runs at exactly that many
-// pixels (fewer if the display can't hold it). "Fill Screen" keeps whatever size the window has.
+// pixels (fewer if the display can't hold it), and the window can't be resized until the
+// resolution changes. "Fill Screen" lets the window take any size.
 void GLFWVideoDriver::fit_window() {
+    if (_fullscreen) {
+        return;
+    }
     const Size resolution = sys.prefs->resolution();
-    if (_fullscreen || resolution.as_rect().empty() || !resolution_supported(resolution)) {
+    if (resolution.as_rect().empty() || !resolution_supported(resolution)) {
+        fix_window_size(_window, nullptr);
         return;
     }
     Size window, framebuffer;
@@ -237,14 +257,16 @@ void GLFWVideoDriver::fit_window() {
             {1.0, double(area.width() - frame_left - frame_right) / size.width,
              double(area.height() - frame_top - frame_bottom) / size.height});
     size = {int(size.width * shrink), int(size.height * shrink)};
-    if (size == window) {
-        return;
+    if (size != window) {
+        // The old limits would hold the window at its old size.
+        fix_window_size(_window, nullptr);
+        Rect window_rect{Point{0, 0}, size};
+        window_rect.center_in(area);
+        glfwSetWindowPos(
+                _window, window_rect.left, std::max(window_rect.top, area.top + frame_top));
+        glfwSetWindowSize(_window, size.width, size.height);
     }
-
-    Rect window_rect{Point{0, 0}, size};
-    window_rect.center_in(area);
-    glfwSetWindowPos(_window, window_rect.left, std::max(window_rect.top, area.top + frame_top));
-    glfwSetWindowSize(_window, size.width, size.height);
+    fix_window_size(_window, &size);
 }
 
 bool GLFWVideoDriver::resolution_supported(Size resolution) const {
