@@ -24,7 +24,9 @@
 #include "config/preferences.hpp"
 #include "data/replay.hpp"
 #include "game/globals.hpp"
+#include "game/sys.hpp"
 #include "game/time.hpp"
+#include "math/random.hpp"
 
 using sfz::range;
 using std::make_pair;
@@ -136,5 +138,31 @@ void ReplayInputSource::key_down(const KeyDownEvent& event) { _exit = true; }
 void ReplayInputSource::gamepad_button_down(const GamepadButtonDownEvent& event) { _exit = true; }
 
 void ReplayInputSource::mouse_down(const MouseDownEvent& event) { _exit = true; }
+
+bool ScriptedInputSource::get(Handle<Admiral> admiral, game_ticks at, EventReceiver& receiver) {
+    static const KeyNum kHeld[]    = {kUpKeyNum,  kLeftKeyNum, kRightKeyNum,
+                                      kOneKeyNum, kTwoKeyNum,  kEnterKeyNum};
+    static const KeyNum kPressed[] = {kSelectFoeKeyNum, kSelectFriendKeyNum, kOrderKeyNum,
+                                      kCompDownKeyNum,  kCompAcceptKeyNum,   kTransferKeyNum};
+
+    uint32_t turn = at.time_since_epoch() / kMajorTick;
+    Random   r{static_cast<int32_t>(_seed ^ (turn * 2654435761u))};
+    if (r.next(4) == 0) {
+        int i    = r.next(sizeof(kHeld) / sizeof(kHeld[0]));
+        Key key  = sys.prefs->key(kHeld[i]);
+        _held[i] = !_held[i];
+        if (_held[i]) {
+            KeyDownEvent(wall_time(), key).send(&receiver);
+        } else {
+            KeyUpEvent(wall_time(), key).send(&receiver);
+        }
+    }
+    if (r.next(40) == 0) {
+        Key key = sys.prefs->key(kPressed[r.next(sizeof(kPressed) / sizeof(kPressed[0]))]);
+        KeyDownEvent(wall_time(), key).send(&receiver);
+        KeyUpEvent(wall_time(), key).send(&receiver);
+    }
+    return true;
+}
 
 }  // namespace antares

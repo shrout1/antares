@@ -40,6 +40,7 @@ message Hello {
     optional string  plugin_identifier  = 3;
     optional string  plugin_version     = 4;
     optional string  name               = 5;
+    optional uint32  fingerprint        = 6;  // identifies how the sender's build plays
 }
 
 message Welcome {
@@ -50,10 +51,11 @@ message Reject {
     optional Reason  reason  = 1;
 
     enum Reason {
-        PROTOCOL  = 0;
-        VERSION   = 1;
-        PLUGIN    = 2;
-        FULL      = 3;
+        PROTOCOL    = 0;
+        reserved 1;
+        PLUGIN      = 2;
+        FULL        = 3;
+        SIMULATION  = 4;
     }
 }
 

@@ -27,6 +27,7 @@
 #include "data/plugin.hpp"
 #include "game/globals.hpp"
 #include "game/level.hpp"
+#include "game/main.hpp"
 #include "game/time.hpp"
 
 namespace antares {
@@ -43,6 +44,17 @@ pn::string player_name() {
     return "Player";
 }
 
+// sim_fingerprint() plays several levels, so it runs once per plugin.
+uint32_t fingerprint() {
+    static pn::string plugin;
+    static uint32_t   value = 0;
+    if (plugin.empty() || (plugin != plug.info.identifier.hash)) {
+        value  = sim_fingerprint();
+        plugin = plug.info.identifier.hash.copy();
+    }
+    return value;
+}
+
 net::Hello hello() {
     net::Hello h;
     h.protocol          = net::kProtocolVersion;
@@ -50,6 +62,7 @@ net::Hello hello() {
     h.plugin_identifier = plug.info.identifier.hash.copy();
     h.plugin_version    = plug.info.version.copy();
     h.name              = player_name();
+    h.fingerprint       = fingerprint();
     return h;
 }
 

@@ -35,8 +35,8 @@ usecs elapsed_since(std::chrono::steady_clock::time_point t) {
 pn::string_view reject_reason(Reject::Reason reason) {
     switch (reason) {
         case Reject::PROTOCOL: return "The host uses a different version of the net protocol.";
-        case Reject::VERSION: return "The host runs a different version of Antares.";
         case Reject::PLUGIN: return "The host is playing a different plugin or plugin version.";
+        case Reject::SIMULATION: return "The host’s copy of Antares plays differently from yours.";
         case Reject::FULL: return "The game is full.";
     }
     return "The host refused to let you join.";
@@ -333,12 +333,12 @@ void Session::handle_hello(int peer, const Hello& hello) {
     p.type = Packet::REJECT;
     if (hello.protocol != kProtocolVersion) {
         p.reject.reason = Reject::PROTOCOL;
-    } else if (hello.antares_version != _hello.antares_version) {
-        p.reject.reason = Reject::VERSION;
     } else if (
             (hello.plugin_identifier != _hello.plugin_identifier) ||
             (hello.plugin_version != _hello.plugin_version)) {
         p.reject.reason = Reject::PLUGIN;
+    } else if (hello.fingerprint != _hello.fingerprint) {
+        p.reject.reason = Reject::SIMULATION;
     } else if (_setup.players.size() != 1) {
         p.reject.reason = Reject::FULL;
     } else {

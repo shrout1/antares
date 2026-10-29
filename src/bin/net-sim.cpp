@@ -51,45 +51,6 @@ namespace args = sfz::args;
 namespace antares {
 namespace {
 
-// Presses keys chosen from `seed` and the turn alone, so that a player's input is the same however
-// their frames fall.
-class ScriptedInputSource : public InputSource {
-  public:
-    explicit ScriptedInputSource(uint32_t seed) : _seed(seed) {}
-
-    virtual void start() {}
-
-    virtual bool get(Handle<Admiral> admiral, game_ticks at, EventReceiver& receiver) {
-        static const KeyNum kHeld[]    = {kUpKeyNum,  kLeftKeyNum, kRightKeyNum,
-                                          kOneKeyNum, kTwoKeyNum,  kEnterKeyNum};
-        static const KeyNum kPressed[] = {kSelectFoeKeyNum, kSelectFriendKeyNum, kOrderKeyNum,
-                                          kCompDownKeyNum,  kCompAcceptKeyNum,   kTransferKeyNum};
-
-        uint32_t turn = at.time_since_epoch() / kMajorTick;
-        Random   r{static_cast<int32_t>(_seed ^ (turn * 2654435761u))};
-        if (r.next(4) == 0) {
-            int i    = r.next(sizeof(kHeld) / sizeof(kHeld[0]));
-            Key key  = sys.prefs->key(kHeld[i]);
-            _held[i] = !_held[i];
-            if (_held[i]) {
-                KeyDownEvent(wall_time(), key).send(&receiver);
-            } else {
-                KeyUpEvent(wall_time(), key).send(&receiver);
-            }
-        }
-        if (r.next(40) == 0) {
-            Key key = sys.prefs->key(kPressed[r.next(sizeof(kPressed) / sizeof(kPressed[0]))]);
-            KeyDownEvent(wall_time(), key).send(&receiver);
-            KeyUpEvent(wall_time(), key).send(&receiver);
-        }
-        return true;
-    }
-
-  private:
-    const uint32_t _seed;
-    bool           _held[6] = {};
-};
-
 net::Hello hello(pn::string_view name) {
     net::Hello h;
     h.protocol          = net::kProtocolVersion;
@@ -97,6 +58,7 @@ net::Hello hello(pn::string_view name) {
     h.plugin_identifier = plug.info.identifier.hash.copy();
     h.plugin_version    = plug.info.version.copy();
     h.name              = name.copy();
+    h.fingerprint       = sim_fingerprint();
     return h;
 }
 
@@ -111,6 +73,29 @@ void wait_for(pn::string_view what, F done) {
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }
+
+void init() {
+    init_globals();
+    sys.audio->set_global_volume(8);
+    sys_init();
+    Label::init();
+    Messages::init();
+    InstrumentInit();
+    PluginInit(sfz::nullopt);
+    SpriteHandlingInit();
+    SpaceObjectHandlingInit();  // MUST be after PluginInit()
+    Admiral::init();
+    Vectors::init();
+}
+
+class FingerprintMaster : public Card {
+  public:
+    virtual void become_front() {
+        init();
+        pn::out.format("{0}\n", sim_fingerprint());
+        stack()->pop(this);
+    }
+};
 
 class NetSimMaster : public Card {
   public:
@@ -153,7 +138,6 @@ class NetSimMaster : public Card {
     }
 
   private:
-    void init();
     void start();
     void set_delay() {
         _session->set_delay(
@@ -178,20 +162,6 @@ class NetSimMaster : public Card {
     GameResult               _game_result = NO_GAME;
     unique_ptr<net::Session> _session;
 };
-
-void NetSimMaster::init() {
-    init_globals();
-    sys.audio->set_global_volume(8);
-    sys_init();
-    Label::init();
-    Messages::init();
-    InstrumentInit();
-    PluginInit(sfz::nullopt);
-    SpriteHandlingInit();
-    SpaceObjectHandlingInit();  // MUST be after PluginInit()
-    Admiral::init();
-    Vectors::init();
-}
 
 void NetSimMaster::start() {
     if (_is_host) {
@@ -248,6 +218,7 @@ void NetSimMaster::start() {
 void usage(pn::output_view out, pn::string_view progname, int retcode) {
     out.format(
             "usage: {0} --host=PORT|--join=PORT [OPTIONS]"
+            "\n       {0} --fingerprint"
             "\n"
             "\n  Plays one side of a two-player net game over loopback, with scripted input"
             "\n"
@@ -260,6 +231,7 @@ void usage(pn::output_view out, pn::string_view progname, int retcode) {
             "\n        --delay=MS       hold each packet received this long (default: 0)"
             "\n        --jitter=MS      vary the delay by up to this much (default: 0)"
             "\n        --world-log=FILE write a line per confirmed turn identifying the world"
+            "\n        --fingerprint    print the simulation fingerprint and exit"
             "\n        --help           display this help screen"
             "\n",
             progname);
@@ -270,12 +242,13 @@ void main(int argc, char* const* argv) {
     args::callbacks callbacks;
 
     sfz::optional<bool>       is_host;
-    int                       port   = 0;
-    pn::string                level  = "net1";
-    int                       seed   = 1;
-    int                       turns  = 600;
-    int                       delay  = 0;
-    int                       jitter = 0;
+    int                       port        = 0;
+    pn::string                level       = "net1";
+    int                       seed        = 1;
+    int                       turns       = 600;
+    int                       delay       = 0;
+    int                       jitter      = 0;
+    bool                      fingerprint = false;
     sfz::optional<pn::string> world_log;
     callbacks.long_option = [&](pn::string_view                     opt,
                                 const args::callbacks::get_value_f& get_value) {
@@ -301,6 +274,9 @@ void main(int argc, char* const* argv) {
         } else if (opt == "world-log") {
             world_log.emplace(get_value().copy());
             return true;
+        } else if (opt == "fingerprint") {
+            fingerprint = true;
+            return true;
         } else if (opt == "help") {
             usage(pn::out, sfz::path::basename(argv[0]), 0);
             return true;
@@ -310,6 +286,16 @@ void main(int argc, char* const* argv) {
     };
 
     args::parse(argc - 1, argv + 1, callbacks);
+    if (fingerprint) {
+        Preferences     preferences;
+        NullPrefsDriver prefs(preferences.copy());
+        EventScheduler  scheduler;
+        NullSoundDriver sound;
+        NullLedger      ledger;
+        TextVideoDriver video({640, 480}, sfz::optional<pn::string>());
+        video.loop(new FingerprintMaster, scheduler);
+        return;
+    }
     if (!is_host.has_value() || (port <= 0) || (port > 65535)) {
         throw std::runtime_error("missing --host=PORT or --join=PORT");
     }

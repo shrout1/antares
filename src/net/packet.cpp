@@ -202,6 +202,7 @@ pn::data write(const Hello& h) {
     put_string(&out, 3, h.plugin_identifier);
     put_string(&out, 4, h.plugin_version);
     put_string(&out, 5, h.name);
+    put_uint(&out, 6, h.fingerprint);
     return out;
 }
 
@@ -213,6 +214,7 @@ bool read(pn::data_view d, Hello* h) {
             case 3: return get(r, wire, &h->plugin_identifier);
             case 4: return get(r, wire, &h->plugin_version);
             case 5: return get(r, wire, &h->name);
+            case 6: return get(r, wire, &h->fingerprint);
             default: return r->skip(wire);
         }
     });
@@ -431,6 +433,7 @@ Hello Hello::copy() const {
     h.plugin_identifier = plugin_identifier.copy();
     h.plugin_version    = plugin_version.copy();
     h.name              = name.copy();
+    h.fingerprint       = fingerprint;
     return h;
 }
 
