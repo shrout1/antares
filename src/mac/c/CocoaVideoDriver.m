@@ -172,6 +172,29 @@ void antares_window_display_size(const AntaresWindow* window, int32_t* width, in
     *height          = pixels.size.height;
 }
 
+void antares_window_work_area_size(const AntaresWindow* window, int32_t* width, int32_t* height) {
+    NSScreen* screen = window_screen(window);
+    NSSize    border = [window->window frameRectForContentRect:NSZeroRect].size;  // title bar
+    NSRect    area   = [screen visibleFrame];
+    area.size.width -= border.width;
+    area.size.height -= border.height;
+    NSRect pixels = [screen convertRectToBacking:area];
+    *width        = pixels.size.width;
+    *height       = pixels.size.height;
+}
+
+void antares_largest_display_size(int32_t* width, int32_t* height) {
+    *width  = 0;
+    *height = 0;
+    for (NSScreen* screen in [NSScreen screens]) {
+        NSRect pixels = [screen convertRectToBacking:[screen frame]];
+        if ((pixels.size.width * pixels.size.height) > ((double)*width * *height)) {
+            *width  = pixels.size.width;
+            *height = pixels.size.height;
+        }
+    }
+}
+
 void antares_window_set_fullscreen(AntaresWindow* window, bool fullscreen) {
     bool is_fullscreen = ([window->window styleMask] & NSWindowStyleMaskFullScreen) != 0;
     if (is_fullscreen != fullscreen) {

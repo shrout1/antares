@@ -63,21 +63,25 @@ static constexpr char kVolRect[]       = "volume";
 static constexpr char kFullscreenButton[] = "fullscreen";
 static constexpr char kWindowedButton[]   = "windowed";
 
-// An empty size fills the display.
-static const struct {
-    const char* id;
-    Size        size;
-} kResolutions[] = {
-        {"resolution/fill", {0, 0}},
-        {"resolution/640x480", {640, 480}},
-        {"resolution/800x600", {800, 600}},
-        {"resolution/1024x768", {1024, 768}},
-        {"resolution/1280x960", {1280, 960}},
-        {"resolution/1280x720", {1280, 720}},
-        {"resolution/1366x768", {1366, 768}},
-        {"resolution/1600x900", {1600, 900}},
-        {"resolution/1920x1080", {1920, 1080}},
-};
+static constexpr char kResolutionsRect[] = "resolutions";
+
+static const int kResolutionRowPadding = 2;
+
+static const Font& resolution_font() { return sys.fonts.small_button; }
+static int         resolution_row_height() {
+    return resolution_font().height + kResolutionRowPadding;
+}
+
+// An empty size fills the display, and is always available.
+static bool resolution_available(Size size) {
+    return size.as_rect().empty() || sys.video->resolution_supported(size);
+}
+
+// A saved resolution the display can't show runs as "Fill Screen", so it's marked instead.
+static Size current_resolution() {
+    const Size current = sys.prefs->resolution();
+    return resolution_available(current) ? current : Size{};
+}
 
 static const struct {
     const char* id;
@@ -268,18 +272,17 @@ VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
                     [] { return !sys.prefs->fullscreen(); },
                     [](bool) { sys.prefs->set_fullscreen(false); },
             });
-    for (const auto& r : kResolutions) {
-        const Size size = r.size;
-        // A saved resolution the display can't show runs as "Fill Screen", so it's checked instead.
-        checkbox(r.id)->bind({
-                [size] {
-                    const Size current = sys.prefs->resolution();
-                    return sys.video->resolution_supported(current) ? (current == size)
-                                                                    : size.as_rect().empty();
-                },
-                [size](bool) { sys.prefs->set_resolution(size); },
-                [size] { return sys.video->resolution_supported(size); },
-        });
+    // Each whole multiple of 640x480 up to the largest display, so that every pixel of the game
+    // is a whole number of the display's pixels.
+    const Size largest = sys.video->largest_display();
+    const int  most    = std::max(1, std::min(largest.width / 640, largest.height / 480));
+    _resolutions.push_back(Size{});
+    for (int n = 1; n <= most; ++n) {
+        _resolutions.push_back(Size{640 * n, 480 * n});
+    }
+    const auto current = std::find(_resolutions.begin(), _resolutions.end(), current_resolution());
+    if (current != _resolutions.end()) {
+        scroll_resolutions((current - _resolutions.begin()) - (visible_resolutions() - 1));
     }
     for (const auto& s : kGameScales) {
         const GameScale scale = s.scale;
@@ -326,7 +329,133 @@ VideoControlScreen::VideoControlScreen(OptionsScreen::State* state)
 
 VideoControlScreen::~VideoControlScreen() {}
 
-void VideoControlScreen::overlay() const {}
+void VideoControlScreen::overlay() const { draw_resolutions(); }
+
+Rect VideoControlScreen::resolution_bounds() const {
+    Rect bounds = widget(kResolutionsRect)->inner_bounds();
+    bounds.offset(offset().h, offset().v);
+    return bounds;
+}
+
+int VideoControlScreen::visible_resolutions() const {
+    return std::max(
+            1, (widget(kResolutionsRect)->inner_bounds().height() - kResolutionRowPadding) /
+                       resolution_row_height());
+}
+
+void VideoControlScreen::scroll_resolutions(int rows) {
+    const int max_top = std::max<int>(0, _resolutions.size() - visible_resolutions());
+    _top              = std::max(0, std::min(_top + rows, max_top));
+}
+
+void VideoControlScreen::choose_resolution(int index) {
+    if ((index < 0) || (index >= _resolutions.size()) ||
+        !resolution_available(_resolutions[index])) {
+        return;
+    }
+    sys.prefs->set_resolution(_resolutions[index]);
+    sys.sound.select();
+    if (index < _top) {
+        _top = index;
+    } else if (index >= _top + visible_resolutions()) {
+        _top = index - visible_resolutions() + 1;
+    }
+}
+
+void VideoControlScreen::mouse_down(const MouseDownEvent& event) {
+    const Rect bounds = resolution_bounds();
+    if (bounds.contains(event.where())) {
+        const int row = (event.where().v - bounds.top - kResolutionRowPadding) /
+                        resolution_row_height();
+        if ((0 <= row) && (row < visible_resolutions())) {
+            choose_resolution(_top + row);
+        }
+        return;
+    }
+    InterfaceScreen::mouse_down(event);
+}
+
+void VideoControlScreen::mouse_scroll(const MouseScrollEvent& event) {
+    _scroll -= event.dy();
+    const int rows = static_cast<int>(_scroll);  // toward zero, keeping the remainder's sign.
+    _scroll -= rows;
+    scroll_resolutions(rows);
+}
+
+void VideoControlScreen::key_down(const KeyDownEvent& event) {
+    // The arrows choose the next resolution up or down that the display can show.
+    int step = 0;
+    switch (event.key().value()) {
+        case Key::UP_ARROW: step = -1; break;
+        case Key::DOWN_ARROW: step = 1; break;
+        default: return InterfaceScreen::key_down(event);
+    }
+    const auto current = std::find(_resolutions.begin(), _resolutions.end(), current_resolution());
+    for (int i = (current - _resolutions.begin()) + step; (0 <= i) && (i < _resolutions.size());
+         i += step) {
+        if (resolution_available(_resolutions[i])) {
+            choose_resolution(i);
+            return;
+        }
+    }
+}
+
+void VideoControlScreen::draw_resolutions() const {
+    const Font& font    = resolution_font();
+    const Rect  bounds  = resolution_bounds();
+    const int   rows    = std::min<int>(visible_resolutions(), _resolutions.size() - _top);
+    const Size  current = current_resolution();
+    const int   box     = font.ascent;
+
+    {
+        Rects rects;
+        for (int row = 0; row < rows; ++row) {
+            const Size size = _resolutions[_top + row];
+            const int  top  = bounds.top + kResolutionRowPadding + (row * resolution_row_height());
+            if (size == current) {
+                rects.fill(
+                        {bounds.left + 2, top, bounds.right - 6, top + resolution_row_height()},
+                        GetRGBTranslateColorShade(Hue::PALE_PURPLE, DARK));
+            }
+            // A checkbox: filled for the chosen resolution.
+            Rect check{bounds.left + 6, top + 1, bounds.left + 6 + box, top + 1 + box};
+            rects.fill(check, GetRGBTranslateColorShade(Hue::PALE_PURPLE, MEDIUM));
+            check.inset(1, 1);
+            rects.fill(
+                    check, GetRGBTranslateColorShade(
+                                   Hue::PALE_PURPLE, (size == current) ? LIGHTEST : VERY_DARK));
+        }
+        if (_resolutions.size() > visible_resolutions()) {
+            const int  h     = bounds.height() - 4;
+            const int  shown = visible_resolutions();
+            const Rect track = {
+                    bounds.right - 4, bounds.top + 2, bounds.right - 2, bounds.top + 2 + h};
+            rects.fill(track, GetRGBTranslateColorShade(Hue::PALE_PURPLE, VERY_DARK));
+            rects.fill(
+                    {track.left, track.top + (h * _top / int(_resolutions.size())), track.right,
+                     track.top + (h * std::min<int>(_top + shown, _resolutions.size()) /
+                                  int(_resolutions.size()))},
+                    GetRGBTranslateColorShade(Hue::PALE_PURPLE, LIGHT));
+        }
+    }
+
+    for (int row = 0; row < rows; ++row) {
+        const Size size = _resolutions[_top + row];
+        const int  y    = bounds.top + kResolutionRowPadding + (row * resolution_row_height()) +
+                      1 + font.ascent;
+        const pn::string label =
+                size.as_rect().empty()
+                        ? pn::string{"Fill Screen"}
+                        : pn::format(
+                                  "{0} x {1}  ({2}x)", size.width, size.height, size.width / 640);
+        const RgbColor color =
+                !resolution_available(size)
+                        ? GetRGBTranslateColorShade(Hue::PALE_PURPLE, DARK)
+                        : GetRGBTranslateColorShade(
+                                  Hue::PALE_PURPLE, (size == current) ? LIGHTEST : LIGHT);
+        font.draw({bounds.left + 12 + box, y}, label, color);
+    }
+}
 
 // The ratios follow the window and the chosen resolution, so check them a few times a second.
 static const usecs kLabelUpdateTime = ticks(15);

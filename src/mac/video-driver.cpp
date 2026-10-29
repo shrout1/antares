@@ -99,13 +99,28 @@ Point CocoaVideoDriver::get_mouse() {
     return _layout.from_window(x, y, _game_layout);
 }
 
+// Whole multiples of 640x480 that fit the display, or in a window, that fit with the title bar
+// beside the menu bar and dock, so that the window isn't shrunk.
 bool CocoaVideoDriver::resolution_supported(Size resolution) const {
+    if (!Layout::whole_resolution(resolution)) {
+        return false;
+    }
     if (!_window) {
         return true;
     }
-    Size display;
-    antares_window_display_size(_window, &display.width, &display.height);
-    return (resolution.width <= display.width) && (resolution.height <= display.height);
+    Size area;
+    if (sys.prefs->fullscreen()) {
+        antares_window_display_size(_window, &area.width, &area.height);
+    } else {
+        antares_window_work_area_size(_window, &area.width, &area.height);
+    }
+    return (resolution.width <= area.width) && (resolution.height <= area.height);
+}
+
+Size CocoaVideoDriver::largest_display() const {
+    Size largest;
+    antares_largest_display_size(&largest.width, &largest.height);
+    return largest;
 }
 
 // Lays the game out for the window's size and the video options; true if anything changed.

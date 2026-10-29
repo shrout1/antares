@@ -64,15 +64,28 @@ class VideoControlScreen : public InterfaceScreen {
 
     virtual void overlay() const;
 
+    virtual void mouse_down(const MouseDownEvent& event);
+    virtual void mouse_scroll(const MouseScrollEvent& event);
+    virtual void key_down(const KeyDownEvent& event);
+
     virtual bool next_timer(wall_time& time);
     virtual void fire_timer();
 
   private:
     void update_game_scale_labels();
 
+    Rect resolution_bounds() const;
+    int  visible_resolutions() const;
+    void scroll_resolutions(int rows);
+    void choose_resolution(int index);
+    void draw_resolutions() const;
+
     OptionsScreen::State* const _state;
     std::vector<pn::string>     _game_scale_labels;  // as in the interface, without the ratio
     wall_time                   _next_label_update;
+    std::vector<Size>           _resolutions;  // "Fill Screen" (empty), then multiples of 640x480.
+    int                         _top    = 0;   // first resolution shown.
+    double                      _scroll = 0;   // part of a row scrolled, but not yet shown.
 };
 
 class KeyControlScreen : public InterfaceScreen {

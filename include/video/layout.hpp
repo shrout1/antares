@@ -28,8 +28,8 @@ namespace antares {
 // Where each region of the screen goes in a window, for drivers that scale the game to fit it.
 // The battlefield is drawn at the game scale; the panels and all other screens are scaled up to
 // fit the display, keeping their 640x480 proportions, by a whole number unless the game scale is
-// "fill". With a fixed resolution, the game is laid
-// out as on a display of that size, then stretched to fill the framebuffer.
+// "fill". A fixed resolution is drawn at exactly that many pixels, centered in the framebuffer
+// with black bars around it (scaled down only if the framebuffer can't hold it).
 class Layout {
   public:
     using Region = VideoDriver::Region;
@@ -38,9 +38,14 @@ class Layout {
     // `resolution` fills the framebuffer.
     void update(Size window, Size framebuffer, Size resolution, GameScale scale);
 
+    // The resolutions a fixed-resolution option can have: whole multiples of 640x480.
+    static bool whole_resolution(Size resolution);
+
     Size  window_size() const { return _window_size; }
     Size  framebuffer_size() const { return _framebuffer_size; }
     Size  viewport_size() const { return _viewport_size; }
+    // Where the viewport is in the framebuffer, in pixels from the bottom left, as for glViewport.
+    Rect  viewport_rect() const { return _viewport_rect; }
     Size  screen_size() const { return _screen_size; }
     int   pixel_ratio() const { return _pixel_ratio; }
     float overlay_scale() const { return _ui_scale / _battlefield_scale; }
@@ -60,6 +65,7 @@ class Layout {
     Size  _window_size;
     Size  _framebuffer_size;
     Size  _viewport_size;
+    Rect  _viewport_rect;
     Size  _screen_size;
     int   _pixel_ratio        = 1;  // pixels per window coordinate
     float _viewport_scale     = 1;  // pixels per point at the viewport's own size

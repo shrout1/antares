@@ -46,6 +46,11 @@ int32_t antares_window_viewport_width(const AntaresWindow* window);
 int32_t antares_window_viewport_height(const AntaresWindow* window);
 // The size of the window's display, in pixels.
 void antares_window_display_size(const AntaresWindow* window, int32_t* width, int32_t* height);
+// The largest view the window's display can show in a window, beside the menu bar and dock, in
+// pixels.
+void antares_window_work_area_size(const AntaresWindow* window, int32_t* width, int32_t* height);
+// The size of the largest display, in pixels.
+void antares_largest_display_size(int32_t* width, int32_t* height);
 void antares_window_set_fullscreen(AntaresWindow* window, bool fullscreen);
 // Sizes a window so its view is `width` by `height` pixels, shrunk to fit the display if needed,
 // centers it, and keeps the user from resizing it. Does nothing in fullscreen.

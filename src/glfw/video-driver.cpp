@@ -230,17 +230,43 @@ void GLFWVideoDriver::fit_window() {
         fix_window_size(_window, nullptr);
         return;
     }
+    Size window;
+    glfwGetWindowSize(_window, &window.width, &window.height);
+    Size       size = window_size_for(resolution);
+    Rect       frame;
+    const Rect area   = work_area(&frame);
+    const double shrink = std::min(
+            {1.0, double(area.width() - frame.left - frame.right) / size.width,
+             double(area.height() - frame.top - frame.bottom) / size.height});
+    size = {int(size.width * shrink), int(size.height * shrink)};
+    if (size != window) {
+        // The old limits would hold the window at its old size.
+        fix_window_size(_window, nullptr);
+        Rect window_rect{Point{0, 0}, size};
+        window_rect.center_in(area);
+        glfwSetWindowPos(
+                _window, window_rect.left, std::max(window_rect.top, area.top + frame.top));
+        glfwSetWindowSize(_window, size.width, size.height);
+    }
+    fix_window_size(_window, &size);
+}
+
+// The window size that makes the framebuffer `resolution` pixels. Window sizes are in screen
+// coordinates, which are not always pixels (e.g. on Wayland).
+Size GLFWVideoDriver::window_size_for(Size resolution) const {
     Size window, framebuffer;
     glfwGetWindowSize(_window, &window.width, &window.height);
     glfwGetFramebufferSize(_window, &framebuffer.width, &framebuffer.height);
     if ((framebuffer.width <= 0) || (framebuffer.height <= 0)) {
-        return;
+        return resolution;
     }
-    // Window sizes are in screen coordinates, which are not always pixels (e.g. on Wayland).
-    Size size = {
-            int(std::lround(double(resolution.width) * window.width / framebuffer.width)),
+    return {int(std::lround(double(resolution.width) * window.width / framebuffer.width)),
             int(std::lround(double(resolution.height) * window.height / framebuffer.height))};
+}
 
+// The part of the primary display a window can take, beside any taskbar or dock, and in `frame`,
+// the width of the window's frame on each side.
+Rect GLFWVideoDriver::work_area(Rect* frame) const {
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     Rect         area;
 #if GLFW_VERSION_MINOR >= 3
@@ -251,27 +277,41 @@ void GLFWVideoDriver::fit_window() {
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
     area                    = Rect{0, 0, mode->width, mode->height};
 #endif
-    int frame_left, frame_top, frame_right, frame_bottom;
-    glfwGetWindowFrameSize(_window, &frame_left, &frame_top, &frame_right, &frame_bottom);
-    const double shrink = std::min(
-            {1.0, double(area.width() - frame_left - frame_right) / size.width,
-             double(area.height() - frame_top - frame_bottom) / size.height});
-    size = {int(size.width * shrink), int(size.height * shrink)};
-    if (size != window) {
-        // The old limits would hold the window at its old size.
-        fix_window_size(_window, nullptr);
-        Rect window_rect{Point{0, 0}, size};
-        window_rect.center_in(area);
-        glfwSetWindowPos(
-                _window, window_rect.left, std::max(window_rect.top, area.top + frame_top));
-        glfwSetWindowSize(_window, size.width, size.height);
-    }
-    fix_window_size(_window, &size);
+    glfwGetWindowFrameSize(_window, &frame->left, &frame->top, &frame->right, &frame->bottom);
+    return area;
 }
 
+// Whole multiples of 640x480 that fit the display, or in a window, that fit with the window's
+// frame beside any taskbar or dock, so that the window isn't shrunk.
 bool GLFWVideoDriver::resolution_supported(Size resolution) const {
+    if (!Layout::whole_resolution(resolution)) {
+        return false;
+    }
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    return !mode || ((resolution.width <= mode->width) && (resolution.height <= mode->height));
+    if (!mode) {
+        return true;
+    }
+    if (sys.prefs->fullscreen() || !_window) {
+        return (resolution.width <= mode->width) && (resolution.height <= mode->height);
+    }
+    Rect       frame;
+    const Rect area = work_area(&frame);
+    const Size size = window_size_for(resolution);
+    return (size.width + frame.left + frame.right <= area.width()) &&
+           (size.height + frame.top + frame.bottom <= area.height());
+}
+
+Size GLFWVideoDriver::largest_display() const {
+    Size          largest;
+    int           count    = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&count);
+    for (int i = 0; i < count; ++i) {
+        const GLFWvidmode* mode = glfwGetVideoMode(monitors[i]);
+        if (mode && ((mode->width * mode->height) > (largest.width * largest.height))) {
+            largest = {mode->width, mode->height};
+        }
+    }
+    return largest;
 }
 
 InputMode GLFWVideoDriver::input_mode() const { return KEYBOARD_MOUSE; }
