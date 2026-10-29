@@ -27,7 +27,8 @@ namespace antares {
 
 // Where each region of the screen goes in a window, for drivers that scale the game to fit it.
 // The battlefield is drawn at the game scale; the panels and all other screens are scaled up to
-// fit the display, keeping their 640x480 proportions. With a fixed resolution, the game is laid
+// fit the display, keeping their 640x480 proportions, by a whole number unless the game scale is
+// "fill". With a fixed resolution, the game is laid
 // out as on a display of that size, then stretched to fill the framebuffer.
 class Layout {
   public:
