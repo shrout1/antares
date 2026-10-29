@@ -27,13 +27,14 @@ namespace {
 
 using SessionTest = testing::Test;
 
-Hello hello(pn::string_view name, pn::string_view version = "1.0") {
+Hello hello(pn::string_view name, pn::string_view version = "1.0", uint32_t fingerprint = 1) {
     Hello h;
     h.protocol          = kProtocolVersion;
     h.antares_version   = version.copy();
     h.plugin_identifier = "factory";
     h.plugin_version    = "1.1.1";
     h.name              = name.copy();
+    h.fingerprint       = fingerprint;
     return h;
 }
 
@@ -129,15 +130,25 @@ TEST_F(SessionTest, Game) {
     EXPECT_EQ("The other player quit.", host->error());
 }
 
-TEST_F(SessionTest, RejectsOtherVersions) {
+TEST_F(SessionTest, RejectsOtherSimulations) {
+    std::unique_ptr<Session> host = Session::host("127.0.0.1", 0, hello("Host"), setup());
+    ASSERT_TRUE(host);
+    std::unique_ptr<Session> guest =
+            Session::join("127.0.0.1", host->port(), hello("Guest", "1.0", 2));
+    ASSERT_TRUE(guest);
+    ASSERT_TRUE(eventually([&] { return guest->state() == Session::CLOSED; }));
+    EXPECT_EQ("The host’s copy of Antares plays differently from yours.", guest->error());
+    EXPECT_FALSE(host->has_peer());
+}
+
+TEST_F(SessionTest, AcceptsOtherVersions) {
     std::unique_ptr<Session> host = Session::host("127.0.0.1", 0, hello("Host"), setup());
     ASSERT_TRUE(host);
     std::unique_ptr<Session> guest =
             Session::join("127.0.0.1", host->port(), hello("Guest", "2.0"));
     ASSERT_TRUE(guest);
-    ASSERT_TRUE(eventually([&] { return guest->state() == Session::CLOSED; }));
-    EXPECT_EQ("The host runs a different version of Antares.", guest->error());
-    EXPECT_FALSE(host->has_peer());
+    ASSERT_TRUE(eventually([&] { return host->has_peer(); }));
+    EXPECT_NE(Session::CLOSED, guest->state());
 }
 
 }  // namespace

@@ -197,6 +197,9 @@ class GamePlay : public Card {
     virtual void gamepad_button_up(const GamepadButtonUpEvent& event);
     virtual void gamepad_stick(const GamepadStickEvent& event);
 
+    // Runs the world alone for `turns`, with input but no effects.
+    void run(uint32_t turns);
+
   private:
     void play_turn();
     void play_net(ticks units);
@@ -248,6 +251,43 @@ class GamePlay : public Card {
     double                   _lead            = 0;  // In net games, turns head predicts, smoothed.
     ticks                    _since_slowed    = ticks(0);
 };
+
+uint32_t sim_fingerprint() {
+    const uint32_t kTurns = 200;
+    const int32_t  kSeed  = 1;
+
+    uint32_t h = 0;
+    for (const auto& kv : plug.levels) {
+        const Level& level = kv.second;
+        if ((level.type() != Level::Type::NET) ||
+            (level.net.players.size() != net::kSessionPlayers)) {
+            continue;
+        }
+        std::vector<NetPlayer> players;
+        for (int i = 0; i < level.net.players.size(); ++i) {
+            NetPlayer player;
+            player.race = level.net.players[i].races[0].copy();
+            player.hue  = (i == 0) ? Hue::RED : Hue::BLUE;
+            players.push_back(std::move(player));
+        }
+        set_net_players(std::move(players), 0);
+        g.random.seed = kSeed;
+        RemoveAllSpaceObjects();
+        g.game_over = false;
+        LoadState s = start_construct_level(level);
+        while (!s.done) {
+            construct_level(&s);
+        }
+        set_up_instruments();
+
+        ScriptedInputSource input(kSeed);
+        GameResult          result = NO_GAME;
+        GamePlay(true, &input, &result, nullptr).run(kTurns);
+        h = (h * 16777619) ^ world_hash();
+    }
+    g.game_over = true;
+    return h;
+}
 
 MainPlay::MainPlay(
         const Level& level, bool replay, InputSource* input, bool show_loading_screen,
@@ -883,6 +923,15 @@ void GamePlay::simulate_to(game_ticks at) {
     while (g.time < at) {
         simulate(kMinorTick, true);
     }
+}
+
+void GamePlay::run(uint32_t turns) {
+    _input_source->start();
+    globals()->confirmed     = false;
+    globals()->shown_through = game_ticks::max();
+    CheckLevelConditions();
+    simulate_to(turn_start(turn_at(g.time) + turns));
+    globals()->confirmed = true;
 }
 
 void GamePlay::end_net_game(pn::string_view message) {

@@ -81,6 +81,20 @@ class ReplayInputSource : public InputSource {
     bool                                                              _exit;
 };
 
+// Presses keys chosen from `seed` and the turn alone, so that a player's input is the same however
+// their frames fall.
+class ScriptedInputSource : public InputSource {
+  public:
+    explicit ScriptedInputSource(uint32_t seed) : _seed(seed) {}
+
+    virtual void start() {}
+    virtual bool get(Handle<Admiral> admiral, game_ticks at, EventReceiver& receiver);
+
+  private:
+    const uint32_t _seed;
+    bool           _held[6] = {};
+};
+
 }  // namespace antares
 
 #endif  // ANTARES_GAME_INPUT_SOURCE_HPP_

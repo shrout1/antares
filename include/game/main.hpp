@@ -42,6 +42,10 @@ void set_rollback_test(pn::string_view log, int lookahead);
 // reached, identifying the state of the world, and ends the game after `last_turn`.
 void set_net_test(pn::string_view log, uint32_t last_turn);
 
+// Identifies how this build plays: plays each two-player net level for a while with scripted input
+// and hashes the result. Builds that agree on it play net games alike.
+uint32_t sim_fingerprint();
+
 // True if `level` has conditions on local state, which differs between players (not net-safe).
 bool uses_local_conditions(const Level& level);
 

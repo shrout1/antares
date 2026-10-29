@@ -27,7 +27,7 @@
 namespace antares {
 namespace net {
 
-const uint32_t kProtocolVersion = 2;
+const uint32_t kProtocolVersion = 3;
 
 // See proto/net.proto.
 struct Hello {
@@ -36,6 +36,7 @@ struct Hello {
     pn::string plugin_identifier;
     pn::string plugin_version;
     pn::string name;
+    uint32_t   fingerprint = 0;  // from sim_fingerprint()
 
     Hello copy() const;
 };
@@ -46,10 +47,10 @@ struct Welcome {
 
 struct Reject {
     enum Reason {
-        PROTOCOL = 0,
-        VERSION  = 1,
-        PLUGIN   = 2,
-        FULL     = 3,
+        PROTOCOL   = 0,
+        PLUGIN     = 2,
+        FULL       = 3,
+        SIMULATION = 4,
     };
     Reason reason = PROTOCOL;
 };

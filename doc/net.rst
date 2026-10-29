@@ -115,8 +115,14 @@ Modules
 ``net/session``
     Services the connection on its own thread.  Exchanges Hello, Setup,
     Choose, Start, and Ready, rejects a peer_ with a different
-    protocol, Antares version, or plugin, and routes Turns to
+    protocol, plugin, or simulation fingerprint, and routes Turns to
     ``net/rollback``.
+
+The simulation fingerprint comes from ``sim_fingerprint()``, which
+plays each two-player net level for 200 turns with scripted input and
+hashes the result, so that builds that play differently can't start a
+game together whatever their versions say.  It only covers what the
+scripted input reaches; the sync values remain the check during play.
 
 ``ui/screens/net-setup``
     Host or Join, Host Address, Status, and the lobby, where players

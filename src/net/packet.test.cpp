@@ -57,11 +57,13 @@ TEST_F(PacketTest, Hello) {
     in.hello.plugin_identifier = "4cab7415715aeeacf1486a352267ae82c0efb220";
     in.hello.plugin_version    = "1.1.1";
     in.hello.name              = "Ishiman Admiral \xc3\xa9";
+    in.hello.fingerprint       = 0xdeadbeef;
     Packet out                 = round_trip(in);
     EXPECT_EQ(kProtocolVersion, out.hello.protocol);
     EXPECT_EQ("0.9.1", out.hello.antares_version);
     EXPECT_EQ("4cab7415715aeeacf1486a352267ae82c0efb220", out.hello.plugin_identifier);
     EXPECT_EQ("1.1.1", out.hello.plugin_version);
+    EXPECT_EQ(0xdeadbeef, out.hello.fingerprint);
     EXPECT_EQ("Ishiman Admiral \xc3\xa9", out.hello.name);
 }
 
