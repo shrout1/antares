@@ -3,11 +3,11 @@
 
 Shows each plugin's solo chapters and how many you've unlocked (Antares keeps that in
 registry/<identifier>.pn under its data folder: ~/.local/share/games/antares on Linux,
-Documents\\Antares on Windows, ~/Library/Application Support/Antares on macOS), and saves,
-imports or resets that progress the same way as the game's Plugins screen (saved copies go in
-saved-progress/). Settings are kept in ~/.config/antares-launcher.json (%APPDATA%\\Antares
-Launcher on Windows, ~/Library/Application Support/Antares Launcher on macOS). Lists the plugins
-in ../plugins unless another folder is chosen.
+Documents\\Antares on Windows, ~/Library/Application Support/Antares on macOS). It saves a copy
+of that progress to a file you choose, imports one, or resets it. Settings are kept in
+~/.config/antares-launcher.json (%APPDATA%\\Antares Launcher on Windows, ~/Library/Application
+Support/Antares Launcher on macOS). Lists the plugins in ../plugins unless another folder is
+chosen.
 """
 import ast
 import hashlib
@@ -64,7 +64,7 @@ LOG = os.path.join(CACHE_DIR, 'antares-launcher.log')
 INPUT_LOGS = os.path.join(CACHE_DIR, 'antares-input')  # one per game; builds with input-debug
 KEEP_INPUT_LOGS = 20
 ALSOFT_CONF = os.path.join(CONFIG_DIR, 'alsoft.conf')  # OpenAL; the Windows build uses XAudio2
-SAVED = os.path.join(GAME_DATA, 'saved-progress')
+SAVED = os.path.join(GAME_DATA, 'saved-progress')  # where the file browser starts at first
 # The converted plugins beside this launcher (contrib/ares-plugins/plugins).
 DEFAULT_FOLDER = os.path.join(CONTRIB, 'plugins')
 FACTORY = ''  # sentinel path: run Antares with no plugin argument
@@ -229,26 +229,6 @@ def write_chapters(path, chapters, title=None, ident=None):
             json.dumps(title, ensure_ascii=False), ident)
     with open(path, 'w', encoding='utf-8') as f:
         f.write(text)
-
-
-def find_saved(ident):
-    """The saved copy of a plugin's progress: <identifier>.pn if present, or else any file in
-    saved-progress/ that names the plugin's identifier, as the game's Plugins screen does."""
-    exact = os.path.join(SAVED, ident + '.pn')
-    if os.path.isfile(exact):
-        return exact
-    try:
-        names = sorted(os.listdir(SAVED))
-    except OSError:
-        return None
-    for name in names:
-        path = os.path.join(SAVED, name)
-        try:
-            if os.path.isfile(path) and read_chapters(path)[1] == ident:
-                return path
-        except (OSError, ValueError, UnicodeDecodeError):
-            pass
-    return None
 
 
 class Launcher(tk.Tk):
@@ -485,17 +465,6 @@ class Launcher(tk.Tk):
             lines.append('Last progress: ' + (time.strftime('%Y-%m-%d %H:%M', time.localtime(p['last']))
                                               if p['last'] else 'never'))
             lines.append('Progress file: registry/%s.pn' % p['id'][:12] + '…')
-            saved = find_saved(p['id'])
-            if saved:
-                try:
-                    chs = read_chapters(saved)[0]
-                    lines.append('Saved copy: %s, chapters %s' % (
-                        time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(saved))),
-                        ', '.join(str(c) for c in chs)))
-                except (OSError, ValueError, UnicodeDecodeError):
-                    lines.append('Saved copy: unreadable (%s)' % os.path.basename(saved))
-            else:
-                lines.append('Saved copy: none')
             t.insert('1.0', '\n'.join(lines))
             t.tag_add('title', '1.0', '1.end')
             t.tag_configure('title', font=('TkDefaultFont', 13, 'bold'))
@@ -529,33 +498,69 @@ class Launcher(tk.Tk):
         ok = bool(p and p['chapters']) and not (self.proc and self.proc.poll() is None)
         self.save_btn.configure(state='normal' if ok else 'disabled')
         self.reset_btn.configure(state='normal' if ok else 'disabled')
-        self.import_btn.configure(state='normal' if ok and find_saved(p['id']) else 'disabled')
+        self.import_btn.configure(state='normal' if ok else 'disabled')
 
     def progress_changed(self):
         self.refresh_progress()
         self.show_details()
 
+    def progress_folder(self):
+        """Where the file browser opens: the folder last used, or saved-progress/ at first."""
+        d = self.cfg.get('progress_folder', SAVED)
+        if d == SAVED:
+            os.makedirs(SAVED, exist_ok=True)
+        return d if os.path.isdir(d) else HOME
+
     def save_progress(self):
         p = self.selected()
-        path = os.path.join(SAVED, p['id'] + '.pn')
-        if os.path.exists(path) and not messagebox.askyesno(
-                'Save Progress', 'Replace the saved copy of %s\'s progress?' % p['title']):
+        name = re.sub(r'[<>:"/\\|?*]', '_', p['title']).strip() or p['id']
+        path = filedialog.asksaveasfilename(
+            parent=self, title='Save Progress for ' + p['title'], initialdir=self.progress_folder(),
+            initialfile=name + '.pn', defaultextension='.pn',
+            filetypes=[('Antares progress', '*.pn'), ('All files', '*.*')])
+        if not path:
             return
         try:
             chs = read_chapters(os.path.join(REGISTRY, p['id'] + '.pn'))[0]
         except (OSError, ValueError):
             chs = [1]
-        write_chapters(path, chs, p['title'], p['id'])
-        self.status.configure(text='Saved progress for ' + p['title'])
+        try:
+            write_chapters(path, chs, p['title'], p['id'])
+        except OSError as e:
+            messagebox.showerror('Save Progress', 'Couldn\'t save to %s:\n%s' % (path, e))
+            return
+        self.cfg['progress_folder'] = os.path.dirname(path)
+        self.save_config()
+        self.status.configure(text='Saved progress for %s to %s' % (p['title'], path))
         self.progress_changed()
 
     def import_progress(self):
         p = self.selected()
-        saved = find_saved(p['id'])
-        if not saved or not messagebox.askyesno(
-                'Import Progress', 'Replace your progress in %s with the saved copy?' % p['title']):
+        path = filedialog.askopenfilename(
+            parent=self, title='Import Progress into ' + p['title'],
+            initialdir=self.progress_folder(),
+            filetypes=[('Antares progress', '*.pn'), ('All files', '*.*')])
+        if not path:
             return
-        write_chapters(os.path.join(REGISTRY, p['id'] + '.pn'), read_chapters(saved)[0])
+        try:
+            chs, ident = read_chapters(path)
+        except (OSError, ValueError, UnicodeDecodeError):
+            messagebox.showerror('Import Progress', '%s isn\'t a progress file.' % path)
+            return
+        self.cfg['progress_folder'] = os.path.dirname(path)
+        self.save_config()
+        if ident and ident != p['id']:
+            other = next((q['title'] for q in self.plugins if q['id'] == ident), 'another plugin')
+            if not messagebox.askyesno(
+                    'Import Progress', 'This file is progress for %s. Import it into %s anyway?'
+                    % (other, p['title'])):
+                return
+        if not messagebox.askyesno(
+                'Import Progress', 'Replace your progress in %s (chapters %s) with chapters %s?' % (
+                    p['title'], ', '.join(str(c) for c in p['unlocked']) or 'none',
+                    ', '.join(str(c) for c in chs) or 'none')):
+            return
+        write_chapters(os.path.join(REGISTRY, p['id'] + '.pn'), chs)
         self.status.configure(text='Imported progress for ' + p['title'])
         self.progress_changed()
 

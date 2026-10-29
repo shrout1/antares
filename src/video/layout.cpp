@@ -46,10 +46,14 @@ void Layout::update(Size window, Size framebuffer, Size resolution, GameScale sc
                 int(std::lround(resolution.width * _viewport_scale)),
                 int(std::lround(resolution.height * _viewport_scale))};
     }
+    const float fit = std::min(
+            float(_viewport_size.width) / kOriginalScreenSize.width,
+            float(_viewport_size.height) / kOriginalScreenSize.height);
+    // Only "fill" scales the panels and screens by a fraction; otherwise each of their points is
+    // a whole number of pixels, so that text and pictures keep their shapes.
     _ui_scale = std::max<float>(
-            _viewport_scale, std::min(
-                                     float(_viewport_size.width) / kOriginalScreenSize.width,
-                                     float(_viewport_size.height) / kOriginalScreenSize.height));
+            _viewport_scale,
+            ((scale == GameScale::FILL) || (fit < 1)) ? fit : std::floor(fit));
     _battlefield_scale           = battlefield_scale(scale);
     _left_panel_pixels           = std::lround(kLeftPanelWidth * _ui_scale);
     _right_panel_pixels          = std::lround(kRightPanelWidth * _ui_scale);

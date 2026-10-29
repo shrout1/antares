@@ -46,7 +46,6 @@ class PluginsScreen : public InterfaceScreen {
   private:
     enum Confirm {
         NONE,
-        IMPORT,
         RESET,
     };
 
@@ -55,7 +54,6 @@ class PluginsScreen : public InterfaceScreen {
         pn::string                   name;  // title, plus the file name if the title isn't unique.
         bool                         current;
         sfz::optional<std::set<int>> progress;
-        sfz::optional<std::set<int>> saved;
     };
 
     const Entry& selected() const { return _entries[_index]; }
