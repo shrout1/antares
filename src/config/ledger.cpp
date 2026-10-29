@@ -27,7 +27,6 @@
 #include <sfz/sfz.hpp>
 
 #include "config/dirs.hpp"
-#include "config/plugins.hpp"
 #include "config/preferences.hpp"
 #include "data/plugin.hpp"
 #include "game/sys.hpp"
@@ -63,12 +62,8 @@ static pn::string registry_path(pn::string_view identifier) {
     return pn::format("{0}/{1}.pn", dirs().registry, identifier);
 }
 
-static pn::string saved_progress_dir() { return pn::format("{0}/saved-progress", dirs().root); }
-
-// Reads the unlocked chapters from a registry or saved-progress file, and the plugin identifier
-// recorded in it, if any.
-static sfz::optional<std::set<int>> read_progress(
-        pn::string_view path, pn::string* identifier = nullptr) {
+// Reads the unlocked chapters from a registry file.
+static sfz::optional<std::set<int>> read_progress(pn::string_view path) {
     pn::input in{path, pn::text};
     if (!in) {
         return sfz::nullopt;
@@ -87,15 +82,10 @@ static sfz::optional<std::set<int>> read_progress(
             chapters.insert(chapter.as_int());
         }
     }
-    if (identifier) {
-        *identifier = data.get("plugin").as_map().get("identifier").as_string().copy();
-    }
     return sfz::make_optional(std::move(chapters));
 }
 
-static void write_progress(
-        pn::string_view path, const std::set<int>& chapters,
-        sfz::optional<std::pair<pn::string_view, pn::string_view>> plugin) {
+static void write_progress(pn::string_view path, const std::set<int>& chapters) {
     pn::array unlocked_chapters;
     for (int chapter : chapters) {
         unlocked_chapters.push_back(chapter);
@@ -107,37 +97,10 @@ static void write_progress(
                      {"chapters", std::move(unlocked_chapters)},
              }},
     };
-    if (plugin.has_value()) {
-        data["plugin"] = pn::map{
-                {"title", plugin->first.copy()},
-                {"identifier", plugin->second.copy()},
-        };
-    }
 
     makedirs(path::dirname(path), 0755);
     pn::output out{path, pn::text};
     out.dump(data);
-}
-
-// Finds the saved copy of a plugin's progress: <identifier>.pn if present, or else any file in
-// the saved-progress directory that names the plugin's identifier.
-static sfz::optional<pn::string> find_saved_progress(pn::string_view identifier) {
-    pn::string dir   = saved_progress_dir();
-    pn::string exact = pn::format("{0}/{1}.pn", dir, identifier);
-    if (path::isfile(exact)) {
-        return sfz::make_optional(std::move(exact));
-    }
-    for (const pn::string& path : list_files(dir)) {
-        pn::string found;
-        try {
-            if (read_progress(path, &found).has_value() && (found == identifier)) {
-                return sfz::make_optional(path.copy());
-            }
-        } catch (std::runtime_error&) {
-            // Not a progress file; skip it.
-        }
-    }
-    return sfz::nullopt;
 }
 
 DirectoryLedger::DirectoryLedger() { load(); }
@@ -162,7 +125,7 @@ std::set<int> DirectoryLedger::load() {
 }
 
 void DirectoryLedger::save(const std::set<int> chapters) {
-    write_progress(registry_path(plug.info.identifier.hash), chapters, sfz::nullopt);
+    write_progress(registry_path(plug.info.identifier.hash), chapters);
 }
 
 sfz::optional<std::set<int>> load_progress(pn::string_view identifier) {
@@ -174,33 +137,6 @@ void reset_progress(pn::string_view identifier) {
     if (path::exists(path)) {
         sfz::unlink(path);
     }
-}
-
-sfz::optional<std::set<int>> load_saved_progress(pn::string_view identifier) {
-    auto path = find_saved_progress(identifier);
-    if (!path.has_value()) {
-        return sfz::nullopt;
-    }
-    return read_progress(*path);
-}
-
-pn::string save_progress(pn::string_view identifier, pn::string_view title) {
-    auto chapters = load_progress(identifier);
-    if (!chapters.has_value()) {
-        chapters.emplace(std::set<int>{1});
-    }
-    pn::string path = pn::format("{0}/{1}.pn", saved_progress_dir(), identifier);
-    write_progress(path, *chapters, sfz::make_optional(std::make_pair(title, identifier)));
-    return path;
-}
-
-bool import_progress(pn::string_view identifier) {
-    auto chapters = load_saved_progress(identifier);
-    if (!chapters.has_value()) {
-        return false;
-    }
-    write_progress(registry_path(identifier), *chapters, sfz::nullopt);
-    return true;
 }
 
 }  // namespace antares
