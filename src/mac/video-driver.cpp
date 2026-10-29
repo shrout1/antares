@@ -127,10 +127,15 @@ bool CocoaVideoDriver::update_size() {
 }
 
 // In a window, a fixed resolution sets the window's size, so the game runs at exactly that many
-// pixels (fewer if the display can't hold it). "Fill Screen" keeps whatever size the window has.
+// pixels (fewer if the display can't hold it), and the window can't be resized until the
+// resolution changes. "Fill Screen" lets the window take any size.
 void CocoaVideoDriver::fit_window() {
+    if (_fullscreen) {
+        return;
+    }
     const Size resolution = sys.prefs->resolution();
-    if (_fullscreen || resolution.as_rect().empty() || !resolution_supported(resolution)) {
+    if (resolution.as_rect().empty() || !resolution_supported(resolution)) {
+        antares_window_unfit(_window);
         return;
     }
     antares_window_fit(_window, resolution.width, resolution.height);

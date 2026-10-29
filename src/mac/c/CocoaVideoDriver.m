@@ -67,6 +67,7 @@ typedef enum {
 
     SelectionDirection selectionDir;
     int32_t            modifier_flags;
+    bool               fixed_size;  // set by antares_window_fit().
 }
 - (BOOL)isEditing;
 @end
@@ -189,12 +190,15 @@ void antares_window_fit(AntaresWindow* window, int32_t width, int32_t height) {
             fmin(1.0, fmin((area.size.width - border.width) / content.width,
                            (area.size.height - border.height) / content.height));
     content = NSMakeSize(floor(content.width * shrink), floor(content.height * shrink));
-    if (NSEqualSizes(content, [window->view bounds].size)) {
-        return;
+    window->view->fixed_size = false;
+    if (!NSEqualSizes(content, [window->view bounds].size)) {
+        [window->window setContentSize:content];
+        [window->window center];
     }
-    [window->window setContentSize:content];
-    [window->window center];
+    window->view->fixed_size = true;
 }
+
+void antares_window_unfit(AntaresWindow* window) { window->view->fixed_size = false; }
 
 static bool translate_coords(AntaresView* view, NSEvent* event, NSPoint* p) {
     if ([event window] != [view window]) {
@@ -446,6 +450,11 @@ static BOOL          isNoRange(NSRange range) { return NSEqualRanges(range, kNoR
 }
 
 // NSWindowDelegate
+
+// Entering and leaving fullscreen don't come through here.
+- (NSSize)windowWillResize:(NSWindow*)sender toSize:(NSSize)size {
+    return fixed_size ? [sender frame].size : size;
+}
 
 - (void)windowDidResize:(NSNotification*)notification {
     antares_window_callback_data data = {.resize = {
