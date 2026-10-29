@@ -64,6 +64,8 @@ class VideoDriver {
     virtual Rect visible_rect(Region region) const { return screen_size().as_rect(); }
     // False for a fixed resolution bigger than the display.
     virtual bool resolution_supported(Size resolution) const { return true; }
+    // The size of the largest display, in pixels.
+    virtual Size largest_display() const { return screen_size(); }
 
     virtual bool start_editing(TextReceiver* text) = 0;
     virtual void stop_editing(TextReceiver* text)  = 0;

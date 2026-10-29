@@ -40,12 +40,17 @@ void Layout::update(Size window, Size framebuffer, Size resolution, GameScale sc
         _viewport_scale = _pixel_ratio;
     } else {
         _viewport_scale = std::min(
-                float(_framebuffer_size.width) / resolution.width,
-                float(_framebuffer_size.height) / resolution.height);
+                {1.0f, float(_framebuffer_size.width) / resolution.width,
+                 float(_framebuffer_size.height) / resolution.height});
         _viewport_size = {
                 int(std::lround(resolution.width * _viewport_scale)),
                 int(std::lround(resolution.height * _viewport_scale))};
     }
+    const int left = (_framebuffer_size.width - _viewport_size.width) / 2;
+    const int top  = (_framebuffer_size.height - _viewport_size.height) / 2;
+    _viewport_rect = Rect{
+            left, _framebuffer_size.height - top - _viewport_size.height,
+            left + _viewport_size.width, _framebuffer_size.height - top};
     const float fit = std::min(
             float(_viewport_size.width) / kOriginalScreenSize.width,
             float(_viewport_size.height) / kOriginalScreenSize.height);
@@ -61,6 +66,12 @@ void Layout::update(Size window, Size framebuffer, Size resolution, GameScale sc
     _screen_size                 = {
             kLeftPanelWidth + int(battlefield_pixels / _battlefield_scale) + kRightPanelWidth,
             int(_viewport_size.height / _battlefield_scale)};
+}
+
+bool Layout::whole_resolution(Size resolution) {
+    const int n = resolution.width / kOriginalScreenSize.width;
+    return (n > 0) && (resolution.width == (n * kOriginalScreenSize.width)) &&
+           (resolution.height == (n * kOriginalScreenSize.height));
 }
 
 float Layout::battlefield_scale(GameScale scale) const {
@@ -122,9 +133,10 @@ Point Layout::convert(Point p, Region from, Region to) const {
 }
 
 Point Layout::from_window(double x, double y, bool game) const {
-    // Window coordinates to viewport pixels, undoing the stretch.
-    x             = x * _viewport_size.width / std::max(1, _window_size.width);
-    y             = y * _viewport_size.height / std::max(1, _window_size.height);
+    // Window coordinates to framebuffer pixels, then to viewport pixels.
+    x = (x * _framebuffer_size.width / std::max(1, _window_size.width)) - _viewport_rect.left;
+    y = (y * _framebuffer_size.height / std::max(1, _window_size.height)) -
+        (_framebuffer_size.height - _viewport_rect.bottom);
     Region region = Region::SCREEN;
     if (game) {
         if (x < _left_panel_pixels) {
