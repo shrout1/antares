@@ -67,14 +67,9 @@ class DirectoryLedger : public Ledger {
 // Progress for any plugin, by identifier, as stored by DirectoryLedger.
 //
 // load_progress() returns the unlocked chapters, or nothing if the plugin has never been played.
-// A saved copy of the progress lives in dirs().root/saved-progress; the copy also records the
-// plugin title and identifier, so a copy received from another player can be imported under any
-// file name.
+// Copies of progress are saved and imported in the launcher.
 sfz::optional<std::set<int>> load_progress(pn::string_view identifier);
 void                         reset_progress(pn::string_view identifier);
-sfz::optional<std::set<int>> load_saved_progress(pn::string_view identifier);
-pn::string                   save_progress(pn::string_view identifier, pn::string_view title);
-bool                         import_progress(pn::string_view identifier);
 
 }  // namespace antares
 

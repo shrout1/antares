@@ -38,8 +38,6 @@ namespace antares {
 
 static constexpr char kPlayButton[]   = "play";
 static constexpr char kCancelButton[] = "cancel";
-static constexpr char kSaveButton[]   = "save-progress";
-static constexpr char kImportButton[] = "import-progress";
 static constexpr char kResetButton[]  = "reset-progress";
 static constexpr char kListRect[]     = "list";
 static constexpr char kDetailsRect[]  = "details";
@@ -177,42 +175,6 @@ PluginsScreen::PluginsScreen(bool* switched)
 
     button(kCancelButton)->bind({[this] { stack()->pop(this); }});
 
-    button(kSaveButton)
-            ->bind({
-                    [this] {
-                        _confirm        = NONE;
-                        const Entry& e  = selected();
-                        pn::string   to = save_progress(e.summary.identifier, e.summary.title);
-                        refresh_progress(&_entries[_index]);
-                        _status = pn::format("Progress saved to {0}", to);
-                    },
-                    [this] {
-                        return selected().summary.error.empty() && selected().progress.has_value();
-                    },
-            });
-
-    button(kImportButton)
-            ->bind({
-                    [this] {
-                        const Entry& e = selected();
-                        if (_confirm != IMPORT) {
-                            confirm(IMPORT,
-                                    pn::format(
-                                            "Replace progress with the saved copy ({0})? "
-                                            "Press Import again.",
-                                            chapter_ranges(unlocked(e.summary, *e.saved))));
-                            return;
-                        }
-                        _confirm = NONE;
-                        import_progress(e.summary.identifier);
-                        refresh_progress(&_entries[_index]);
-                        _status = "Saved progress imported.";
-                    },
-                    [this] {
-                        return selected().summary.error.empty() && selected().saved.has_value();
-                    },
-            });
-
     button(kResetButton)
             ->bind({
                     [this] {
@@ -250,7 +212,6 @@ void PluginsScreen::refresh_progress(Entry* e) {
     }
     try {
         e->progress = load_progress(e->summary.identifier);
-        e->saved    = load_saved_progress(e->summary.identifier);
     } catch (std::exception& x) {
         e->summary.error = pn::format("progress: {0}", x.what());
     }
@@ -480,16 +441,6 @@ void PluginsScreen::draw_details() const {
                 }
             }
             lines.emplace_back(fit(font, progress, width), normal);
-
-            pn::string saved = "Saved copy: none";
-            if (e.saved.has_value()) {
-                std::set<int> done = unlocked(p, *e.saved);
-                saved              = pn::format(
-                        "Saved copy: {0} ({1} of {2})",
-                        done.empty() ? pn::string{"none"} : chapter_ranges(done), done.size(),
-                        all.size());
-            }
-            lines.emplace_back(fit(font, saved, width), dim);
         }
     }
     if (!_status.empty()) {
