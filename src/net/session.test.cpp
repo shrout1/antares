@@ -89,15 +89,32 @@ TEST_F(SessionTest, Game) {
     for (uint32_t t = 10; t < 20; ++t) {
         host->submit(t, {build});
         guest->submit(t, {});
-        ASSERT_TRUE(eventually([&] { return host->ready_turn(t) && guest->ready_turn(t); }));
-        std::vector<Lockstep::Turn> x = host->take(t), y = guest->take(t);
-        ASSERT_EQ(x[0].size(), y[0].size());
-        ASSERT_EQ(x[1].size(), y[1].size());
+        ASSERT_TRUE(
+                eventually([&] { return (host->confirmed() >= t) && (guest->confirmed() >= t); }));
+        for (int i = 0; i < 2; ++i) {
+            ASSERT_EQ(host->known(i, t)->size(), guest->known(i, t)->size());
+        }
+        host->confirm(t);
+        guest->confirm(t);
         host->sync(t, t * 7);
         guest->sync(t, t * 7);
     }
     EXPECT_FALSE(host->desynced());
     EXPECT_FALSE(guest->desynced());
+
+    ASSERT_TRUE(eventually([&] { return host->confirmed() == 21; }));
+    host->submit(20, {build});
+    EXPECT_EQ(21u, host->confirmed());  // The guest hasn't sent turn 22.
+    ASSERT_TRUE(host->known(0, 22).has_value());
+    EXPECT_EQ(3, (*host->known(0, 22))[0].data);
+    EXPECT_FALSE(host->known(1, 22).has_value());
+    guest->submit(20, {});
+    ASSERT_TRUE(eventually([&] { return host->confirmed() == 22; }));
+    ASSERT_TRUE(host->known(1, 22).has_value());
+    for (uint32_t t = 20; t <= 22; ++t) {
+        host->confirm(t);
+    }
+    EXPECT_FALSE(host->known(0, 22).has_value());
 
     host->chat("gg");
     std::vector<pn::string> chats;

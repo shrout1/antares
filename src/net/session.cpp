@@ -145,7 +145,7 @@ void Session::ready(uint32_t first) {
     if (_state != STARTED) {
         return;
     }
-    _lockstep.reset(new Lockstep(kSessionPlayers, _local, first, _setup.delay));
+    _rollback.reset(new Rollback(kSessionPlayers, _local, first, _setup.delay));
     Packet p;
     p.type = Packet::READY;
     send(RELIABLE, std::move(p));
@@ -166,34 +166,60 @@ void Session::quit() {
     _state = CLOSED;
 }
 
-void Session::submit(uint32_t at, Lockstep::Turn turn) {
+void Session::submit(uint32_t at, Rollback::Turn turn) {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (_lockstep) {
-        _lockstep->submit(at, std::move(turn));
+    if (_rollback) {
+        _rollback->submit(at, std::move(turn));
         _turns_dirty = true;
     }
 }
 
-bool Session::ready_turn(uint32_t at) const {
+uint32_t Session::confirmed() const {
     std::lock_guard<std::mutex> lock(_mutex);
-    return (_state == PLAYING) && _lockstep->ready(at);
+    return (_state == PLAYING) ? _rollback->confirmed() : 0;
 }
 
-std::vector<Lockstep::Turn> Session::take(uint32_t at) {
+void Session::set_lead(int32_t lead) {
     std::lock_guard<std::mutex> lock(_mutex);
-    return _lockstep->take(at);
+    if (_state == PLAYING) {
+        _rollback->set_lead(lead);
+    }
+}
+
+int32_t Session::peer_lead() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return (_state == PLAYING) ? _rollback->lead(1 - _local) : 0;
+}
+
+uint32_t Session::peer_synced() const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    return (_state == PLAYING) ? _rollback->synced(1 - _local) : 0;
+}
+
+sfz::optional<Rollback::Turn> Session::known(int player, uint32_t at) const {
+    std::lock_guard<std::mutex> lock(_mutex);
+    const Rollback::Turn*       turn = _rollback ? _rollback->known(player, at) : nullptr;
+    if (!turn) {
+        return sfz::nullopt;
+    }
+    return sfz::make_optional(Rollback::Turn{*turn});
+}
+
+void Session::confirm(uint32_t at) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _rollback->confirm(at);
 }
 
 void Session::sync(uint32_t at, uint32_t value) {
     std::lock_guard<std::mutex> lock(_mutex);
-    if (_lockstep) {
-        _lockstep->sync(at, value);
+    if (_rollback) {
+        _rollback->sync(at, value);
     }
 }
 
 bool Session::desynced() const {
     std::lock_guard<std::mutex> lock(_mutex);
-    return _lockstep && _lockstep->desynced();
+    return _rollback && _rollback->desynced();
 }
 
 void Session::chat(pn::string_view text) {
@@ -203,6 +229,15 @@ void Session::chat(pn::string_view text) {
     p.chat.player = _local;
     p.chat.text   = text.copy();
     send(RELIABLE, std::move(p));
+}
+
+void Session::set_delay(
+        std::chrono::milliseconds delay, std::chrono::milliseconds jitter, uint32_t seed) {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _delay      = delay;
+    _jitter     = jitter;
+    _delay_seed = seed;
+    _delay_set  = true;
 }
 
 std::vector<pn::string> Session::take_chats() {
@@ -220,6 +255,10 @@ void Session::run() {
         const bool  got = !stopping && _host->poll(kPollInterval, &e);
 
         std::lock_guard<std::mutex> lock(_mutex);
+        if (_delay_set) {
+            _host->set_delay(_delay, _jitter, _delay_seed);
+            _delay_set = false;
+        }
         if (got) {
             handle(e);
         }
@@ -227,11 +266,11 @@ void Session::run() {
             for (const auto& out : _outbox) {
                 _host->send(_peer, out.first, out.second);
             }
-            if (_lockstep && (_state == PLAYING) &&
+            if (_rollback && (_state == PLAYING) &&
                 (_turns_dirty || (elapsed_since(last_turns) >= kResendInterval))) {
                 Packet p;
                 p.type  = Packet::TURNS;
-                p.turns = _lockstep->outgoing(1 - _local);
+                p.turns = _rollback->outgoing(1 - _local);
                 _host->send(_peer, UNRELIABLE, p);
                 _turns_dirty = false;
                 last_turns   = std::chrono::steady_clock::now();
@@ -356,14 +395,14 @@ void Session::receive(const Packet& p) {
 
         case Packet::READY:
             _peer_ready = true;
-            if (_lockstep && (_state == STARTED)) {
+            if (_rollback && (_state == STARTED)) {
                 _state = PLAYING;
             }
             break;
 
         case Packet::TURNS:
-            if (_lockstep) {
-                _lockstep->receive(p.turns);
+            if (_rollback) {
+                _rollback->receive(p.turns);
             }
             break;
 

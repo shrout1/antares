@@ -22,12 +22,14 @@
 #include <math.h>
 
 #include <algorithm>
+#include <cmath>
 #include <pn/output>
 #include <set>
 
 #include "config/gamepad.hpp"
 #include "config/keys.hpp"
 #include "config/preferences.hpp"
+#include "data/condition.hpp"
 #include "data/plugin.hpp"
 #include "data/replay.hpp"
 #include "data/resource.hpp"
@@ -83,6 +85,90 @@ Rect play_screen() {
     return Rect(kLeftPanelWidth, 0, size.width - kRightPanelWidth, size.height);
 }
 
+namespace {
+
+struct RollbackTest {
+    sfz::optional<pn::output> log;
+    int                       lookahead = 0;
+    uint32_t                  last_turn = 0;
+};
+ANTARES_GLOBAL RollbackTest rollback_test;
+
+uint32_t world_hash() {
+    uint32_t h    = g.sync;
+    auto     post = [&h](int32_t x) { h = (h * 16777619) ^ uint32_t(x); };
+    for (auto o : SpaceObject::all()) {
+        if (!o->active) {
+            continue;
+        }
+        post(o.number());
+        post(o->id);
+        post(o->location.h);
+        post(o->location.v);
+        post(o->velocity.h.val());
+        post(o->velocity.v.val());
+        post(o->direction);
+        post(o->health());
+        post(o->energy());
+        post(o->owner.number());
+        post(o->targetObject.number());
+        post(o->destObject.number());
+    }
+    for (auto a : Admiral::all()) {
+        post(a->active());
+        post(a->cash().amount.val());
+        post(a->saveGoal().amount.val());
+        post(a->kills());
+        post(a->losses());
+        post(a->shipsLeft());
+        for (int i = 0; i < kAdmiralScoreNum; ++i) {
+            post(a->score()[i]);
+        }
+        post(a->blitzkrieg());
+        post(a->flagship().number());
+        post(a->considerShip().number());
+        post(a->destinationObject().number());
+        post(a->hopeToBuild().has_value());
+        post(a->totalBuildChance().val());
+    }
+    for (const auto& p : g.pilots) {
+        post(p.keys);
+        post(p.gamepad_keys);
+        post(p.steer);
+        for (const auto& e : p.events) {
+            post(static_cast<uint32_t>(e.type));
+            post(e.data);
+        }
+    }
+    post(g.key_mask);
+    post(g.game_over);
+    return h;
+}
+
+}  // namespace
+
+void set_rollback_test(pn::string_view log, int lookahead) {
+    rollback_test.log.emplace(log, pn::text);
+    rollback_test.lookahead = lookahead;
+}
+
+void set_net_test(pn::string_view log, uint32_t last_turn) {
+    rollback_test.log.emplace(log, pn::text);
+    rollback_test.last_turn = last_turn;
+}
+
+bool uses_local_conditions(const Level& level) {
+    for (const auto& c : level.base.conditions) {
+        switch (c.when.type()) {
+            case ConditionType::COMPUTER:
+            case ConditionType::MESSAGE:
+            case ConditionType::ZOOM: return true;
+            default: break;
+        }
+    }
+    return false;
+}
+
 Rect viewport() {
     const Size size = sys.video->screen_size();
     return Rect(kLeftPanelWidth, 0, size.width - kRightPanelWidth, size.height - g.bottom_border);
@@ -113,6 +199,7 @@ class GamePlay : public Card {
 
   private:
     void play_turn();
+    void play_net(ticks units);
     void end_net_game(pn::string_view message);
 
     enum State {
@@ -123,6 +210,17 @@ class GamePlay : public Card {
         HELP,
     };
     State _state;
+
+    // Runs `units` of the game, and updates the display to match.
+    void step(ticks units, bool input);
+    // Runs `units` of the world only. With `input`, executes the turn's commands; without, each
+    // player keeps the controls they hold.
+    void simulate(ticks units, bool input);
+    void simulate_to(game_ticks at);
+    // Updates local display state for `units` of elapsed time.
+    void update_display(ticks units);
+    void move_stars(ticks units);
+    void look_ahead();
 
     const bool            _replay;
     GameResult* const     _game_result;
@@ -145,6 +243,10 @@ class GamePlay : public Card {
     InputSource*             _input_source;
     net::Session* const      _session;
     sfz::optional<wall_time> _stalled_since;
+    game_ticks               _frontier;             // In net games, the time head has reached.
+    uint32_t                 _sampled_through = 0;  // In net games, the last turn of local input.
+    double                   _lead            = 0;  // In net games, turns head predicts, smoothed.
+    ticks                    _since_slowed    = ticks(0);
 };
 
 MainPlay::MainPlay(
@@ -229,10 +331,19 @@ void MainPlay::become_front() {
     }
 }
 
-static uint32_t turn_at(game_ticks at) { return at.time_since_epoch() / kMajorTick; }
+static uint32_t   turn_at(game_ticks at) { return at.time_since_epoch() / kMajorTick; }
+static game_ticks turn_start(uint32_t turn) { return game_ticks(turn * kMajorTick); }
 
-static net::Lockstep::Turn to_turn(const std::vector<PlayerEvent>& events) {
-    net::Lockstep::Turn turn;
+// How many turns head may run ahead of the input every player has sent.
+const uint32_t kRollbackTurns = 20;
+
+// A node that predicts more turns than the other player's does is running ahead of it, so it drops
+// one tick in every kSlowEvery until the two are even.  Leads are smoothed over kLeadWindow.
+const ticks kSlowEvery  = ticks(100);
+const ticks kLeadWindow = ticks(60);
+
+static net::Rollback::Turn to_turn(const std::vector<PlayerEvent>& events) {
+    net::Rollback::Turn turn;
     for (const PlayerEvent& e : events) {
         turn.emplace_back();
         turn.back().type = static_cast<uint32_t>(e.type);
@@ -241,7 +352,7 @@ static net::Lockstep::Turn to_turn(const std::vector<PlayerEvent>& events) {
     return turn;
 }
 
-static std::vector<PlayerEvent> from_turn(const net::Lockstep::Turn& turn) {
+static std::vector<PlayerEvent> from_turn(const net::Rollback::Turn& turn) {
     std::vector<PlayerEvent> events;
     for (const net::Turns::Event& e : turn) {
         events.push_back(PlayerEvent{static_cast<PlayerEventType>(e.type), e.data});
@@ -365,6 +476,9 @@ void GamePlay::become_front() {
             _input_source->start();
             if (_session) {
                 _session->ready(turn_at(g.time) + 1);
+                copy_world(&tail, g);
+                _frontier        = g.time;
+                _sampled_through = turn_at(g.time);
             }
             if (_replay) {
                 _player_ship.cursor().show = false;
@@ -514,88 +628,39 @@ void GamePlay::fire_timer() {
             end_net_game("The game is out of sync.");
             return;
         } else if (_session->state() == net::Session::CLOSED) {
-            if (!g.game_over) {
+            if (!tail.game_over) {
                 end_net_game(_session->error());
                 return;
             }
-            g.game_over_at = g.time;
+            tail.game_over_at = tail.time;
         }
+        play_net(unitsPassed);
     }
 
-    while (unitsPassed > ticks(0)) {
+    while (!_session && (unitsPassed > ticks(0))) {
         ticks unitsToDo   = unitsPassed;
         ticks minor_ticks = g.time.time_since_epoch() % kMajorTick;
         if (minor_ticks + unitsToDo > kMajorTick) {
             unitsToDo = kMajorTick - minor_ticks;
         }
 
-        if (_session && (minor_ticks + unitsToDo == kMajorTick)) {
-            if (!_session->ready_turn(turn_at(g.time + unitsToDo))) {
-                if (!_stalled_since.has_value()) {
-                    _stalled_since.emplace(now());
-                }
-                _real_time = now();
-                break;
-            }
-            _stalled_since = sfz::nullopt;
+        if ((minor_ticks == ticks(0)) && rollback_test.lookahead) {
+            look_ahead();
         }
-
-        // executed arbitrarily, but at least once every major tick
-        globals()->starfield.prepare_to_move();
-        globals()->starfield.move(unitsToDo);
-        MoveSpaceObjects(unitsToDo);
-
-        g.time += unitsToDo;
-
-        if ((g.time.time_since_epoch() % kMajorTick) == ticks(0)) {
-            // everything in here gets executed once every major tick
-            _player_paused = false;
-
-            NonplayerShipThink();
-            AdmiralThink();
-            execute_action_queue();
-
-            if (!_input_source->get(g.admiral, g.time, _player_ship)) {
-                g.game_over    = true;
-                g.game_over_at = g.time;
-            }
-            play_turn();
-
-            CollideSpaceObjects();
-            if ((g.time.time_since_epoch() % kConditionTick) == ticks(0)) {
-                CheckLevelConditions();
-            }
-            if (_session) {
-                _session->sync(turn_at(g.time), g.sync);
-            }
+        step(unitsToDo, true);
+        if (rollback_test.log.has_value() &&
+            ((g.time.time_since_epoch() % kMajorTick) == ticks(0))) {
+            rollback_test.log->format(
+                    "{0}\t{1}\n", g.time.time_since_epoch().count(), world_hash());
         }
-
-        UpdateMiniScreenLines();
-
-        Messages::clip();
-        Messages::draw_long_message(unitsToDo);
-
-        _should_draw_sector_lines = update_sector_lines();
-        Vectors::update();
-        Label::update_positions(unitsToDo);
-        Label::update_contents(unitsToDo);
-        _should_draw_site = update_site();
-
-        CullSprites();
-        Label::show_all();
-        Vectors::cull();
-        globals()->starfield.show();
-
-        Messages::draw_message_screen(unitsToDo);
-        UpdateRadar(unitsToDo);
-        globals()->transitions.update_boolean(unitsToDo);
-
         unitsPassed -= unitsToDo;
     }
 
-    if (g.game_over && (g.time >= g.game_over_at)) {
+    // In net games, only what every player's input confirms can end the game.
+    const World& world = _session ? static_cast<const World&>(tail) : g;
+    if (world.game_over && (world.time >= world.game_over_at)) {
         if (*_game_result == NO_GAME) {
-            if (g.victor == g.admiral) {
+            if (world.victor == g.admiral) {
                 *_game_result = WIN_GAME;
             } else {
                 *_game_result = LOSE_GAME;
@@ -608,7 +673,7 @@ void GamePlay::fire_timer() {
         case RESTART_GAME: stack()->pop(this); break;
 
         case WIN_GAME:
-            if (_replay || !g.victory_text.has_value()) {
+            if (_replay || !world.victory_text.has_value()) {
                 stack()->pop(this);
             } else {
                 _state        = DEBRIEFING;
@@ -621,7 +686,7 @@ void GamePlay::fire_timer() {
                                 g.level->solo.par.kills));
                         break;
 
-                    default: stack()->push(new DebriefingScreen(*g.victory_text)); break;
+                    default: stack()->push(new DebriefingScreen(*world.victory_text)); break;
                 }
             }
             break;
@@ -630,14 +695,14 @@ void GamePlay::fire_timer() {
             if (_replay) {
                 *_game_result = QUIT_GAME;
                 stack()->pop(this);
-            } else if (_session && !g.victory_text.has_value()) {
+            } else if (_session && !world.victory_text.has_value()) {
                 stack()->pop(this);
-            } else if (!g.victory_text.has_value()) {
+            } else if (!world.victory_text.has_value()) {
                 _state = PLAY_AGAIN;
                 stack()->push(new PlayAgainScreen(false, false, &_play_again));
             } else {
                 _state = DEBRIEFING;
-                stack()->push(new DebriefingScreen(*g.victory_text));
+                stack()->push(new DebriefingScreen(*world.victory_text));
             }
             break;
 
@@ -647,22 +712,194 @@ void GamePlay::fire_timer() {
     }
 }
 
+void GamePlay::step(ticks units, bool input) {
+    move_stars(units);
+    simulate(units, input);
+    update_display(units);
+}
+
+void GamePlay::simulate(ticks units, bool input) {
+    globals()->show_effects = (g.time + units) > globals()->shown_through;
+
+    MoveSpaceObjects(units);
+
+    g.time += units;
+
+    if ((g.time.time_since_epoch() % kMajorTick) == ticks(0)) {
+        // everything in here gets executed once every major tick
+        _player_paused = false;
+
+        NonplayerShipThink();
+        AdmiralThink();
+        execute_action_queue();
+
+        if (input) {
+            play_turn();
+        } else {
+            _player_ship.execute(g.admiral, {});
+        }
+
+        CollideSpaceObjects();
+        if ((g.time.time_since_epoch() % kConditionTick) == ticks(0)) {
+            CheckLevelConditions();
+        }
+    }
+
+    CullSprites();
+    Vectors::cull();
+    globals()->shown_through = std::max(globals()->shown_through, g.time);
+}
+
+void GamePlay::move_stars(ticks units) {
+    globals()->starfield.prepare_to_move();
+    globals()->starfield.move(units);
+}
+
+void GamePlay::update_display(ticks units) {
+    UpdateMiniScreenLines();
+
+    if (confirmed()) {
+        Messages::clip();
+        Messages::draw_long_message(units);
+    }
+
+    _should_draw_sector_lines = update_sector_lines();
+    Vectors::update();
+    Label::update_positions(units);
+    Label::update_contents(units);
+    _should_draw_site = update_site();
+
+    Label::show_all();
+    globals()->starfield.show();
+
+    if (confirmed()) {
+        Messages::draw_message_screen(units);
+    }
+    UpdateRadar(units);
+    globals()->transitions.update_boolean(units);
+}
+
+void GamePlay::look_ahead() {
+    static World ahead;
+    copy_world(&ahead, g);
+    // The steps ahead play their own sounds, and the steps that replace them stay silent, so the
+    // sound log means nothing with a look-ahead.
+    globals()->confirmed = false;
+    for (auto& p : g.pilots) {
+        p.keys ^= kUpKey | kLeftKey | kPulseKey;  // Look ahead with other controls held.
+    }
+    for (int i = 0; (i < rollback_test.lookahead) && !g.game_over; ++i) {
+        step(kMajorTick, false);
+    }
+    globals()->confirmed = true;
+    copy_world(&g, ahead);
+}
+
 void GamePlay::play_turn() {
+    uint32_t turn = turn_at(g.time);
+    if (!_session || (turn > _sampled_through)) {
+        if (!_input_source->get(g.admiral, g.time, _player_ship)) {
+            g.game_over    = true;
+            g.game_over_at = g.time;
+        }
+    }
     if (!_session) {
-        _player_ship.execute(g.admiral, _player_ship.commands());
+        _player_ship.execute(g.admiral, _player_ship.sample());
         return;
     }
-    uint32_t turn = turn_at(g.time);
-    _session->submit(turn, to_turn(_player_ship.commands()));
-    std::vector<net::Lockstep::Turn> turns = _session->take(turn);
-    for (int i = 0; i < turns.size(); ++i) {
-        _player_ship.execute(Handle<Admiral>(i), from_turn(turns[i]));
+
+    if (turn > _sampled_through) {
+        _session->submit(turn, to_turn(_player_ship.sample()));
+        _sampled_through = turn;
+    }
+    for (int i = 0; i < net::kSessionPlayers; ++i) {
+        // A player whose input hasn't arrived keeps holding the same controls.
+        sfz::optional<net::Rollback::Turn> commands = _session->known(i, turn);
+        _player_ship.execute(
+                Handle<Admiral>(i),
+                commands.has_value() ? from_turn(*commands) : std::vector<PlayerEvent>{});
+    }
+}
+
+// Advances tail through each turn that every player's input has reached, then predicts head from
+// tail to `units` past where head was.
+void GamePlay::play_net(ticks units) {
+    double lead = static_cast<double>(turn_at(_frontier)) - _session->confirmed();
+    _lead += (lead - _lead) *
+             std::min(1.0, static_cast<double>(units.count()) / kLeadWindow.count());
+    _session->set_lead(static_cast<int32_t>(std::lround(_lead)));
+    if ((_lead - _session->peer_lead()) > 1) {
+        _since_slowed += units;
+        if (_since_slowed >= kSlowEvery) {
+            _since_slowed -= kSlowEvery;
+            units -= kMinorTick;
+        }
+    }
+
+    game_ticks target = _frontier + units;
+    game_ticks limit  = turn_start(_session->confirmed() + kRollbackTurns);
+    if (target > limit) {
+        target = std::max(limit, _frontier);
+        if (!_stalled_since.has_value()) {
+            _stalled_since.emplace(now());
+        }
+        _real_time = now();
+    } else {
+        _stalled_since = sfz::nullopt;
+    }
+    units = target - _frontier;
+    if (units <= ticks(0)) {
+        return;
+    }
+
+    move_stars(units);
+
+    copy_world(&g, tail);
+    while (turn_at(g.time) < _session->confirmed()) {
+        game_ticks next = turn_start(turn_at(g.time) + 1);
+        if (next > target) {
+            break;
+        }
+        simulate_to(next);
+        _session->sync(turn_at(g.time), g.sync);
+        _session->confirm(turn_at(g.time));
+        if (rollback_test.log.has_value()) {
+            rollback_test.log->format(
+                    "{0}\t{1}\n", g.time.time_since_epoch().count(), world_hash());
+        }
+        if (rollback_test.last_turn && (turn_at(g.time) >= rollback_test.last_turn)) {
+            g.game_over    = true;
+            g.game_over_at = g.time;
+            break;
+        }
+    }
+    copy_world(&tail, g);
+
+    globals()->confirmed = false;
+    simulate_to(target);
+    globals()->confirmed = true;
+    _frontier            = target;
+
+    update_display(units);
+}
+
+// One minor tick at a time, so that every player's world runs the same steps however their frames
+// fall.
+void GamePlay::simulate_to(game_ticks at) {
+    while (g.time < at) {
+        simulate(kMinorTick, true);
     }
 }
 
 void GamePlay::end_net_game(pn::string_view message) {
     *_game_result = QUIT_GAME;
-    _state        = DEBRIEFING;
+    if (rollback_test.last_turn) {
+        // No one is there to dismiss the debriefing.
+        pn::err.format("{0}\n", message);
+        stack()->pop(this);
+        return;
+    }
+    _state = DEBRIEFING;
     stack()->push(new DebriefingScreen(message));
 }
 

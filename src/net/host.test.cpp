@@ -98,6 +98,30 @@ TEST_F(HostTest, Loopback) {
     EXPECT_EQ(guest, e.peer);
 }
 
+TEST_F(HostTest, Delay) {
+    Node server{Host::listen("127.0.0.1", 0, 1)};
+    ASSERT_TRUE(server.host);
+    Node client{Host::connect("127.0.0.1", server.host->port())};
+    ASSERT_TRUE(client.host);
+    ASSERT_EQ(Host::Event::CONNECT, next(&server, &client).type);
+    ASSERT_EQ(Host::Event::CONNECT, next(&client, &server).type);
+
+    client.host->set_delay(std::chrono::milliseconds(100), std::chrono::milliseconds(50), 7);
+    auto sent = std::chrono::steady_clock::now();
+    for (uint32_t i = 0; i < 10; ++i) {
+        Packet p;
+        p.type        = Packet::TURNS;
+        p.turns.first = i;
+        server.host->broadcast(RELIABLE, p);
+    }
+    for (uint32_t i = 0; i < 10; ++i) {
+        Host::Event e = next(&client, &server);
+        ASSERT_EQ(Host::Event::RECEIVE, e.type);
+        EXPECT_EQ(i, e.packet.turns.first);  // Reliable packets stay in order.
+    }
+    EXPECT_GE(std::chrono::steady_clock::now() - sent, std::chrono::milliseconds(50));
+}
+
 TEST_F(HostTest, NoAddress) { EXPECT_FALSE(Host::connect("", kDefaultPort)); }
 
 }  // namespace

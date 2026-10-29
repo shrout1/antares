@@ -62,13 +62,36 @@ _`predictive networking`
 ..  _input logs: log_
 ..  _desync: desynchronization_
 
-Lockstep
---------
+Implementation
+--------------
 
-The first implementation uses `pre-delay networking`_ between two
-players_.  A turn is ``kMajorTick``.  Input from turn *n* executes on
-turn *n* + ``Setup.delay`` on every node_, and a node_ waits while it
-lacks any player_'s input for the turn it is about to execute.
+The implementation uses `predictive networking`_ between two players_,
+following Protocol_ below.  A turn is ``kMajorTick``.  Input from turn
+*n* executes on turn *n* + ``Setup.delay`` on every node_.
+
+Each frame, ``GamePlay``:
+
+1. Samples local input the first time any pass reaches a turn, and
+   sends it.
+2. Advances tail_ through every turn that every player_'s input has
+   reached, comparing sync values after each.
+3. Copies tail_ to head_, and simulates head_ up to the present.  A
+   player_ whose input for a turn hasn't arrived keeps holding the same
+   controls.
+4. Updates the display once, from head_.
+
+``World`` holds everything a turn reads or changes, including each
+player_'s held controls and waiting commands, and ``copy_world()``
+copies it.  The rest of ``GlobalState`` is the local view.  The world
+is simulated one minor tick at a time, however frames fall, so that
+every node_ runs the same steps.
+
+A node_ waits if head_ gets 20 turns ahead of tail_.  Each node_ sends
+how far its head_ runs ahead of tail_, and one that runs further ahead
+than its peer_ slows its clock by 1% until they even out.  Only tail_
+can end the game.  Sounds and sparks play the first time any pass reaches a
+tick.  Messages, and the zoom and select actions, wait until a tick is
+on tail_.
 
 Packets are ``antares.pb.net.Packet`` messages (``proto/net.proto``),
 sent over ENet.  Turns go on an unreliable channel, repeating every turn
@@ -85,15 +108,15 @@ Modules
     Connects, accepts, sends, and polls.  The only module that uses
     ENet (``ext/enet``).
 
-``net/lockstep``
-    Keeps each player_'s turns, decides when the next turn may execute,
-    and compares sync values.
+``net/rollback``
+    Keeps each player_'s turns, reports which are known and which every
+    player_'s input has reached, and compares sync values.
 
 ``net/session``
     Services the connection on its own thread.  Exchanges Hello, Setup,
     Choose, Start, and Ready, rejects a peer_ with a different
     protocol, Antares version, or plugin, and routes Turns to
-    ``net/lockstep``.
+    ``net/rollback``.
 
 ``ui/screens/net-setup``
     Host or Join, Host Address, Status, and the lobby, where players
@@ -108,8 +131,18 @@ Each turn, ``PlayerShip`` turns local input into a list of
 ``PlayerEvent`` commands, and the game executes every player_'s
 commands for that turn.  Selections made with the mouse, hotkeys, or a
 gamepad become ``SELECT_OBJECT`` or ``TARGET_OBJECT``, whose data is the
-object's number.  Zooming, message paging, and hotkey assignment stay
-local.
+object's number and ID, so that a selection does nothing if its object
+is gone when it executes.  Zooming, message paging, and hotkey
+assignment stay local.
+
+Testing
+~~~~~~~
+
+``replay --world-log=FILE --look-ahead=N`` checks that copying the
+world back undoes simulating ahead.  ``net-sim`` plays two processes
+against each other over loopback, with optional ``--delay`` and
+``--jitter``, and ``scripts/test.py -t net`` requires their tail_ logs
+to match.
 
 Protocol
 --------
@@ -177,6 +210,10 @@ assume that the local and remote version of an input log are the same.
     conditions are broken on multiplayer anyway because they test
     against the local player_ and would therefore cause desync_.
 
+    No net level uses the computer, message, or zoom conditions, and
+    reading a message doesn't check conditions in a net game, as in
+    Ares.
+
 `Input logs`_ are circular buffers.  The leading edge is filled either
 through local input or from the network.  The trailing edge is trimmed
 of any information that tail_ and all peers_ have been updated with.
@@ -199,6 +236,9 @@ intended heading of the ship is what will cause problems; thrust,
 weapons, and warp state can all probably be assumed to be unchanged
 without further input.
 
+Antares assumes held controls are unchanged, including the direction a
+gamepad stick steers toward, and that no other commands are given.
+
 Stableness
 ~~~~~~~~~~
 
@@ -208,6 +248,9 @@ global random number generator, which means that it's likely that remote
 events will result in a different identifier.  We need stable
 identifiers to use instead of ID; probably, the tuple `(basetype,
 creation_time)` is sufficient.
+
+Antares sends an object's number and ID, which agree on every node_'s
+tail_, and the command does nothing if they no longer match.
 
 Pausing
 -------
@@ -229,12 +272,17 @@ We could go a few ways on this:
 
 Honestly, the first option seems best.
 
+Antares takes the first option.
+
 Sounds
 ------
 
 Do we only consider head_ for sounds, or do we try to track remote
 changes?  The latter seems hard, and maybe not even possible with the
 OpenAL API.
+
+Antares considers only head_: a sound plays the first time any pass
+reaches its tick, and isn't repeated when head_ is rebuilt.
 
 Malice
 ------
@@ -254,5 +302,7 @@ Replays
 
 The `input logs`_ in a game have all the information we need to make a
 replay, so we should implement them as such.
+
+Net replays aren't recorded yet.
 
 ..  -*- tab-width: 3; fill-column: 72 -*-

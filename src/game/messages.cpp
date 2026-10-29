@@ -215,16 +215,11 @@ void Messages::draw_long_message(ticks time_pass) {
     longMessageType* m = long_message_data;
 
     if (m->was_updated()) {
-        // TODO(sfiera): figure out what this meant.
-        //
-        // we check scenario conditions here for ambrosia tutorial
-        // but not during net game -- other players wouldn't care what message
-        // we were looking at
-        //
-        // if ( !(globals()->gOptions & kOptionNetworkOn))
-        // {
-        CheckLevelConditions();
-        // }
+        // The tutorials check conditions on the message being read. Other players in a net game
+        // can't know which message that is.
+        if (g.level->type() != Level::Type::NET) {
+            CheckLevelConditions();
+        }
 
         if (m->had_current() && m->lastLabelMessage) {
             m->labelMessageID->set_age(kMinorTick);

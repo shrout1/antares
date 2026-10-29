@@ -19,6 +19,7 @@
 #include "net/host.hpp"
 
 #include <enet/enet.h>
+#include <algorithm>
 #include <stdexcept>
 
 namespace antares {
@@ -103,12 +104,73 @@ std::unique_ptr<Host> Host::connect(pn::string_view address, uint16_t port) {
 uint16_t Host::port() const { return _host->address.port; }
 
 bool Host::poll(usecs timeout, Event* event) {
+    if ((_delay.count() == 0) && (_jitter.count() == 0) && _held.empty()) {
+        return receive(timeout, event, nullptr);
+    }
+
+    const clock::time_point deadline = clock::now() + timeout;
+    while (true) {
+        Event e;
+        bool  ordered;
+        while (receive(usecs(0), &e, &ordered)) {
+            hold(std::move(e), ordered);
+        }
+
+        const clock::time_point now  = clock::now();
+        auto                    next = _held.end();
+        for (auto it = _held.begin(); it != _held.end(); ++it) {
+            if ((next == _held.end()) || (it->at < next->at)) {
+                next = it;
+            }
+        }
+        if ((next != _held.end()) && (next->at <= now)) {
+            *event = std::move(next->event);
+            _held.erase(next);
+            return true;
+        } else if (now >= deadline) {
+            return false;
+        }
+
+        clock::time_point until = deadline;
+        if (next != _held.end()) {
+            until = std::min(until, next->at);
+        }
+        if (receive(std::chrono::duration_cast<usecs>(until - now), &e, &ordered)) {
+            hold(std::move(e), ordered);
+        }
+    }
+}
+
+void Host::set_delay(
+        std::chrono::milliseconds delay, std::chrono::milliseconds jitter, uint32_t seed) {
+    _delay  = delay;
+    _jitter = jitter;
+    _seed   = seed;
+}
+
+void Host::hold(Event event, bool ordered) {
+    clock::time_point at = clock::now() + _delay;
+    if (_jitter.count() > 0) {
+        _seed = (_seed * 1103515245) + 12345;
+        at += std::chrono::milliseconds((_seed >> 8) % (2 * _jitter.count() + 1)) - _jitter;
+    }
+    if (ordered) {
+        at          = std::max(at, _ordered_at);
+        _ordered_at = at;
+    }
+    _held.push_back(Held{at, std::move(event)});
+}
+
+bool Host::receive(usecs timeout, Event* event, bool* ordered) {
     enet_uint32 ms = std::chrono::duration_cast<std::chrono::milliseconds>(timeout).count();
     ENetEvent   e;
     while (enet_host_service(_host.get(), &e, ms) > 0) {
         ms          = 0;
         *event      = Event{};
         event->peer = e.peer - _host->peers;
+        if (ordered) {
+            *ordered = (e.type != ENET_EVENT_TYPE_RECEIVE) || (e.channelID == RELIABLE);
+        }
         switch (e.type) {
             case ENET_EVENT_TYPE_CONNECT: event->type = Event::CONNECT; return true;
             case ENET_EVENT_TYPE_DISCONNECT: event->type = Event::DISCONNECT; return true;

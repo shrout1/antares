@@ -20,6 +20,8 @@
 #define ANTARES_NET_HOST_HPP_
 
 #include <stdint.h>
+#include <chrono>
+#include <deque>
 #include <memory>
 #include <pn/string>
 
@@ -72,14 +74,33 @@ class Host {
     void broadcast(Channel channel, const Packet& packet);
     void disconnect(int peer);
 
+    // For testing: poll() holds each event for `delay`, give or take up to `jitter`, after it
+    // arrives.  Events keep their order, except for packets on the unreliable channel.
+    void set_delay(
+            std::chrono::milliseconds delay, std::chrono::milliseconds jitter, uint32_t seed);
+
   private:
+    typedef std::chrono::steady_clock clock;
+
     struct Deleter {
         void operator()(_ENetHost* host) const;
+    };
+    struct Held {
+        clock::time_point at;
+        Event             event;
     };
 
     explicit Host(_ENetHost* host);
 
+    bool receive(usecs timeout, Event* event, bool* ordered);
+    void hold(Event event, bool ordered);
+
     std::unique_ptr<_ENetHost, Deleter> _host;
+    std::chrono::milliseconds           _delay{0};
+    std::chrono::milliseconds           _jitter{0};
+    uint32_t                            _seed = 0;
+    std::deque<Held>                    _held;
+    clock::time_point                   _ordered_at;  // When the last ordered event is released.
 };
 
 }  // namespace net

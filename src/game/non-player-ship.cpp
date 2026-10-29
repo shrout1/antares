@@ -795,7 +795,9 @@ uint32_t ThinkObjectWarpInPresence(Handle<SpaceObject> anObject) {
     presence.progress += kMajorTick;
     for (int i = 0; i < 4; ++i) {
         if ((presence.step == i) && (presence.progress > ticks(25 * i))) {
-            sys.sound.warp(i, anObject);
+            if (show_effects()) {
+                sys.sound.warp(i, anObject);
+            }
             ++presence.step;
             break;
         }
@@ -1330,7 +1332,7 @@ void HitObject(Handle<SpaceObject> anObject, Handle<SpaceObject> sObject) {
     }
 
     if (anObject->health() < 0 && (anObject->owner == g.admiral) &&
-        (anObject->attributes & kCanAcceptDestination)) {
+        (anObject->attributes & kCanAcceptDestination) && confirmed()) {
         int count = CountObjectsOfBaseType(anObject->base, anObject->owner) - 1;
         Messages::add(pn::format(
                 sys.messages.at(kShipDestroyedString).c_str(), anObject->long_name(), count));

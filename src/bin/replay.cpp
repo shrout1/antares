@@ -54,6 +54,9 @@ namespace path = sfz::path;
 namespace antares {
 namespace {
 
+sfz::optional<pn::string> world_log;
+int                       look_ahead = 0;
+
 class ReplayMaster : public Card {
   public:
     ReplayMaster(pn::input_view in, const sfz::optional<pn::string>& plugin_path,
@@ -73,6 +76,14 @@ class ReplayMaster : public Card {
             case NEW:
                 _state = REPLAY;
                 init();
+                if (world_log.has_value()) {
+                    const Level& level = *Level::get(_replay_data.chapter_id);
+                    if (look_ahead && uses_local_conditions(level)) {
+                        pn::out.write("level has local conditions; not looking ahead\n");
+                        look_ahead = 0;
+                    }
+                    set_rollback_test(*world_log, look_ahead);
+                }
                 Randomize(4);  // For the decision to replay intro.
                 _game_result  = NO_GAME;
                 g.random.seed = _random_seed;
@@ -157,6 +168,9 @@ void usage(pn::output_view out, pn::string_view progname, int retcode) {
             "\n    -h, --height=HEIGHT  screen height (default: 480)"
             "\n    -t, --text           produce text output"
             "\n    -s, --smoke          run as smoke text"
+            "\n        --world-log=FILE write a line per major tick identifying the world"
+            "\n        --look-ahead=TURNS"
+            "\n                         simulate ahead and copy the world back each major tick"
             "\n        --opengl=2.0|3.2 select OpenGL version (default: 3.2)"
             "\n        --help           display this help screen"
             "\n",
@@ -214,6 +228,12 @@ void main(int argc, char* const* argv) {
             return callbacks.short_option(pn::rune{'t'}, get_value);
         } else if (opt == "smoke") {
             return callbacks.short_option(pn::rune{'s'}, get_value);
+        } else if (opt == "world-log") {
+            world_log.emplace(get_value().copy());
+            return true;
+        } else if (opt == "look-ahead") {
+            sfz::args::integer_option(get_value(), &look_ahead);
+            return true;
         } else if (opt == "opengl") {
             if (get_value() == "2.0") {
                 gl_version   = {2, 0};
@@ -240,6 +260,9 @@ void main(int argc, char* const* argv) {
 
     if (output_dir.has_value()) {
         sfz::makedirs(*output_dir, 0755);
+    }
+    if (look_ahead && !world_log.has_value()) {
+        throw std::runtime_error("--look-ahead requires --world-log");
     }
 
     Preferences preferences;

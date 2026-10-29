@@ -11,6 +11,7 @@ import io
 import multiprocessing.pool
 import os
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -27,14 +28,14 @@ WINE_TESTS = [
     "editable-text-test",
     "fixed-test",
     "object-data",
-    "lockstep-test",
+    "rollback-test",
     "packet-test",
     "shapes",
     "tint",
 ]
 
 
-def run(opts, queue, name, cmd):
+def command(opts, cmd):
     if cmd[0].startswith("out/cur/") and not os.path.islink("out/cur"):
         with open("out/cur") as f:
             cur = f.read().strip()
@@ -42,7 +43,11 @@ def run(opts, queue, name, cmd):
     if opts.wine and cmd[0].startswith("out/cur/"):
         cmd[0] += ".exe"
         cmd.insert(0, "wine")
-    sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    return cmd
+
+
+def run(opts, queue, name, cmd):
+    sub = subprocess.Popen(command(opts, cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output, _ = sub.communicate()
     if sub.returncode != 0:
         print(
@@ -93,7 +98,88 @@ def replay_test(opts, queue, name, args=[]):
         expected = "test/smoke/%s" % name
     else:
         expected = "test/%s" % name
-    return diff_test(opts, queue, name, cmd + args, expected)
+    with NamedTemporaryDir() as d:
+        log = os.path.join(d, "world.log")
+        return diff_test(
+            opts, queue, name, cmd + args + ["--world-log=%s" % log], expected
+        ) and rollback_test(opts, queue, name, log)
+
+
+def rollback_test(opts, queue, name, expected_log):
+    # Simulating ahead and copying the world back must not change the game.
+    with NamedTemporaryDir() as d:
+        log = os.path.join(d, "world.log")
+        cmd = ["out/cur/replay", "test/%s.NLRP" % name, "--smoke", "--look-ahead=2"]
+        if not run(opts, queue, name, cmd + ["--world-log=%s" % log]):
+            return False
+        with open(expected_log) as f:
+            expected = f.readlines()
+        with open(log) as f:
+            actual = f.readlines()
+    for x, y in zip(expected, actual):
+        if x != y:
+            print("%s: world differs at tick %s after looking ahead" % (name, x.split()[0]))
+            return False
+    if len(expected) != len(actual):
+        print("%s: %d ticks after looking ahead, not %d" % (name, len(actual), len(expected)))
+        return False
+    return True
+
+
+def net_sim_test(opts, queue, name, level, seed, delay, jitter):
+    # Both players must see the same world, at loopback speed and with a slow link.
+    logs = []
+    with NamedTemporaryDir() as d:
+        for link in [(0, 0), (delay, jitter)]:
+            logs.append(net_sim_pair(opts, queue, name, d, level, seed, *link))
+            if logs[-1] is None:
+                return False
+    host, join = logs[0]
+    for kind, actual in [("joining", join), ("slow", logs[1][0]), ("slow joining", logs[1][1])]:
+        for x, y in zip(host, actual):
+            if x != y:
+                print("%s: %s world differs at tick %s" % (name, kind, x.split()[0]))
+                return False
+        if len(actual) != len(host):
+            print("%s: %d turns for %s, not %d" % (name, len(actual), kind, len(host)))
+            return False
+    return True
+
+
+def net_sim_pair(opts, queue, name, d, level, seed, delay, jitter):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    cmds, logs = [], []
+    for role in ["host", "join"]:
+        log = os.path.join(d, "%s-%d-%s.log" % (role, delay, name))
+        logs.append(log)
+        cmds.append(
+            [
+                "out/cur/net-sim",
+                "--%s=%d" % (role, port),
+                "--level=%s" % level,
+                "--seed=%d" % seed,
+                "--delay=%d" % delay,
+                "--jitter=%d" % jitter,
+                "--world-log=%s" % log,
+            ]
+        )
+    host = subprocess.Popen(
+        command(opts, cmds[0]), stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    joined = run(opts, queue, name, cmds[1])
+    output, _ = host.communicate()
+    if host.returncode != 0:
+        print("net-sim host failed:\n%s" % output.decode("utf-8", errors="replace"))
+        return None
+    if not joined:
+        return None
+    result = []
+    for log in logs:
+        with open(log) as f:
+            result.append(f.readlines())
+    return result
 
 
 def call(args):
@@ -139,7 +225,7 @@ def main():
         print("test data submodule is missing; fetching it")
         subprocess.check_call("git submodule update --init test".split())
 
-    test_types = "unit data offscreen replay".split()
+    test_types = "unit data offscreen replay net".split()
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--wine", action="store_true")
@@ -159,7 +245,7 @@ def main():
         (unit_test, opts, queue, "editable-text-test"),
         (unit_test, opts, queue, "fixed-test"),
         (unit_test, opts, queue, "host-test"),
-        (unit_test, opts, queue, "lockstep-test"),
+        (unit_test, opts, queue, "rollback-test"),
         (unit_test, opts, queue, "packet-test"),
         (unit_test, opts, queue, "session-test"),
         (data_test, opts, queue, "build-pix", ["--text"]),
@@ -187,6 +273,8 @@ def main():
         (replay_test, opts, queue, "while-the-iron-is-hot"),
         (replay_test, opts, queue, "yo-ho-ho"),
         (replay_test, opts, queue, "you-should-have-seen-the-one-that-got-away"),
+        (net_sim_test, opts, queue, "net-sim-net1", "net1", 1, 100, 40),
+        (net_sim_test, opts, queue, "net-sim-net3", "net3", 2, 250, 100),
     ]
 
     if opts.test:
@@ -205,6 +293,8 @@ def main():
             tests = [t for t in tests if t[0] != offscreen_test]
         if "replay" not in opts.type:
             tests = [t for t in tests if t[0] != replay_test]
+        if "net" not in opts.type:
+            tests = [t for t in tests if t[0] != net_sim_test]
 
     if opts.wine:
         tests = [t for t in tests if t[3] in WINE_TESTS]

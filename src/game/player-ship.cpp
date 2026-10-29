@@ -59,6 +59,10 @@ namespace {
 // const int32_t kSendMessageVOffset = 20;
 const int32_t kCursorBoundsSize = 16;  // should be same in instruments.c
 
+// The data of a SELECT_OBJECT or TARGET_OBJECT command: the object's number and its ID, so that
+// the command does nothing if another object has taken the number by the time it executes.
+int32_t selection(Handle<SpaceObject> o) { return (o->id * kMaxSpaceObject) + o.number(); }
+
 }  // namespace
 
 const static ticks kKlaxonInterval      = ticks(125);
@@ -138,7 +142,6 @@ PlayerShip::PlayerShip()
         : _gamepad_keys(0),
           _sent_gamepad_keys(0),
           _sent_steer(-1),
-          _pilots(kMaxPlayerNum),
           _gamepad_state(NO_BUMPER),
           _control_active(false),
           _control_direction(0) {}
@@ -574,7 +577,7 @@ void PlayerShip::gamepad_button_down(const GamepadButtonDownEvent& event) {
             case Gamepad::Button::LSB:
                 if (_gamepad_state & TARGET_BUMPER) {
                     _player_events.push_back(
-                            PlayerEvent{PlayerEventType::TARGET_OBJECT, player.number()});
+                            PlayerEvent{PlayerEventType::TARGET_OBJECT, selection(player)});
                 } else {
                     _player_events.push_back(PlayerEvent{PlayerEventType::TRANSFER});
                 }
@@ -699,7 +702,7 @@ void PlayerShip::pick(PlayerEventType type, int32_t direction) {
     if (o.get()) {
         _player_events.push_back(PlayerEvent{
                 targets(type) ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
-                o.number()});
+                selection(o)});
     }
 }
 
@@ -732,7 +735,7 @@ static sfz::optional<PlayerEvent> use_hotkey(int i, bool target) {
             target = target || (o->owner != g.admiral);
             return sfz::make_optional(PlayerEvent{
                     target ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
-                    o.number()});
+                    selection(o)});
         } else {
             globals()->hotKey[i].object = SpaceObject::none();
         }
@@ -744,9 +747,9 @@ static void handle_selections(Handle<Admiral> adm, const std::vector<PlayerEvent
     for (const auto& e : player_events) {
         if (((e.type == PlayerEventType::SELECT_OBJECT) ||
              (e.type == PlayerEventType::TARGET_OBJECT)) &&
-            (0 <= e.data) && (e.data < kMaxSpaceObject)) {
-            Handle<SpaceObject> o(e.data);
-            if (o->active) {
+            (0 <= e.data)) {
+            Handle<SpaceObject> o(e.data % kMaxSpaceObject);
+            if (o->active && (o->id == (e.data / kMaxSpaceObject))) {
                 select_object(o, e.type == PlayerEventType::TARGET_OBJECT, adm);
             }
         }
@@ -818,7 +821,7 @@ static void sound_klaxon() {
     }
 }
 
-std::vector<PlayerEvent> PlayerShip::commands() {
+std::vector<PlayerEvent> PlayerShip::sample() {
     std::vector<PlayerEvent> commands;
     if (_message.editing()) {
         _player_events.clear();
@@ -879,23 +882,24 @@ std::vector<PlayerEvent> PlayerShip::commands() {
 }
 
 void PlayerShip::execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& commands) {
-    Pilot& pilot = _pilots[adm.number()];
-    pilot.events.insert(pilot.events.end(), commands.begin(), commands.end());
+    Pilot&                    pilot  = g.pilots[adm.number()];
+    std::vector<PlayerEvent>& events = pilot.events;
+    events.insert(events.end(), commands.begin(), commands.end());
 
     if (!adm->flagship().get()) {
         return;
     }
 
-    for (auto it = pilot.events.rbegin(); it != pilot.events.rend(); ++it) {
+    for (auto it = events.rbegin(); it != events.rend(); ++it) {
         if (it->type == PlayerEventType::CLEAR) {
-            pilot.events.erase(pilot.events.begin(), it.base());
+            events.erase(events.begin(), it.base());
             pilot.keys = 0;
             break;
         }
     }
 
     uint32_t& keys = pilot.keys;
-    for (auto e : pilot.events) {
+    for (auto e : events) {
         switch (e.type) {
             case PlayerEventType::ACCEL_ON: keys |= (kUpKey & ~g.key_mask); break;
             case PlayerEventType::DECEL_ON: keys |= (kDownKey & ~g.key_mask); break;
@@ -936,26 +940,26 @@ void PlayerShip::execute(Handle<Admiral> adm, const std::vector<PlayerEvent>& co
     if (!flagship->active) {
         return;
     }
-    if (adm == g.admiral) {
+    if ((adm == g.admiral) && confirmed()) {
         sound_klaxon();
     }
     if (!(flagship->attributes & kIsPlayerShip)) {
         return;
     }
 
-    for (auto e : pilot.events) {
+    for (auto e : events) {
         if (e.type == PlayerEventType::MINI_TRANSFER) {
             transfer_control(adm);
         }
     }
-    handle_destination_key(adm, pilot.events);
-    handle_selections(adm, pilot.events);
-    handle_target_keys(adm, pilot.events);
+    handle_destination_key(adm, events);
+    handle_selections(adm, events);
+    handle_target_keys(adm, events);
     handle_pilot_keys(flagship, keys, pilot.gamepad_keys, pilot.steer);
-    handle_order_key(adm, pilot.events);
-    handle_autopilot_keys(adm, pilot.events);
+    handle_order_key(adm, events);
+    handle_autopilot_keys(adm, events);
 
-    pilot.events.clear();
+    events.clear();
 }
 
 std::vector<pn::string> PlayerShip::take_messages() {
@@ -1049,7 +1053,7 @@ void PlayerShip::click(Point where, int button) {
             if (selectShipNum.get()) {
                 _player_events.push_back(PlayerEvent{
                         target ? PlayerEventType::TARGET_OBJECT : PlayerEventType::SELECT_OBJECT,
-                        selectShipNum.number()});
+                        selection(selectShipNum)});
             }
         }
     }
@@ -1100,13 +1104,15 @@ void ChangePlayerShipNumber(Handle<Admiral> adm, Handle<SpaceObject> newShip) {
 void TogglePlayerAutoPilot(Handle<SpaceObject> flagship) {
     if (flagship->attributes & kOnAutoPilot) {
         flagship->attributes &= ~kOnAutoPilot;
-        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip)) {
+        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip) &&
+            confirmed()) {
             Messages::autopilot(false);
         }
     } else {
         SetObjectDestination(flagship);
         flagship->attributes |= kOnAutoPilot;
-        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip)) {
+        if ((flagship->owner == g.admiral) && (flagship->attributes & kIsPlayerShip) &&
+            confirmed()) {
             Messages::autopilot(true);
         }
     }
@@ -1119,7 +1125,7 @@ void PlayerShipGiveCommand(Handle<Admiral> whichAdmiral) {
 
     if (control.get()) {
         SetObjectDestination(control);
-        if (whichAdmiral == g.admiral) {
+        if ((whichAdmiral == g.admiral) && show_effects()) {
             sys.sound.order();
         }
     }
