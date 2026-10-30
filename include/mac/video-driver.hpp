@@ -41,7 +41,7 @@ class CocoaVideoDriver : public OpenGlVideoDriver {
 
     virtual Size  viewport_size() const { return _layout.viewport_size(); }
     virtual Rect  viewport_rect() const { return _layout.viewport_rect(); }
-    virtual bool  resolution_supported(Size resolution) const;
+    virtual bool  resolution_supported(Size resolution, bool fullscreen) const;
     virtual Size  largest_display() const;
     virtual Size  screen_size() const { return _layout.screen_size(); }
     virtual int   scale() const { return _layout.pixel_ratio(); }

@@ -101,7 +101,7 @@ Point CocoaVideoDriver::get_mouse() {
 
 // Whole multiples of 640x480 that fit the display, or in a window, that fit with the title bar
 // beside the menu bar and dock, so that the window isn't shrunk.
-bool CocoaVideoDriver::resolution_supported(Size resolution) const {
+bool CocoaVideoDriver::resolution_supported(Size resolution, bool fullscreen) const {
     if (!Layout::whole_resolution(resolution)) {
         return false;
     }
@@ -109,7 +109,7 @@ bool CocoaVideoDriver::resolution_supported(Size resolution) const {
         return true;
     }
     Size area;
-    if (sys.prefs->fullscreen()) {
+    if (fullscreen) {
         antares_window_display_size(_window, &area.width, &area.height);
     } else {
         antares_window_work_area_size(_window, &area.width, &area.height);
@@ -135,9 +135,8 @@ bool CocoaVideoDriver::update_size() {
     }
     _resolution = sys.prefs->resolution();
     _game_scale = sys.prefs->game_scale();
-    _layout.update(
-            window, framebuffer, resolution_supported(_resolution) ? _resolution : Size{},
-            _game_scale);
+    const bool supported = resolution_supported(_resolution, sys.prefs->fullscreen());
+    _layout.update(window, framebuffer, supported ? _resolution : Size{}, _game_scale);
     return true;
 }
 
@@ -149,7 +148,7 @@ void CocoaVideoDriver::fit_window() {
         return;
     }
     const Size resolution = sys.prefs->resolution();
-    if (resolution.as_rect().empty() || !resolution_supported(resolution)) {
+    if (resolution.as_rect().empty() || !resolution_supported(resolution, false)) {
         antares_window_unfit(_window);
         return;
     }

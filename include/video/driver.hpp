@@ -62,8 +62,8 @@ class VideoDriver {
     virtual Point convert(Point p, Region from, Region to) const { return p; }
     // The part of `region` that is on screen, in its points.
     virtual Rect visible_rect(Region region) const { return screen_size().as_rect(); }
-    // False for a fixed resolution bigger than the display.
-    virtual bool resolution_supported(Size resolution) const { return true; }
+    // False for a fixed resolution bigger than the display, in fullscreen or in a window.
+    virtual bool resolution_supported(Size resolution, bool fullscreen) const { return true; }
     // The size of the largest display, in pixels.
     virtual Size largest_display() const { return screen_size(); }
 
