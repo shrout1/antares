@@ -83,7 +83,7 @@ class VideoControlScreen : public InterfaceScreen {
     OptionsScreen::State* const _state;
     std::vector<pn::string>     _game_scale_labels;  // as in the interface, without the ratio
     wall_time                   _next_label_update;
-    std::vector<Size>           _resolutions;  // "Fill Screen" (empty), then multiples of 640x480.
+    std::vector<Size>           _resolutions;  // multiples of 640x480, maybe then "Fill Screen".
     int                         _top    = 0;   // first resolution shown.
     double                      _scroll = 0;   // part of a row scrolled, but not yet shown.
 };

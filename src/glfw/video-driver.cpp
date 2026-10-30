@@ -197,9 +197,8 @@ void GLFWVideoDriver::update_size() {
     glfwGetFramebufferSize(_window, &framebuffer.width, &framebuffer.height);
     _resolution = sys.prefs->resolution();
     _game_scale = sys.prefs->game_scale();
-    _layout.update(
-            window, framebuffer, resolution_supported(_resolution) ? _resolution : Size{},
-            _game_scale);
+    const bool supported = resolution_supported(_resolution, sys.prefs->fullscreen());
+    _layout.update(window, framebuffer, supported ? _resolution : Size{}, _game_scale);
     _window_size = _layout.window_size();
 }
 
@@ -226,7 +225,7 @@ void GLFWVideoDriver::fit_window() {
         return;
     }
     const Size resolution = sys.prefs->resolution();
-    if (resolution.as_rect().empty() || !resolution_supported(resolution)) {
+    if (resolution.as_rect().empty() || !resolution_supported(resolution, false)) {
         fix_window_size(_window, nullptr);
         return;
     }
@@ -283,7 +282,7 @@ Rect GLFWVideoDriver::work_area(Rect* frame) const {
 
 // Whole multiples of 640x480 that fit the display, or in a window, that fit with the window's
 // frame beside any taskbar or dock, so that the window isn't shrunk.
-bool GLFWVideoDriver::resolution_supported(Size resolution) const {
+bool GLFWVideoDriver::resolution_supported(Size resolution, bool fullscreen) const {
     if (!Layout::whole_resolution(resolution)) {
         return false;
     }
@@ -291,7 +290,7 @@ bool GLFWVideoDriver::resolution_supported(Size resolution) const {
     if (!mode) {
         return true;
     }
-    if (sys.prefs->fullscreen() || !_window) {
+    if (fullscreen || !_window) {
         return (resolution.width <= mode->width) && (resolution.height <= mode->height);
     }
     Rect       frame;
